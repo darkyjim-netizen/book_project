@@ -2,13 +2,23 @@
 
 import os
 
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException
+from app.core.api_errors import http_error, validation_error
+
 from dotenv import load_dotenv
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.core.config import cors_origins
 from starlette.middleware.sessions import SessionMiddleware
 
-from app import models
+from app.auth import auth_router, session_router
 from app.database import Base, engine
-from app.routers import admin, auth, members
+from app.models.category_model import Category
+from app.routers import (
+    admin_dashboard_router, admin_members_router, ai_router, cart_router,
+    orders_router, products_router, profile_router,
+)
 
 load_dotenv()  # .env 파일에서 환경 변수를 로드합니다.
 
@@ -18,6 +28,11 @@ app = FastAPI(
     description="회원 CRUD, 세션 로그인, 관리자 권한 실습",
     version="1.0.0",
 )
+
+origins = cors_origins()
+if origins:
+    app.add_middleware(CORSMiddleware, allow_origins=origins, allow_credentials=True,
+                       allow_methods=["*"], allow_headers=["*"])
 
 session_secret = os.getenv("SESSION_SECRET")
 
@@ -45,9 +60,31 @@ app.add_middleware(
 Base.metadata.create_all(bind=engine)
 
 # 각 도메인별 라우터(인증, 회원, 관리자)를 애플리케이션에 등록합니다.
-app.include_router(auth.router)
-app.include_router(members.router)
-app.include_router(admin.router)
+app.add_exception_handler(HTTPException, http_error)
+app.add_exception_handler(RequestValidationError, validation_error)
+
+for module in (
+    session_router, profile_router, admin_members_router, auth_router, products_router,
+    cart_router, orders_router, ai_router, admin_dashboard_router,
+):
+    app.include_router(module.router)
+
+
+default_openapi = app.openapi
+
+
+def api_openapi():
+    schema = default_openapi()
+    for path, methods in schema["paths"].items():
+        if path.startswith("/api/"):
+            for operation in methods.values():
+                responses = operation["responses"]
+                if responses.pop("422", None):
+                    responses.setdefault("400", {"description": "INVALID_INPUT_VALUE"})
+    return schema
+
+
+app.openapi = api_openapi
 
 
 # 서버의 기본 안내 메시지와 문서 링크를 반환하는 루트 엔드포인트입니다.

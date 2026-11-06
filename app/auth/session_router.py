@@ -1,14 +1,14 @@
-# app/routers/auth.py
+# app/auth/session_router.py
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.dependencies import get_current_member
-from app.models import Member
-from app.schemas import LoginRequest, MemberCreate, MemberResponse
-from app.security import verify_password
-from app.services.members import (
+from app.auth.session_dependencies import get_current_member
+from app.models.user_model import Member
+from app.routers.member_schemas import LoginRequest, MemberCreate, MemberResponse
+from app.core.security import verify_password
+from app.crud.user_crud import (
     create_member,
     get_member_by_username,
 )

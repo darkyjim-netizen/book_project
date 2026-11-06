@@ -1,4 +1,4 @@
-# app/routers/members.py
+# app/routers/profile_router.py
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select
@@ -6,9 +6,9 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.dependencies import get_current_member
-from app.models import Member
-from app.schemas import MemberResponse, MemberUpdate
+from app.auth.session_dependencies import get_current_member
+from app.models.user_model import Member
+from app.routers.member_schemas import MemberResponse, MemberUpdate
 
 router = APIRouter(prefix="/members", tags=["회원"])
 

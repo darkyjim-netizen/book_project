@@ -1,18 +1,18 @@
-# app/routers/admin.py
+# app/routers/admin_members_router.py
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.dependencies import require_admin
-from app.models import Member
-from app.schemas import (
+from app.auth.session_dependencies import require_admin
+from app.models.user_model import Member
+from app.routers.member_schemas import (
     AdminMemberUpdate,
     MemberListResponse,
     MemberResponse,
 )
-from app.services.members import list_members
+from app.crud.user_crud import list_members
 
 router = APIRouter(
     prefix="/admin/members",

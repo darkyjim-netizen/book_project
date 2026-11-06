@@ -1,4 +1,4 @@
-# app/security.py
+# app/core/security.py
 
 from pwdlib import PasswordHash
 

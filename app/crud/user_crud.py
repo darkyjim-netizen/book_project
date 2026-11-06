@@ -1,11 +1,11 @@
-# app/services/members.py
+# app/crud/user_crud.py
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models import Member
-from app.schemas import MemberCreate
-from app.security import hash_password
+from app.models.user_model import Member
+from app.routers.member_schemas import MemberCreate
+from app.core.security import hash_password
 
 
 # 데이터베이스에서 사용자 아이디를 기준으로 회원 정보를 조회합니다.

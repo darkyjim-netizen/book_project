@@ -1,10 +1,10 @@
-# app/dependencies.py
+# app/auth/session_dependencies.py
 
 from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import Member
+from app.models.user_model import Member
 
 
 # 세션 정보를 기반으로 현재 로그인된 사용자를 조회하고 검증하는 의존성 함수입니다.

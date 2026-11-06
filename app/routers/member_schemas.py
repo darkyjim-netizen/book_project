@@ -1,4 +1,4 @@
-# app/schemas.py
+# app/routers/member_schemas.py
 from datetime import datetime
 from typing import Literal
 

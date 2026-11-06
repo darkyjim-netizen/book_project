@@ -4,3 +4,4 @@ psycopg2-binary
 pwdlib[argon2]
 itsdangerous
 python-dotenv
+jwt==1.4.0
