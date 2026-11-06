@@ -12,12 +12,16 @@ from app.schemas import MemberResponse, MemberUpdate
 
 router = APIRouter(prefix="/members", tags=["회원"])
 
+
+# 현재 로그인한 회원의 프로필 정보를 조회합니다.
 @router.get("/me", response_model=MemberResponse)
 def read_my_profile(
     member: Member = Depends(get_current_member),
 ):
     return member
 
+
+# 현재 로그인한 회원의 프로필 정보(이메일, 닉네임 등)를 수정합니다.
 @router.patch("/me", response_model=MemberResponse)
 def update_my_profile(
     data: MemberUpdate,
@@ -62,6 +66,8 @@ def update_my_profile(
 
     return member
 
+
+# 현재 로그인한 회원의 계정을 삭제(회원 탈퇴)하고 세션을 초기화합니다.
 @router.delete("/me")
 def delete_my_account(
     request: Request,

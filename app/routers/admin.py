@@ -1,7 +1,6 @@
 # app/routers/admin.py
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -21,6 +20,7 @@ router = APIRouter(
 )
 
 
+# 관리자 권한으로 회원 목록을 페이지네이션하여 조회
 @router.get("", response_model=MemberListResponse)
 def admin_list_members(
     page: int = 1,
@@ -44,6 +44,7 @@ def admin_list_members(
     }
 
 
+# 특정 회원의 상세 정보를 조회
 @router.get("/{member_id}", response_model=MemberResponse)
 def admin_read_member(
     member_id: int,
@@ -61,6 +62,7 @@ def admin_read_member(
     return member
 
 
+# 특정 회원의 정보를 수정, 자기 계정의 안전 장치를 검증
 @router.patch("/{member_id}", response_model=MemberResponse)
 def admin_update_member(
     member_id: int,
@@ -78,8 +80,8 @@ def admin_update_member(
 
     changes = data.model_dump(exclude_unset=True)
 
-    # 실습에서는 자기 자신의 관리자 권한을 해제하거나
-    # 자기 계정을 비활성화하는 것을 방지합니다.
+    # 자기 자신의 관리자 권한을 해제하거나
+    # 자기 계정을 비활성화하는 것을 방지
     if member.id == admin.id:
         if changes.get("role") == "member":
             raise HTTPException(
@@ -109,6 +111,7 @@ def admin_update_member(
     return member
 
 
+# 특정 회원을 삭제, 자기 자신 계정의 삭제를 방지
 @router.delete("/{member_id}")
 def admin_delete_member(
     member_id: int,
