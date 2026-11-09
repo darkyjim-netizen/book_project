@@ -28,11 +28,13 @@ def update_my_profile(
     db: Session = Depends(get_db),
     member: Member = Depends(get_current_member),
 ):
+    # 요청에 실제로 포함된 필드만 추려 수정 대상으로 사용합니다.
     changes = data.model_dump(exclude_unset=True)
 
     if "email" in changes and changes["email"] is not None:
         email = str(changes["email"])
 
+        # 다른 회원이 변경하려는 이메일을 이미 사용 중인지 조회합니다.
         duplicate = db.scalar(
             select(Member).where(
                 Member.email == email,
@@ -57,6 +59,7 @@ def update_my_profile(
     try:
         db.commit()
         db.refresh(member)
+    # 저장 중 데이터 제약 위반이 발생하면 변경을 취소하고 충돌 오류를 반환합니다.
     except IntegrityError as exc:
         db.rollback()
         raise HTTPException(

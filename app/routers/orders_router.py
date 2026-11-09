@@ -15,6 +15,7 @@ from app.routers.page_schema import PageResponse
 router = APIRouter(prefix="/api/orders", tags=["주문"])
 
 
+# 로그인한 회원의 주문을 최신순으로 페이지를 나누어 조회합니다.
 @router.get("", response_model=PageResponse[OrderResponse])
 def orders(member: Member = Depends(current_member), db: Session = Depends(get_db),
            page: int = Query(1, ge=1), size: int = Query(10, ge=1, le=100)):
@@ -24,11 +25,13 @@ def orders(member: Member = Depends(current_member), db: Session = Depends(get_d
     return {"items": items, "total": total, "page": page, "size": size}
 
 
+# 로그인한 회원의 요청으로 재고를 차감하고 주문을 생성합니다.
 @router.post("", response_model=OrderResponse, status_code=201)
 def create_order(data: OrderInput, member: Member = Depends(current_member), db: Session = Depends(get_db)):
     return place_order(db, member.id, data)
 
 
+# 주문 ID와 회원 ID를 함께 확인하여 본인의 주문만 조회합니다.
 @router.get("/{order_id}", response_model=OrderResponse)
 def get_order(order_id: int, member: Member = Depends(current_member), db: Session = Depends(get_db)):
     order = db.scalar(select(Order).where(Order.id == order_id, Order.member_id == member.id))

@@ -29,11 +29,13 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# 환경 변수에 등록된 출처가 있을 때만 교차 출처 요청을 허용합니다.
 origins = cors_origins()
 if origins:
     app.add_middleware(CORSMiddleware, allow_origins=origins, allow_credentials=True,
                        allow_methods=["*"], allow_headers=["*"])
 
+# 세션 쿠키 서명에 사용할 비밀 키를 환경 변수에서 읽습니다.
 session_secret = os.getenv("SESSION_SECRET")
 
 # 보안을 위해 세션 암호화 키가 안전하게 설정되었는지 확인하고, 미설정 시 실행을 중단합니다.
@@ -42,6 +44,7 @@ if not session_secret or session_secret == "replace-with-a-long-random-secret":
         "실제 무작위 SESSION_SECRET 값을 .env에 설정하세요."
     )
 
+# 설정값에 따라 HTTPS 연결에서만 세션 쿠키를 전송하도록 지정합니다.
 https_only = (
     os.getenv("SESSION_HTTPS_ONLY", "false").lower() == "true"
 )
@@ -63,6 +66,7 @@ Base.metadata.create_all(bind=engine)
 app.add_exception_handler(HTTPException, http_error)
 app.add_exception_handler(RequestValidationError, validation_error)
 
+# 각 모듈의 라우터를 순회하여 API 경로를 앱에 연결합니다.
 for module in (
     session_router, profile_router, admin_members_router, auth_router, products_router,
     cart_router, orders_router, ai_router, admin_dashboard_router,
@@ -70,9 +74,11 @@ for module in (
     app.include_router(module.router)
 
 
+# 기존 문서 생성 함수를 보관하여 사용자 정의 함수에서 재사용합니다.
 default_openapi = app.openapi
 
 
+# API 문서의 입력 검증 오류 응답 코드를 실제 처리 방식인 400으로 맞춥니다.
 def api_openapi():
     schema = default_openapi()
     for path, methods in schema["paths"].items():
@@ -84,6 +90,7 @@ def api_openapi():
     return schema
 
 
+# 사용자 정의 함수가 API 문서를 생성하도록 연결합니다.
 app.openapi = api_openapi
 
 

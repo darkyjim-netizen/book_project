@@ -4,6 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.database import Base
 
 
+# 도서를 분류할 카테고리 이름을 저장하는 테이블입니다.
 class Category(Base):
     __tablename__ = "categories"
 

@@ -28,6 +28,7 @@ def admin_list_members(
     db: Session = Depends(get_db),
     _admin: Member = Depends(require_admin),
 ):
+    # 페이지 번호와 페이지 크기가 허용 범위 안에 있는지 확인합니다.
     if page < 1 or size < 1 or size > 100:
         raise HTTPException(
             status_code=422,
@@ -78,6 +79,7 @@ def admin_update_member(
             detail="회원을 찾을 수 없습니다.",
         )
 
+    # 관리자가 요청에 포함한 필드만 변경 대상으로 가져옵니다.
     changes = data.model_dump(exclude_unset=True)
 
     # 자기 자신의 관리자 권한을 해제하거나
@@ -95,12 +97,14 @@ def admin_update_member(
                 detail="현재 로그인한 관리자는 직접 비활성화할 수 없습니다.",
             )
 
+    # 요청한 권한과 활성 상태를 회원 객체에 반영합니다.
     for field, value in changes.items():
         setattr(member, field, value)
 
     try:
         db.commit()
         db.refresh(member)
+    # DB 제약 조건을 위반하면 변경을 취소하고 충돌 오류를 반환합니다.
     except IntegrityError as exc:
         db.rollback()
         raise HTTPException(

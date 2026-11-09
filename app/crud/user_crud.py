@@ -33,9 +33,11 @@ def create_member(
     db: Session,
     data: MemberCreate,
 ) -> Member:
+    # 회원 생성 전에 이미 사용 중인 아이디인지 확인합니다.
     if get_member_by_username(db, data.username):
         raise ValueError("이미 사용 중인 아이디입니다.")
 
+    # 회원 생성 전에 이미 사용 중인 이메일인지 확인합니다.
     if get_member_by_email(db, str(data.email)):
         raise ValueError("이미 사용 중인 이메일입니다.")
 

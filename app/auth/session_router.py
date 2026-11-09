@@ -28,6 +28,7 @@ def register(
 ):
     try:
         return create_member(db, data)
+    # 회원 생성 시 중복 등의 검증 실패를 409 오류 응답으로 변환합니다.
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -58,6 +59,7 @@ def login(
 
     # 로그인 전 세션을 초기화하여 세션 고정 위험을 줄입니다.
     request.session.clear()
+    # 로그인한 회원 ID를 세션에 저장하여 다음 요청에서도 인증에 사용합니다.
     request.session["member_id"] = member.id
 
     return {

@@ -36,8 +36,11 @@ class Base(DeclarativeBase):
 
 # 요청(Request)마다 독립된 DB 세션을 생성하고 안전하게 닫아주는 의존성 함수입니다.
 def get_db():
+    # 현재 요청에서 사용할 독립적인 데이터베이스 세션을 만듭니다.
     db = SessionLocal()
     try:
+        # 요청 처리 함수에 세션을 전달하고 처리가 끝나면 finally로 이동합니다.
         yield db
     finally:
+        # 요청 처리 성공 여부와 관계없이 세션을 닫아 연결 자원을 반환합니다.
         db.close()
