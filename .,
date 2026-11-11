@@ -1,0 +1,6 @@
+from PIL import Image
+
+img = Image.open("cat001.jpg")
+
+# 이미지 크기 통일
+img = img.resize((64, 64))

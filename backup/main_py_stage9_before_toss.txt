@@ -1,0 +1,378 @@
+# app/main.py
+
+import os
+
+import enum
+import uuid
+
+from datetime import datetime
+
+from sqlalchemy import (
+    Column, Integer, String, Text, Boolean,
+    DateTime, ForeignKey, Numeric, Enum,
+    UniqueConstraint
+)
+
+from sqlalchemy.orm import relationship
+
+from app.database import Base
+
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException
+from app.core.api_errors import http_error, validation_error
+
+from dotenv import load_dotenv
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.core.config import cors_origins
+from starlette.middleware.sessions import SessionMiddleware
+
+from app.auth import auth_router, session_router
+from app.database import Base, engine
+from app.models.category_model import Category
+from app.routers import (
+    admin_dashboard_router, admin_members_router, ai_router, cart_router,
+    orders_router, products_router, profile_router,
+)
+
+load_dotenv()  # .env 파일에서 환경 변수를 로드합니다.
+
+# FastAPI 애플리케이션 인스턴스를 생성하고 기본 메타데이터를 설정합니다.
+app = FastAPI(
+    title="FastAPI 회원 관리 시스템",
+    description="회원 CRUD, 세션 로그인, 관리자 권한 실습",
+    version="1.0.0",
+)
+
+# 환경 변수에 등록된 출처가 있을 때만 교차 출처 요청을 허용합니다.
+origins = cors_origins()
+if origins:
+    app.add_middleware(CORSMiddleware, allow_origins=origins, allow_credentials=True,
+                       allow_methods=["*"], allow_headers=["*"])
+
+# 세션 쿠키 서명에 사용할 비밀 키를 환경 변수에서 읽습니다.
+session_secret = os.getenv("SESSION_SECRET")
+
+# 보안을 위해 세션 암호화 키가 안전하게 설정되었는지 확인하고, 미설정 시 실행을 중단합니다.
+if not session_secret or session_secret == "replace-with-a-long-random-secret":
+    raise RuntimeError(
+        "실제 무작위 SESSION_SECRET 값을 .env에 설정하세요."
+    )
+
+# 설정값에 따라 HTTPS 연결에서만 세션 쿠키를 전송하도록 지정합니다.
+https_only = (
+    os.getenv("SESSION_HTTPS_ONLY", "false").lower() == "true"
+)
+
+# 서버 세션 관리를 위해 애플리케이션에 SessionMiddleware를 등록합니다.
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=session_secret,
+    session_cookie="fastapi_session",
+    same_site="lax",
+    https_only=https_only,
+    max_age=60 * 60 * 8,
+)
+
+# 학습용 편의를 위해 정의된 모델을 바탕으로 데이터베이스 테이블을 자동 생성합니다.
+Base.metadata.create_all(bind=engine)
+
+# 각 도메인별 라우터(인증, 회원, 관리자)를 애플리케이션에 등록합니다.
+app.add_exception_handler(HTTPException, http_error)
+app.add_exception_handler(RequestValidationError, validation_error)
+
+# 각 모듈의 라우터를 순회하여 API 경로를 앱에 연결합니다.
+for module in (
+    session_router, profile_router, admin_members_router, auth_router, products_router,
+    cart_router, orders_router, ai_router, admin_dashboard_router,
+):
+    app.include_router(module.router)
+
+
+# 기존 문서 생성 함수를 보관하여 사용자 정의 함수에서 재사용합니다.
+default_openapi = app.openapi
+
+
+# API 문서의 입력 검증 오류 응답 코드를 실제 처리 방식인 400으로 맞춥니다.
+def api_openapi():
+    schema = default_openapi()
+    for path, methods in schema["paths"].items():
+        if path.startswith("/api/"):
+            for operation in methods.values():
+                responses = operation["responses"]
+                if responses.pop("422", None):
+                    responses.setdefault("400", {"description": "INVALID_INPUT_VALUE"})
+    return schema
+
+
+# 사용자 정의 함수가 API 문서를 생성하도록 연결합니다.
+app.openapi = api_openapi
+
+
+# 서버의 기본 안내 메시지와 문서 링크를 반환하는 루트 엔드포인트입니다.
+@app.get("/", tags=["기본"])
+def home():
+    return {
+        "message": "FastAPI 회원 관리 시스템",
+        "docs": "/docs",
+    }
+
+
+# 서버가 정상적으로 동작 중인지 확인하는 헬스 체크 엔드포인트입니다.
+@app.get("/health", tags=["기본"])
+def health():
+    return {"status": "ok"}
+
+
+class OrderStatus(str, enum.Enum):
+    PENDING = "PENDING"
+    PAID = "PAID"
+    PREPARING = "PREPARING"
+    SHIPPING = "SHIPPING"
+    DELIVERED = "DELIVERED"
+    CANCELLED = "CANCELLED"
+    PAYMENT_FAILED = "PAYMENT_FAILED"
+
+
+class PaymentStatus(str, enum.Enum):
+    READY = "READY"
+    PAID = "PAID"
+    FAILED = "FAILED"
+    CANCELLED = "CANCELLED"
+    REFUNDED = "REFUNDED"
+
+
+class ShippingStatus(str, enum.Enum):
+    READY = "READY"
+    PREPARING = "PREPARING"
+    SHIPPING = "SHIPPING"
+    DELIVERED = "DELIVERED"
+
+
+class Cart(Base):
+    __tablename__ = "carts"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    member_id = Column(
+        Integer,
+        ForeignKey("members.id", ondelete="CASCADE"),
+        unique=True,
+        nullable=False
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
+
+    items = relationship(
+        "CartItem",
+        back_populates="cart",
+        cascade="all, delete-orphan"
+    )
+
+
+class CartItem(Base):
+    __tablename__ = "cart_items"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    cart_id = Column(
+        Integer,
+        ForeignKey("carts.id", ondelete="CASCADE"),
+        nullable=False
+    )
+
+    product_id = Column(
+        Integer,
+        ForeignKey("products.id"),
+        nullable=False
+    )
+
+    quantity = Column(Integer, nullable=False, default=1)
+
+    cart = relationship("Cart", back_populates="items")
+    product = relationship("Product")
+
+    __table_args__ = (
+        UniqueConstraint(
+            "cart_id",
+            "product_id",
+            name="uq_cart_product"
+        ),
+    )
+
+
+class Order(Base):
+    __tablename__ = "orders"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    order_number = Column(
+        String(64),
+        unique=True,
+        nullable=False,
+        index=True
+    )
+
+    member_id = Column(
+        Integer,
+        ForeignKey("members.id"),
+        nullable=False
+    )
+
+    total_amount = Column(Numeric(12, 2), nullable=False)
+
+    status = Column(
+        Enum(OrderStatus),
+        default=OrderStatus.PENDING,
+        nullable=False
+    )
+
+    idempotency_key = Column(
+        String(100),
+        unique=True,
+        nullable=False
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
+
+    items = relationship(
+        "OrderItem",
+        back_populates="order",
+        cascade="all, delete-orphan"
+    )
+
+    payment = relationship(
+        "Payment",
+        back_populates="order",
+        uselist=False
+    )
+
+
+class OrderItem(Base):
+    __tablename__ = "order_items"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    order_id = Column(
+        Integer,
+        ForeignKey("orders.id", ondelete="CASCADE"),
+        nullable=False
+    )
+
+    product_id = Column(
+        Integer,
+        ForeignKey("products.id"),
+        nullable=False
+    )
+
+    product_name = Column(String(200), nullable=False)
+
+    unit_price = Column(Numeric(12, 2), nullable=False)
+
+    quantity = Column(Integer, nullable=False)
+
+    order = relationship("Order", back_populates="items")
+
+
+class Payment(Base):
+    __tablename__ = "payments"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    order_id = Column(
+        Integer,
+        ForeignKey("orders.id"),
+        unique=True,
+        nullable=False
+    )
+
+    provider = Column(String(30), nullable=False)
+
+    payment_key = Column(String(200), unique=True, nullable=True)
+
+    transaction_id = Column(String(200), nullable=True)
+
+    amount = Column(Numeric(12, 2), nullable=False)
+
+    status = Column(
+        Enum(PaymentStatus),
+        default=PaymentStatus.READY,
+        nullable=False
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
+
+    approved_at = Column(DateTime, nullable=True)
+
+    order = relationship("Order", back_populates="payment")
+
+
+class Shipping(Base):
+    __tablename__ = "shippings"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    order_id = Column(
+        Integer,
+        ForeignKey("orders.id"),
+        unique=True,
+        nullable=False
+    )
+
+    recipient = Column(String(100), nullable=False)
+
+    phone = Column(String(30), nullable=False)
+
+    address = Column(String(500), nullable=False)
+
+    tracking_number = Column(String(100), nullable=True)
+
+    carrier = Column(String(100), nullable=True)
+
+    status = Column(
+        Enum(ShippingStatus),
+        default=ShippingStatus.READY,
+        nullable=False
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
+    
+    from fastapi import FastAPI
+
+from app.routers import (
+    cart,
+    orders,
+    payments,
+    shipping
+)
+
+app = FastAPI(
+    title="FastAPI Shopping Mall API",
+    description="9단계 쇼핑몰 주문 및 결제 API",
+    version="9.0.0"
+)
+
+app.include_router(cart.router)
+app.include_router(orders.router)
+app.include_router(payments.router)
+app.include_router(shipping.router)
+
+
+@app.get("/")
+def home():
+    return {
+        "message": "FastAPI Shopping Mall API",
+        "stage": 9
+    }

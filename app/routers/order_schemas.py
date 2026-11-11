@@ -6,11 +6,11 @@ from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 from app.routers.cart_router import CartInput
 
 
-# 테스트 결제 방식만 허용하고 정의되지 않은 결제 필드는 거부합니다.
+# 테스트 결제와 토스페이먼츠 결제만 허용하고 정의되지 않은 결제 필드는 거부합니다.
 class PaymentInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    method: Literal["test"]
+    method: Literal["test", "toss"]
 
 
 # 배송지, 주문 항목, 결제 방식과 선택 통계 정보를 검증합니다.
@@ -35,9 +35,14 @@ class OrderResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    # 결제 연동 이전에 만든 주문은 주문번호가 없을 수 있습니다.
+    order_number: str | None = None
     receiver_name: str
     address: str
     items: list[OrderLineResponse]
     total: int
+    status: str
+    payment_method: str
     payment_status: str
+    paid_at: datetime | None = None
     created_at: datetime

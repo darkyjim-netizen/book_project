@@ -17,7 +17,7 @@ from app.database import Base, engine
 from app.models.category_model import Category
 from app.routers import (
     admin_dashboard_router, admin_members_router, ai_router, cart_router,
-    orders_router, products_router, profile_router,
+    orders_router, payments_router, products_router, profile_router,
 )
 
 load_dotenv()  # .env 파일에서 환경 변수를 로드합니다.
@@ -69,7 +69,7 @@ app.add_exception_handler(RequestValidationError, validation_error)
 # 각 모듈의 라우터를 순회하여 API 경로를 앱에 연결합니다.
 for module in (
     session_router, profile_router, admin_members_router, auth_router, products_router,
-    cart_router, orders_router, ai_router, admin_dashboard_router,
+    cart_router, orders_router, payments_router, ai_router, admin_dashboard_router,
 ):
     app.include_router(module.router)
 

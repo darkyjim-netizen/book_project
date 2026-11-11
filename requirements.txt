@@ -5,3 +5,8 @@ pwdlib[argon2]
 itsdangerous
 python-dotenv
 jwt==1.4.0
+uvicorn[standard]
+pydantic>=2.0
+pydantic-settings
+httpx
+python-multipart
