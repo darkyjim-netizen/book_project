@@ -1,0 +1,2935 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Gowun+Dodum&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+/* 색상 변수와 브라우저 기본 스타일 */
+:root {
+  --ink: #20251f;
+  --muted: #858a80;
+  --paper: #f7f6f2;
+  --white: #fff;
+  --line: #e9e8e2;
+  --green: #476b52;
+  --lime: #d8f276;
+  --orange: #ef8c5d;
+  --shadow: 0 16px 40px #26301b0d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'DM Sans','Gowun Dodum',sans-serif;
+  font-size: 14px;
+}
+
+button,input,select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: 0;
+  color: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.app {
+  max-width: 1440px;
+  margin: auto;
+  min-height: 100vh;
+}
+
+/* 상단 안내, 로고, 메뉴, 검색창 */
+.topline {
+  height: 36px;
+  background: #25342a;
+  color: #eaf0e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  letter-spacing: .06em;
+}
+
+.topline b {
+  color: var(--lime);
+  font-weight: 600;
+  margin-left: 5px;
+}
+
+.header {
+  height: 82px;
+  padding: 0 5.3%;
+  display: flex;
+  align-items: center;
+  gap: 42px;
+  background: var(--paper);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  border-bottom: 1px solid #e8e7e1dd;
+}
+
+.brand {
+  font-family: Manrope,sans-serif;
+  font-size: 25px;
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  white-space: nowrap;
+}
+
+.brand span {
+  display: inline-grid;
+  place-items: center;
+  background: var(--green);
+  color: #fff;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
+  margin-right: 5px;
+  vertical-align: 2px;
+}
+
+.nav {
+  display: flex;
+  gap: 27px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #676d64;
+  white-space: nowrap;
+}
+
+.nav a.active,.nav a:hover {
+  color: var(--green);
+}
+
+.search {
+  height: 42px;
+  max-width: 400px;
+  flex: 1;
+  margin-left: auto;
+  background: #eeede8;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 9px;
+}
+
+.search input {
+  border: 0;
+  background: transparent;
+  outline: 0;
+  width: 100%;
+  font-size: 12px;
+}
+
+.search input::placeholder {
+  color: #999c93;
+}
+
+.head-actions {
+  display: flex;
+  gap: 17px;
+  align-items: center;
+  color: #565d54;
+}
+
+.icon-btn {
+  background: none;
+  padding: 4px;
+  position: relative;
+  font-size: 18px;
+}
+
+.badge {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  background: var(--orange);
+  color: white;
+  border-radius: 9px;
+  padding: 1px 5px;
+  font-size: 9px;
+  font-weight: bold;
+}
+
+.content {
+  padding: 29px 5.3% 80px;
+}
+
+.view-switch {
+  display: flex;
+  gap: 5px;
+  background: #eeede8;
+  padding: 4px;
+  border-radius: 10px;
+  width: max-content;
+  margin: 0 0 24px;
+}
+
+.view-switch button {
+  background: transparent;
+  border-radius: 7px;
+  padding: 8px 14px;
+  font-weight: 600;
+  font-size: 12px;
+  color: #71766e;
+}
+
+.view-switch button.selected {
+  background: white;
+  box-shadow: 0 2px 6px #0000000b;
+  color: var(--ink);
+}
+
+/* 첫 화면 배너와 책 표지 장식 */
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: #dfe8d5;
+  border-radius: 20px;
+  min-height: 340px;
+  padding: 45px 6.3%;
+  display: flex;
+  align-items: center;
+}
+
+.hero:before {
+  content: '';
+  position: absolute;
+  width: 350px;
+  height: 350px;
+  border-radius: 50%;
+  background: #cad9bd;
+  right: 16%;
+  top: 30px;
+}
+
+.hero:after {
+  content: '';
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: #ecf0df;
+  right: -5%;
+  bottom: -145px;
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 1;
+  max-width: 490px;
+}
+
+.eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  color: var(--green);
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  font-family: 'Gowun Dodum',sans-serif;
+  font-size: 37px;
+  line-height: 1.4;
+  letter-spacing: -1.8px;
+  margin: 15px 0 9px;
+}
+
+.hero p {
+  color: #697465;
+  font-size: 13px;
+  line-height: 1.8;
+  margin: 0;
+}
+
+.primary {
+  background: var(--green);
+  color: white;
+  border-radius: 7px;
+  padding: 12px 18px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 23px;
+  transition: .2s;
+}
+
+.primary:hover {
+  background: #35553f;
+  transform: translateY(-1px);
+}
+
+.hero-books {
+  position: absolute;
+  right: 9%;
+  bottom: 0;
+  width: 380px;
+  height: 270px;
+  z-index: 1;
+}
+
+.hero-books .book {
+  position: absolute;
+  bottom: -16px;
+  width: 132px;
+  height: 200px;
+  border-radius: 3px 9px 9px 3px;
+  box-shadow: 12px 16px 20px #27382125;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 15px;
+  color: #fff;
+  line-height: 1.55;
+}
+
+.hero-books .book:after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid #ffffff55;
+}
+
+.hero-books .one {
+  background: #d87857;
+  left: 37px;
+  transform: rotate(-9deg);
+}
+
+.hero-books .two {
+  background: #263f35;
+  left: 137px;
+  bottom: -1px;
+  transform: rotate(1deg);
+  height: 225px;
+  z-index: 1;
+}
+
+.hero-books .three {
+  background: #e2c28a;
+  color: #514936;
+  left: 244px;
+  transform: rotate(9deg);
+}
+
+.cover-title {
+  font-family: 'Gowun Dodum';
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.cover-sub {
+  font-size: 9px;
+  opacity: .78;
+  margin-top: 10px;
+}
+
+.shelf-tag {
+  position: absolute;
+  right: 12%;
+  top: 21px;
+  z-index: 2;
+  background: #f7f6f2;
+  border-radius: 30px;
+  padding: 10px 14px;
+  font-size: 10px;
+  font-weight: bold;
+  box-shadow: var(--shadow);
+}
+
+/* 서비스 안내와 홈 섹션 공통 제목 */
+.quick-info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  padding: 18px 0 6px;
+  color: #777d73;
+  font-size: 11px;
+}
+
+.quick-info b {
+  color: var(--green);
+  font-size: 12px;
+}
+
+.section {
+  margin-top: 50px;
+}
+
+.section-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.section-head h2 {
+  margin: 0;
+  font-size: 21px;
+  letter-spacing: -.8px;
+}
+
+.section-head p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.more {
+  font-size: 11px;
+  color: #6f766c;
+  background: transparent;
+}
+
+.categories {
+  display: flex;
+  gap: 7px;
+  margin: 0 0 19px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  border: 1px solid var(--line);
+  background: transparent;
+  border-radius: 30px;
+  padding: 8px 15px;
+  color: #747a70;
+  font-size: 11px;
+}
+
+.chip.active {
+  background: #25342a;
+  border-color: #25342a;
+  color: white;
+}
+
+/* 카테고리 선택과 도서 목록 카드 */
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(5,minmax(0,1fr));
+  gap: 18px;
+}
+
+.book-card {
+  background: transparent;
+  min-width: 0;
+  position: relative;
+}
+
+.book-art {
+  height: 224px;
+  border-radius: 10px;
+  background: #eee9df;
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.book-art:before {
+  content: '';
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: #ffffff45;
+  right: -46px;
+  top: -45px;
+}
+
+.book-cover {
+  width: 130px;
+  height: 178px;
+  box-shadow: 8px 8px 15px #25251f30;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  padding: 16px 13px;
+  color: #fff;
+  line-height: 1.45;
+  transition: .25s;
+}
+
+.book-card:hover .book-cover {
+  transform: translateY(-5px) rotate(-1deg);
+}
+
+.book-cover:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 7px;
+  border-left: 1px solid #ffffff50;
+}
+
+.book-cover strong {
+  font-family: 'Gowun Dodum';
+  font-size: 16px;
+  z-index: 1;
+}
+
+.book-cover small {
+  font-size: 8px;
+  opacity: .8;
+  margin-top: 13px;
+  z-index: 1;
+}
+
+.wish {
+  position: absolute;
+  right: 11px;
+  top: 10px;
+  width: 29px;
+  height: 29px;
+  background: #ffffffdc;
+  border-radius: 50%;
+  font-size: 15px;
+  color: #62685f;
+  z-index: 2;
+}
+
+.wish.on {
+  color: #e87364;
+}
+
+.rank {
+  position: absolute;
+  left: 11px;
+  top: 10px;
+  font-family: Manrope;
+  font-size: 11px;
+  font-weight: 800;
+  color: #73796f;
+}
+
+.book-meta {
+  padding: 12px 2px;
+}
+
+.book-meta .category {
+  font-size: 9px;
+  color: #898e84;
+}
+
+.book-meta h3 {
+  font-size: 13px;
+  margin: 5px 0 4px;
+  letter-spacing: -.25px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.author {
+  font-size: 10px;
+  color: #868b82;
+}
+
+.price-line {
+  margin-top: 9px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.price {
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.discount {
+  font-size: 10px;
+  color: #d47759;
+  font-weight: 700;
+}
+
+.rating {
+  font-size: 10px;
+  color: #9a8a61;
+  margin-top: 7px;
+}
+
+.rating span {
+  color: #777d73;
+  margin-left: 4px;
+}
+
+.buy-row {
+  display: flex;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.buy-row button {
+  border: 1px solid var(--line);
+  background: transparent;
+  border-radius: 5px;
+  font-size: 10px;
+  padding: 7px 10px;
+}
+
+.buy-row button:first-child {
+  background: #25342a;
+  color: white;
+  border-color: #25342a;
+}
+
+/* 편집자 추천 영역 */
+.editorial {
+  margin-top: 52px;
+  background: #eee9df;
+  border-radius: 16px;
+  padding: 25px 29px;
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.editorial-mark {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #d8e2ce;
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  flex: none;
+}
+
+.editorial h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+}
+
+.editorial p {
+  margin: 0;
+  color: #787d73;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.editorial button {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid #c8c9bf;
+  border-radius: 5px;
+  padding: 9px 12px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+/* 관리자 화면과 통계, 도서 관리 표 */
+.admin-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin: 8px 0 23px;
+}
+
+.admin-head h1 {
+  font-size: 26px;
+  letter-spacing: -1px;
+  margin: 0 0 7px;
+}
+
+.admin-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.admin-head .primary {
+  margin: 0;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 13px;
+  margin-bottom: 23px;
+}
+
+.stat {
+  background: white;
+  border: 1px solid #efeee9;
+  border-radius: 12px;
+  padding: 18px 19px;
+  box-shadow: 0 4px 16px #2c301708;
+}
+
+.stat span {
+  color: #8a8f85;
+  font-size: 10px;
+}
+
+.stat strong {
+  display: block;
+  font-family: Manrope;
+  font-size: 23px;
+  margin: 7px 0 3px;
+  letter-spacing: -.7px;
+}
+
+.stat small {
+  font-size: 10px;
+  color: #86907e;
+}
+
+.panel {
+  background: white;
+  border: 1px solid #efeee9;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px #2c301708;
+  overflow: hidden;
+}
+
+.panel-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 19px;
+  border-bottom: 1px solid #efeee9;
+}
+
+.panel-toolbar h2 {
+  font-size: 14px;
+  margin: 0 auto 0 0;
+}
+
+.filter-input,.select {
+  border: 1px solid #e8e9e3;
+  border-radius: 6px;
+  height: 34px;
+  padding: 0 10px;
+  background: white;
+  font-size: 11px;
+  outline: none;
+}
+
+.filter-input {
+  width: 200px;
+}
+
+.table-wrap {
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  white-space: nowrap;
+}
+
+th {
+  background: #fafaf8;
+  color: #858a80;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 12px 16px;
+}
+
+td {
+  padding: 13px 16px;
+  border-top: 1px solid #f0f0eb;
+  font-size: 11px;
+}
+
+td.muted {
+  color: #858a80;
+}
+
+.table-book {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mini-cover {
+  width: 31px;
+  height: 42px;
+  border-radius: 2px;
+  box-shadow: 2px 3px 5px #0002;
+}
+
+.table-book b {
+  font-size: 11px;
+  display: block;
+}
+
+.table-book small {
+  display: block;
+  color: #92968e;
+  font-size: 9px;
+  margin-top: 4px;
+}
+
+.status {
+  display: inline-block;
+  background: #e9f3e6;
+  color: #54764d;
+  padding: 5px 9px;
+  border-radius: 20px;
+  font-size: 9px;
+}
+
+.status.sold {
+  background: #f3eee1;
+  color: #9b7a42;
+}
+
+.row-actions button {
+  background: transparent;
+  color: #777;
+  font-size: 12px;
+  margin-right: 7px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 19px;
+  color: #858a80;
+  font-size: 10px;
+  border-top: 1px solid #efeee9;
+}
+
+.pagination button {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 6px 9px;
+  font-size: 10px;
+}
+
+/* 입력 폼, 팝업, 알림 메시지 */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: #17201975;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.modal {
+  width: min(440px,100%);
+  background: white;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 24px 70px #10181050;
+}
+
+.modal-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-top h2 {
+  font-size: 17px;
+  margin: 0;
+}
+
+.close {
+  background: #f2f2ee;
+  border-radius: 50%;
+  width: 29px;
+  height: 29px;
+  font-size: 16px;
+}
+
+.field {
+  margin-bottom: 13px;
+}
+
+.field label {
+  display: block;
+  font-size: 10px;
+  color: #7e847a;
+  margin-bottom: 6px;
+}
+
+.field input,.field select {
+  width: 100%;
+  height: 39px;
+  border: 1px solid #e6e7e0;
+  border-radius: 6px;
+  padding: 0 10px;
+  outline: none;
+}
+
+.modal-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.secondary {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px 15px;
+  font-size: 11px;
+}
+
+.modal-foot .primary {
+  margin: 0;
+  padding: 10px 16px;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 25px;
+  transform: translate(-50%,15px);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 20;
+  background: #25342a;
+  color: white;
+  padding: 12px 17px;
+  border-radius: 8px;
+  font-size: 11px;
+  transition: .25s;
+  box-shadow: var(--shadow);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translate(-50%,0);
+}
+
+/* 페이지 하단 안내 */
+.footer {
+  border-top: 1px solid var(--line);
+  padding: 25px 5.3%;
+  color: #8b9088;
+  font-size: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.hidden {
+  display: none!important;
+}
+
+/* 태블릿과 모바일 화면 크기에 따른 배치 조정 */
+@media(max-width:900px) {
+
+  .header {
+    gap: 19px;
+    padding: 0 4%;
+  }
+
+  .nav {
+    gap: 13px;
+  }
+
+  .nav a:nth-child(n+4) {
+    display: none;
+  }
+
+  .content {
+    padding-left: 4%;
+    padding-right: 4%;
+  }
+
+  .hero-books {
+    right: 3%;
+    transform: scale(.85);
+    transform-origin: bottom right;
+  }
+
+  .book-grid {
+    grid-template-columns: repeat(3,1fr);
+  }
+
+  .stats {
+    grid-template-columns: repeat(2,1fr);
+  }
+}
+
+@media(max-width:600px) {
+
+  .topline {
+    height: 30px;
+    font-size: 10px;
+  }
+
+  .header {
+    height: auto;
+    min-height: 70px;
+    flex-wrap: wrap;
+    padding: 13px 5%;
+    gap: 12px;
+  }
+
+  .brand {
+    font-size: 22px;
+  }
+
+  .nav {
+    order: 3;
+    width: 190%;
+    justify-content: space-between;
+    gap: 5px;
+    font-size: 11px;
+  }
+
+  .nav a:nth-child(n) {
+    display: block;
+  }
+
+  .search {
+    order: 2;
+    max-width: none;
+    flex-basis: 100%;
+    margin: 0;
+    height: 38px;
+  }
+
+  .head-actions {
+    margin-left: auto;
+  }
+
+  .head-actions .icon-btn:nth-child(2) {
+    display: none;
+  }
+
+  .content {
+    padding: 20px 5% 55px;
+  }
+
+  .hero {
+    min-height: 370px;
+    align-items: flex-start;
+    padding: 29px 24px;
+  }
+
+  .hero h1 {
+    font-size: 29px;
+  }
+
+  .hero p {
+    font-size: 11px;
+  }
+
+  .hero-books {
+    right: 0;
+    transform: scale(.68);
+    transform-origin: bottom right;
+  }
+
+  .shelf-tag {
+    right: 7%;
+    top: auto;
+    bottom: 145px;
+  }
+
+  .quick-info {
+    gap: 10px;
+    font-size: 9px;
+    flex-wrap: wrap;
+  }
+
+  .quick-info b {
+    font-size: 10px;
+  }
+
+  .section {
+    margin-top: 38px;
+  }
+
+  .section-head h2 {
+    font-size: 18px;
+  }
+
+  .book-grid {
+    grid-template-columns: repeat(2,1fr);
+    gap: 12px;
+  }
+
+  .book-art {
+    height: 190px;
+  }
+
+  .book-cover {
+    width: 112px;
+    height: 156px;
+  }
+
+  .book-cover strong {
+    font-size: 14px;
+  }
+
+  .editorial {
+    padding: 18px;
+    gap: 13px;
+  }
+
+  .editorial-mark {
+    width: 44px;
+    height: 44px;
+  }
+
+  .editorial h3 {
+    font-size: 13px;
+  }
+
+  .editorial p {
+    font-size: 10px;
+  }
+
+  .editorial button {
+    padding: 8px;
+  }
+
+  .admin-head {
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .admin-head h1 {
+    font-size: 22px;
+  }
+
+  .admin-head .primary {
+    font-size: 10px;
+    padding: 10px 12px;
+    white-space: nowrap;
+  }
+
+  .stats {
+    gap: 8px;
+  }
+
+  .stat {
+    padding: 13px;
+  }
+
+  .stat strong {
+    font-size: 19px;
+  }
+
+  .panel-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .panel-toolbar h2 {
+    width: 100%;
+  }
+
+  .filter-input {
+    flex: 1;
+  }
+
+  .select {
+    max-width: 120px;
+  }
+
+  .footer {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+/* 도서 상세 보기 팝업 */
+.detail-backdrop {
+  position: fixed;
+  inset: 0;
+  background: #17201988;
+  z-index: 12;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  overflow: auto;
+}
+
+.detail-modal {
+  position: relative;
+  width: min(850px,100%);
+  max-height: min(90vh,850px);
+  overflow: auto;
+  background: #fbfaf7;
+  border-radius: 16px;
+  padding: 34px;
+  box-shadow: 0 24px 80px #10181055;
+}
+
+.detail-close {
+  position: absolute;
+  right: 17px;
+  top: 17px;
+  z-index: 1;
+}
+
+.detail-layout {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 34px;
+}
+
+.detail-art {
+  min-height: 340px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  position: sticky;
+  top: 0;
+  align-self: start;
+}
+
+.detail-art .book-cover {
+  width: 160px;
+  height: 230px;
+}
+
+.detail-art .book-cover strong {
+  font-size: 20px;
+}
+
+.detail-info {
+  padding: 8px 4px;
+}
+
+.detail-info h2 {
+  font-size: 25px;
+  letter-spacing: -1px;
+  margin: 9px 0 6px;
+  padding-right: 28px;
+}
+
+.detail-byline {
+  font-size: 12px;
+  color: #7c8178;
+  margin: 0;
+}
+
+.detail-intro {
+  font-size: 13px;
+  line-height: 1.85;
+  color: #52594f;
+  margin: 20px 0;
+}
+
+.detail-info h3 {
+  font-size: 14px;
+  margin: 18px 0 9px;
+}
+
+.contents-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-top: 1px solid var(--line);
+}
+
+.contents-list li {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  padding: 10px 2px;
+  font-size: 12px;
+  color: #535a50;
+}
+
+.contents-list li span {
+  font: 700 10px Manrope;
+  color: var(--green);
+}
+
+.format-label {
+  font-size: 11px;
+  font-weight: 700;
+  margin: 18px 0 8px;
+}
+
+.format-options {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 8px;
+}
+
+.format-option {
+  border: 1px solid #e4e4dc;
+  border-radius: 8px;
+  background: white;
+  padding: 10px;
+  text-align: left;
+}
+
+.format-option.chosen {
+  border-color: var(--green);
+  box-shadow: inset 0 0 0 1px var(--green);
+  background: #f4f7f1;
+}
+
+.format-option b,.format-option small {
+  display: block;
+}
+
+.format-option b {
+  font-size: 11px;
+}
+
+.format-option small {
+  font-size: 9px;
+  color: #858a80;
+  margin-top: 4px;
+}
+
+.detail-buy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--line);
+  margin-top: 17px;
+  padding-top: 15px;
+}
+
+.detail-buy strong {
+  font-size: 18px;
+}
+
+.detail-buy button {
+  background: var(--green);
+  color: white;
+  border-radius: 6px;
+  padding: 11px 16px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+@media(max-width:600px) {
+
+  .detail-backdrop {
+    padding: 10px;
+    align-items: end;
+  }
+
+  .detail-modal {
+    max-height: 94vh;
+    padding: 23px 18px;
+    border-radius: 15px 15px 8px 8px;
+  }
+
+  .detail-layout {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .detail-art {
+    position: relative;
+    min-height: 190px;
+  }
+
+  .detail-art .book-cover {
+    width: 105px;
+    height: 150px;
+  }
+
+  .detail-art .book-cover strong {
+    font-size: 14px;
+  }
+
+  .detail-info h2 {
+    font-size: 21px;
+  }
+
+  .detail-intro {
+    font-size: 12px;
+    margin: 14px 0;
+  }
+
+  .format-options {
+    gap: 5px;
+  }
+
+  .format-option {
+    padding: 8px 6px;
+  }
+
+  .format-option small {
+    font-size: 8px;
+  }
+}
+
+.hero {
+  padding: 0;
+  min-height: 385px;
+  display: block;
+  cursor: default;
+}
+
+.hero:before,.hero:after {
+  display: none;
+}
+
+.hero-carousel {
+  position: absolute;
+  inset: 0;
+}
+
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  padding: 48px 6.3%;
+  display: none;
+  align-items: center;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.hero-slide.active {
+  display: flex;
+  animation: bannerIn .45s ease both;
+}
+
+.hero-slide.sage {
+  background: #dfe8d5;
+}
+
+.hero-slide.mist {
+  background: #dfe4e5;
+}
+
+.hero-slide.sun {
+  background: #f0e5ce;
+}
+
+.hero-slide.lavender {
+  background: #e8e0ed;
+}
+
+.hero-slide.clay {
+  background: #eadfd5;
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 2;
+  max-width: 490px;
+}
+
+.hero-slide h1 {
+  font-family: 'Gowun Dodum',sans-serif;
+  font-size: 37px;
+  line-height: 1.4;
+  letter-spacing: -1.8px;
+  margin: 15px 0 9px;
+}
+
+.hero-slide p {
+  color: #697465;
+  font-size: 13px;
+  line-height: 1.8;
+  margin: 0;
+}
+
+.banner-cta {
+  display: inline-block;
+  margin-top: 21px;
+  background: var(--green);
+  color: white;
+  border-radius: 7px;
+  padding: 12px 17px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.hero-art {
+  position: absolute;
+  right: 10%;
+  top: 0;
+  bottom: 0;
+  width: 38%;
+  display: grid;
+  place-items: center;
+}
+
+.art-orbit {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: #ffffff55;
+  right: 12%;
+  top: 18px;
+}
+
+.hero-poster {
+  position: relative;
+  z-index: 1;
+  width: 205px;
+  height: 285px;
+  background: linear-gradient(145deg,var(--cover),#26342a);
+  color: white;
+  box-shadow: 18px 21px 30px #29332835;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 26px;
+  transform: rotate(4deg);
+  border-radius: 2px 8px 8px 2px;
+}
+
+.hero-poster:before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid #ffffff55;
+}
+
+.hero-poster span {
+  font-size: 9px;
+  letter-spacing: .08em;
+  opacity: .8;
+}
+
+.hero-poster strong {
+  font-family: 'Gowun Dodum';
+  font-size: 23px;
+  line-height: 1.45;
+  margin: 20px 0;
+}
+
+.hero-poster small {
+  font-size: 10px;
+  opacity: .8;
+}
+
+.art-book-shadow {
+  position: absolute;
+  width: 152px;
+  height: 225px;
+  background: var(--cover-bg);
+  right: 5%;
+  top: 26%;
+  transform: rotate(-10deg);
+  box-shadow: 8px 14px 20px #29332820;
+}
+
+.art-caption {
+  position: absolute;
+  right: -5%;
+  bottom: 27px;
+  font: 700 9px Manrope;
+  letter-spacing: .18em;
+  color: #536254;
+}
+
+.hero-slide .shelf-tag {
+  top: 24px;
+  right: 5.5%;
+}
+
+.hero-controls {
+  position: absolute;
+  z-index: 3;
+  left: 6.3%;
+  bottom: 22px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hero-arrow,.hero-pause {
+  width: 29px;
+  height: 29px;
+  border: 1px solid #52634a55;
+  border-radius: 50%;
+  background: #ffffff80;
+  color: #344537;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.hero-pause {
+  font-size: 10px;
+}
+
+.hero-dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 3px;
+}
+
+.hero-dot {
+  height: 7px;
+  width: 7px;
+  padding: 0;
+  background: #71806c77;
+  border-radius: 9px;
+  transition: .2s;
+}
+
+.hero-dot.active {
+  width: 22px;
+  background: #344d3b;
+}
+
+.hero-slide:focus-visible {
+  outline: 3px solid var(--green);
+  outline-offset: -5px;
+}
+
+@keyframes bannerIn {
+
+  from {
+    opacity: .3;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media(max-width:900px) {
+
+  .hero {
+    min-height: 360px;
+  }
+
+  .hero-slide {
+    padding: 42px 5%;
+  }
+
+  .hero-art {
+    right: 5%;
+    width: 38%;
+    transform: scale(.85);
+  }
+
+  .hero-controls {
+    left: 5%;
+  }
+}
+
+@media(max-width:600px) {
+
+  .hero {
+    min-height: 430px;
+  }
+
+  .hero-slide {
+    align-items: flex-start;
+    padding: 30px 23px;
+  }
+
+  .hero-slide h1 {
+    font-size: 27px;
+    line-height: 1.35;
+  }
+
+  .hero-slide p {
+    font-size: 11px;
+    max-width: 270px;
+  }
+
+  .hero-slide .hero-copy {
+    z-index: 2;
+  }
+
+  .hero-art {
+    width: 100%;
+    height: 220px;
+    top: auto;
+    bottom: 0;
+    right: 0;
+    transform: scale(.72);
+    transform-origin: bottom right;
+  }
+
+  .hero-poster {
+    width: 170px;
+    height: 235px;
+  }
+
+  .art-orbit {
+    width: 250px;
+    height: 250px;
+    right: 10%;
+  }
+
+  .art-caption {
+    right: 4%;
+    bottom: 12px;
+  }
+
+  .hero-slide .shelf-tag {
+    top: auto;
+    right: 20px;
+    bottom: 218px;
+    font-size: 9px;
+    padding: 8px 11px;
+  }
+
+  .hero-controls {
+    left: 20px;
+    bottom: 14px;
+  }
+
+  .hero-slide .banner-cta {
+    margin-top: 14px;
+    padding: 10px 13px;
+  }
+
+  .hero-arrow,.hero-pause {
+    width: 26px;
+    height: 26px;
+  }
+}
+
+.hero-slide {
+  display: flex;
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform .52s cubic-bezier(.22,.75,.25,1),opacity .52s ease;
+  animation: none;
+}
+
+.hero-slide.active {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
+  animation: none;
+}
+
+.hero-slide.exit-left {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.hero-slide.exit-right {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.hero-slide.from-left {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.hero-slide.from-right {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.book-cover-img {
+  height: 86%;
+  max-width: 76%;
+  object-fit: contain;
+  position: relative;
+  z-index: 1;
+  box-shadow: 9px 11px 18px #25251f30;
+  transition: .25s;
+}
+
+.book-card:hover .book-cover-img {
+  transform: translateY(-5px) rotate(-1deg);
+}
+
+.hero-poster {
+  padding: 0;
+  overflow: hidden;
+  background: transparent;
+  transform: rotate(4deg);
+}
+
+.hero-poster img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.detail-cover-img {
+  max-height: 300px;
+  max-width: 90%;
+  object-fit: contain;
+  box-shadow: 10px 13px 24px #25251f30;
+}
+
+.mini-cover {
+  overflow: hidden;
+  flex: none;
+}
+
+.mini-cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.catalog-head {
+  padding: 22px 0 34px;
+  border-bottom: 1px solid var(--line);
+}
+
+.catalog-head h1 {
+  font-size: 32px;
+  letter-spacing: -1.2px;
+  margin: 10px 0 6px;
+}
+
+.catalog-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.catalog-section-head {
+  margin-top: 32px;
+}
+
+.catalog-count {
+  color: var(--muted);
+  font-size: 11px;
+  padding-bottom: 3px;
+}
+
+.catalog-grid {
+  row-gap: 28px;
+}
+
+.empty-catalog {
+  grid-column: 1/-1;
+  color: var(--muted);
+  padding: 45px;
+  text-align: center;
+  font-size: 13px;
+}
+
+@media(max-width:600px) {
+
+  .catalog-head {
+    padding: 14px 0 24px;
+  }
+
+  .catalog-head h1 {
+    font-size: 26px;
+  }
+
+  .catalog-section-head {
+    margin-top: 26px;
+  }
+
+  .catalog-grid {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+  }
+
+  .book-cover-img {
+    max-width: 78%;
+    height: 84%;
+  }
+
+  .detail-cover-img {
+    max-height: 210px;
+  }
+}
+
+/* 서점 화면의 기본 색상과 테마 */
+
+:root {
+  --ink: #263642;
+  --muted: #73817f;
+  --paper: #fff;
+  --white: #fff;
+  --line: #e7eeec;
+  --green: #147d78;
+  --lime: #d8f1eb;
+  --orange: #d98572;
+  --shadow: 0 14px 36px #163b3512;
+}
+
+body {
+  background: #fff;
+  color: var(--ink);
+}
+
+.topline {
+  background: #f2f7f6;
+  color: #526461;
+}
+
+.topline b {
+  color: #147d78;
+}
+
+.header {
+  background: #fff;
+  border-bottom-color: #e9efed;
+}
+
+.brand {
+  color: #283647;
+}
+
+.brand span {
+  background: #eee8fb;
+  color: #6748ad;
+}
+
+.nav {
+  color: #697976;
+}
+
+.nav a.active,.nav a:hover {
+  color: #147d78;
+}
+
+.search {
+  background: #f5f8f7;
+  border: 1px solid #e7eeec;
+}
+
+.search input::placeholder {
+  color: #8b9996;
+}
+
+.head-actions {
+  color: #4d625f;
+}
+
+.content {
+  background: #fff;
+}
+
+.view-switch {
+  background: #f3f7f6;
+}
+
+.view-switch button {
+  color: #71807d;
+}
+
+.view-switch button.selected {
+  color: #263642;
+}
+
+.hero-slide.sage {
+  background: linear-gradient(118deg,#e7f4f0,#d5ede6);
+}
+
+.hero-slide.mist {
+  background: linear-gradient(118deg,#eef3f4,#e3edef);
+}
+
+.hero-slide.sun {
+  background: linear-gradient(118deg,#f6f2e9,#f0e9d9);
+}
+
+.hero-slide.lavender {
+  background: linear-gradient(118deg,#f1eff8,#e7e3f2);
+}
+
+.hero-slide.clay {
+  background: linear-gradient(118deg,#f5efec,#eee4de);
+}
+
+.hero-slide .eyebrow,.eyebrow {
+  color: #147d78;
+}
+
+.hero-slide p {
+  color: #667a76;
+}
+
+.banner-cta,.primary,.detail-buy button {
+  background: #147d78;
+}
+
+.banner-cta:hover,.primary:hover {
+  background: #0d6965;
+}
+
+.hero-slide .shelf-tag {
+  background: #ffffffdf;
+  color: #405754;
+}
+
+.hero-controls button {
+  border-color: #147d7855;
+  color: #286762;
+}
+
+.hero-dot.active {
+  background: #147d78;
+}
+
+.hero-slide:focus-visible {
+  outline-color: #147d78;
+}
+
+.quick-info {
+  color: #71817d;
+}
+
+.quick-info b {
+  color: #147d78;
+}
+
+.section {
+  margin-top: 54px;
+}
+
+.section-head h2 {
+  color: #263642;
+}
+
+.section-head p {
+  color: #788782;
+}
+
+.more {
+  color: #147d78;
+}
+
+.chip {
+  border-color: #e4ece9;
+  background: #fff;
+  color: #60716e;
+}
+
+.chip.active {
+  background: #147d78;
+  border-color: #147d78;
+}
+
+.book-card {
+  padding: 8px 8px 12px;
+  background: #fff;
+  border: 1px solid #edf1f0;
+  border-radius: 13px;
+  box-shadow: 0 5px 18px #173e3808;
+  transition: transform .2s,box-shadow .2s;
+}
+
+.book-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 26px #173e3814;
+}
+
+.book-art {
+  border-radius: 9px;
+  background: #f2f6f5!important;
+}
+
+.book-meta .category,.author {
+  color: #758581;
+}
+
+.book-meta h3 {
+  color: #2c3e47;
+}
+
+.discount {
+  color: #c96f62;
+}
+
+.rating {
+  color: #bd8a3c;
+}
+
+.rating span {
+  color: #758581;
+}
+
+.buy-row button {
+  border-color: #e5ecea;
+  color: #536764;
+}
+
+.buy-row button:first-child {
+  background: #147d78;
+  border-color: #147d78;
+}
+
+.editorial {
+  background: #eff7f4;
+  border-radius: 18px;
+}
+
+.editorial-mark {
+  background: #dfefea;
+  color: #147d78;
+}
+
+.editorial p {
+  color: #70817d;
+}
+
+.editorial button {
+  border-color: #cfdfda;
+  color: #3f625d;
+}
+
+.catalog-head {
+  border-bottom-color: #e8efed;
+}
+
+.stat,.panel {
+  border-color: #e8efed;
+  box-shadow: 0 5px 18px #183b3508;
+}
+
+.panel-toolbar,th,.pagination {
+  border-color: #e8efed;
+}
+
+.status {
+  background: #e9f5f1;
+  color: #327b69;
+}
+
+.status.sold {
+  background: #faf1e8;
+  color: #a27645;
+}
+
+.toast {
+  background: #263642;
+}
+
+.footer {
+  background: #f8faf9;
+  border-top-color: #e8efed;
+  color: #73817f;
+}
+
+#categories {
+  display: grid;
+  grid-template-columns: repeat(6,minmax(0,1fr));
+  gap: 12px;
+  margin: 0 0 22px;
+}
+
+.category-tile {
+  min-height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid #e8efed;
+  border-radius: 13px;
+  background: #f8faf9;
+  color: #425752;
+  font-size: 13px;
+  font-weight: 700;
+  transition: background .18s,border-color .18s,transform .18s;
+}
+
+.category-tile span {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #e7f3ef;
+  color: #147d78;
+  font-size: 16px;
+}
+
+.category-tile:hover,.category-tile.active {
+  border-color: #b9ded4;
+  background: #eff8f5;
+  transform: translateY(-1px);
+}
+
+.category-tile.active span {
+  background: #147d78;
+  color: #fff;
+}
+
+@media(max-width:900px) {
+
+  #categories {
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    gap: 9px;
+  }
+}
+
+@media(max-width:600px) {
+
+  #categories {
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    gap: 7px;
+  }
+
+  .category-tile {
+    min-height: 58px;
+    flex-direction: column;
+    gap: 3px;
+    font-size: 10px;
+  }
+
+  .category-tile span {
+    width: 25px;
+    height: 25px;
+    font-size: 14px;
+  }
+}
+
+/* 한글 가독성, 글자 크기, 색상 대비 조정 */
+
+body {
+  font-family: Arial,"Malgun Gothic","Apple SD Gothic Neo",sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  color: #24343c;
+}
+
+.brand,.hero h1,.hero-slide h1,.book-cover strong {
+  font-family: inherit;
+}
+
+.topline {
+  font-size: 12px;
+  color: #465a57;
+}
+
+.nav {
+  font-size: 14px;
+  color: #4e625e;
+}
+
+.search input {
+  font-size: 14px;
+}
+
+.search input::placeholder {
+  color: #667774;
+  opacity: 1;
+}
+
+.head-actions {
+  color: #405651;
+}
+
+.view-switch button {
+  font-size: 13px;
+}
+
+.hero-slide h1 {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #20343c;
+}
+
+.hero-slide p {
+  font-size: 15px;
+  color: #4f6661;
+  line-height: 1.8;
+}
+
+.hero-slide .eyebrow {
+  font-size: 12px;
+}
+
+.banner-cta {
+  font-size: 13px;
+}
+
+.shelf-tag {
+  font-size: 12px;
+}
+
+.hero-controls button {
+  color: #315c57;
+}
+
+.quick-info {
+  font-size: 13px;
+  color: #536762;
+}
+
+.quick-info b {
+  font-size: 14px;
+}
+
+.section-head h2 {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.section-head p {
+  font-size: 13px;
+  color: #5f706c;
+}
+
+.more {
+  font-size: 13px;
+  color: #126d69;
+}
+
+.chip {
+  font-size: 13px;
+}
+
+.category-tile {
+  font-size: 14px;
+  color: #344b48;
+}
+
+.book-meta .category {
+  font-size: 11px;
+  color: #536964;
+}
+
+.book-meta h3 {
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.author {
+  font-size: 12px;
+  color: #5c6d69;
+}
+
+.price {
+  font-size: 15px;
+}
+
+.discount {
+  font-size: 12px;
+  color: #b9574c;
+}
+
+.rating {
+  font-size: 12px;
+  color: #936716;
+}
+
+.rating span {
+  color: #5e706c;
+}
+
+.buy-row button {
+  font-size: 12px;
+}
+
+.editorial h3 {
+  font-size: 17px;
+}
+
+.editorial p {
+  font-size: 13px;
+  color: #536762;
+}
+
+.editorial button {
+  font-size: 12px;
+  color: #355d58;
+}
+
+.catalog-head h1 {
+  font-size: 34px;
+}
+
+.catalog-head p,.catalog-section-head p {
+  font-size: 14px;
+  color: #5e706c;
+}
+
+.catalog-count {
+  font-size: 13px;
+}
+
+.admin-head h1 {
+  font-size: 28px;
+}
+
+.admin-head p {
+  font-size: 14px;
+  color: #5e706c;
+}
+
+.stat span,.stat small,.filter-input,.select,th,.table-book small,.status,.pagination,.field label,.row-actions button {
+  font-size: 12px;
+}
+
+.stat strong {
+  font-size: 26px;
+}
+
+.panel-toolbar h2 {
+  font-size: 16px;
+}
+
+.filter-input,.select {
+  height: 38px;
+}
+
+.table-book b,td {
+  font-size: 13px;
+}
+
+.footer {
+  font-size: 12px;
+  color: #596b67;
+}
+
+.toast {
+  font-size: 13px;
+}
+
+.detail-info h2 {
+  font-size: 28px;
+}
+
+.detail-byline,.detail-intro {
+  font-size: 14px;
+}
+
+.detail-intro {
+  line-height: 1.9;
+}
+
+.contents-list li {
+  font-size: 13px;
+}
+
+.format-label,.format-option b,.detail-buy button {
+  font-size: 13px;
+}
+
+.format-option small {
+  font-size: 11px;
+}
+
+@media(max-width:600px) {
+
+  body {
+    font-size: 14px;
+  }
+
+  .topline {
+    font-size: 11px;
+  }
+
+  .nav {
+    font-size: 12px;
+  }
+
+  .search input {
+    font-size: 13px;
+  }
+
+  .hero-slide h1 {
+    font-size: 30px;
+  }
+
+  .hero-slide p {
+    font-size: 13px;
+  }
+
+  .hero-slide .eyebrow {
+    font-size: 11px;
+  }
+
+  .quick-info {
+    font-size: 11px;
+  }
+
+  .quick-info b {
+    font-size: 12px;
+  }
+
+  .section-head h2 {
+    font-size: 20px;
+  }
+
+  .section-head p {
+    font-size: 12px;
+  }
+
+  .more {
+    font-size: 12px;
+  }
+
+  .category-tile {
+    font-size: 11px;
+  }
+
+  .book-meta h3 {
+    font-size: 14px;
+  }
+
+  .author {
+    font-size: 11px;
+  }
+
+  .price {
+    font-size: 14px;
+  }
+
+  .buy-row button {
+    font-size: 11px;
+  }
+
+  .editorial h3 {
+    font-size: 14px;
+  }
+
+  .editorial p {
+    font-size: 11px;
+  }
+
+  .admin-head h1 {
+    font-size: 23px;
+  }
+
+  .admin-head p {
+    font-size: 12px;
+  }
+
+  .stat span,.stat small {
+    font-size: 10px;
+  }
+
+  .stat strong {
+    font-size: 20px;
+  }
+
+  .table-book b,td {
+    font-size: 11px;
+  }
+
+  .detail-info h2 {
+    font-size: 22px;
+  }
+
+  .detail-byline,.detail-intro {
+    font-size: 12px;
+  }
+}
+
+/* 취향별 도서 큐레이션 화면 */
+.curation-welcome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  padding: 34px 40px;
+  border-radius: 20px;
+  background: linear-gradient(120deg,#e8f5f1,#f1eff8);
+}
+
+.curation-welcome h1 {
+  margin: 8px 0;
+  font-size: 32px;
+  letter-spacing: -1.3px;
+}
+
+.curation-welcome p {
+  margin: 0;
+  color: #5f706c;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.curation-mark {
+  width: 76px;
+  height: 76px;
+  display: grid;
+  place-items: center;
+  flex: none;
+  border-radius: 24px;
+  background: #fff;
+  color: #8064c9;
+  font-size: 38px;
+  box-shadow: 0 10px 26px #2c4a4312;
+}
+
+.curation-guides {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 13px;
+  margin: 19px 0 43px;
+}
+
+.curation-guides article {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  align-items: center;
+  column-gap: 10px;
+  padding: 17px;
+  border: 1px solid #e7eeec;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.curation-guides article>span {
+  grid-row: span 2;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: #e9f5f1;
+  color: #147d78;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.curation-guides b {
+  font-size: 13px;
+  color: #344b48;
+}
+
+.curation-guides small {
+  margin-top: 4px;
+  color: #71817d;
+  font-size: 11px;
+}
+
+.curation-section-head {
+  margin-bottom: 18px;
+}
+
+.curation-grid {
+  align-items: start;
+}
+
+.curation-book {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid #e8efed;
+  border-radius: 14px;
+  background: #fff;
+  cursor: pointer;
+  transition: transform .18s,box-shadow .18s;
+}
+
+.curation-book:hover,.curation-book:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 26px #173e3814;
+  outline: 2px solid #a7d7ca;
+  outline-offset: 2px;
+}
+
+.curation-cover {
+  height: 225px;
+  position: relative;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: #f2f6f5;
+}
+
+.curation-cover>span {
+  position: absolute;
+  top: 11px;
+  left: 12px;
+  color: #4e625e;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.curation-cover img {
+  max-width: 74%;
+  height: 82%;
+  object-fit: contain;
+  box-shadow: 9px 11px 18px #25251f30;
+}
+
+.curation-copy {
+  padding: 13px 3px 5px;
+}
+
+.curation-copy .category {
+  color: #147d78;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.curation-copy h3 {
+  margin: 6px 0;
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.curation-copy .author {
+  margin: 0;
+  color: #657571;
+  font-size: 12px;
+}
+
+.curation-reason {
+  min-height: 58px;
+  margin: 12px 0;
+  color: #536762;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.curation-more {
+  display: block;
+  padding-top: 11px;
+  border-top: 1px solid #edf1f0;
+  color: #147d78;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.book-info-facts {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin: 14px 0 19px;
+}
+
+.book-info-facts span {
+  padding: 8px 11px;
+  border-radius: 7px;
+  background: #f1f7f5;
+  color: #60736e;
+  font-size: 11px;
+}
+
+.book-info-facts b {
+  margin-left: 6px;
+  color: #2c4843;
+}
+
+.book-info-only .detail-info h3 {
+  margin: 16px 0 6px;
+}
+
+.curation-note {
+  margin: 17px 0 0;
+  padding: 12px 14px;
+  border-radius: 9px;
+  background: #eef7f4;
+  color: #41655d;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+@media(max-width:900px) {
+
+  .curation-grid {
+    grid-template-columns: repeat(3,minmax(0,1fr));
+  }
+
+  .curation-cover {
+    height: 200px;
+  }
+}
+
+@media(max-width:600px) {
+
+  .curation-welcome {
+    padding: 25px 22px;
+  }
+
+  .curation-welcome h1 {
+    font-size: 24px;
+  }
+
+  .curation-welcome p {
+    font-size: 12px;
+  }
+
+  .curation-mark {
+    width: 54px;
+    height: 54px;
+    border-radius: 17px;
+    font-size: 28px;
+  }
+
+  .curation-guides {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin: 12px 0 32px;
+  }
+
+  .curation-guides article {
+    padding: 13px;
+  }
+
+  .curation-grid {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 10px;
+  }
+
+  .curation-book {
+    padding: 7px;
+  }
+
+  .curation-cover {
+    height: 170px;
+  }
+
+  .curation-copy h3 {
+    font-size: 14px;
+  }
+
+  .curation-reason {
+    min-height: 76px;
+    font-size: 11px;
+  }
+
+  .curation-copy .author {
+    font-size: 10px;
+  }
+
+  .curation-more {
+    font-size: 11px;
+  }
+
+  .book-info-only .detail-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .book-info-only .detail-art {
+    min-height: 190px;
+  }
+
+  .book-info-only .detail-cover-img {
+    max-height: 165px;
+  }
+}
+
+/* 분야 및 하위 분야 메뉴 */
+.category-menu {
+  position: sticky;
+  top: 82px;
+  z-index: 4;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  overflow-x: auto;
+  padding: 10px max(5.3%,calc((100% - 1288px)/2));
+  border-bottom: 1px solid #e8efed;
+  background: #ffffffed;
+  backdrop-filter: blur(12px);
+  scrollbar-width: thin;
+}
+
+.category-menu-item {
+  flex: none;
+  padding: 9px 13px;
+  border-radius: 8px;
+  background: transparent;
+  color: #536762;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.category-menu-item:hover,.category-menu-item.active {
+  background: #eaf5f1;
+  color: #126d69;
+}
+
+.subcategory-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 18px 0 7px;
+}
+
+.subcategory-chip {
+  padding: 9px 15px;
+  border: 1px solid #e4ece9;
+  border-radius: 22px;
+  background: #fff;
+  color: #536762;
+  font-size: 12px;
+}
+
+.subcategory-chip:hover,.subcategory-chip.active {
+  border-color: #147d78;
+  background: #147d78;
+  color: #fff;
+}
+
+.category-empty {
+  grid-column: 1/-1;
+  padding: 70px 20px;
+  text-align: center;
+  border: 1px dashed #ccdcd7;
+  border-radius: 14px;
+  background: #f8fbfa;
+}
+
+.category-empty strong {
+  font-size: 17px;
+  color: #344b48;
+}
+
+.category-empty p {
+  margin: 8px 0 0;
+  color: #657571;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+@media(max-width:600px) {
+
+  .category-menu {
+    top: 70px;
+    padding: 8px 5%;
+    gap: 2px;
+  }
+
+  .category-menu-item {
+    padding: 8px 11px;
+    font-size: 11px;
+  }
+
+  .subcategory-bar {
+    gap: 6px;
+  }
+
+  .subcategory-chip {
+    padding: 8px 12px;
+    font-size: 11px;
+  }
+
+  .category-empty {
+    padding: 50px 16px;
+  }
+}
+
+[v-cloak] {
+  display: none!important;
+}
+

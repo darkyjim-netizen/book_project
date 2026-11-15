@@ -1,0 +1,495 @@
+/* 마이페이지와 내 서재 */
+
+.mypage-page {
+  max-width: 1240px;
+  padding-top: 26px;
+}
+
+.mypage-welcome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 23px 26px;
+  border-left: 4px solid #59436b;
+  background: #f6f3f0;
+}
+
+.mypage-kicker {
+  color: #756a60;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.mypage-welcome h1 {
+  margin: 5px 0 4px;
+  color: #2f2925;
+  font-size: 25px;
+  letter-spacing: -.045em;
+}
+
+.mypage-welcome p {
+  margin: 0;
+  color: #716a64;
+  font-size: 13px;
+}
+
+.mypage-bookmark {
+  width: 52px;
+  height: 62px;
+  display: grid;
+  place-items: center;
+  flex: none;
+  border: 1px solid #d8d0c6;
+  background: #fff;
+  color: #55435d;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 3px 3px 0 #e2dcd4;
+}
+
+.mypage-overview {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 0;
+  margin: 14px 0 20px;
+  border-top: 1px solid #e4dfd9;
+  border-bottom: 1px solid #e4dfd9;
+}
+
+.mypage-overview article {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 18px;
+  border-right: 1px solid #e4dfd9;
+}
+
+.mypage-overview article:first-child {
+  padding-left: 4px;
+}
+
+.mypage-overview article:last-child {
+  border: 0;
+}
+
+.mypage-overview article>span {
+  color: #716a64;
+  font-size: 12px;
+}
+
+.mypage-overview strong {
+  color: #39312f;
+  font-size: 20px;
+}
+
+.mypage-overview strong small {
+  margin-left: 3px;
+  color: #79716a;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.mypage-page .mypage-grid {
+  grid-template-columns: minmax(290px,.78fr) minmax(0,1.22fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.mypage-page .account-panel {
+  padding: 19px 20px;
+  border-color: #e5e0da;
+  border-radius: 4px;
+  box-shadow: none;
+}
+
+.mypage-panel-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e9e5df;
+}
+
+.mypage-panel-heading>div>span {
+  color: #81776e;
+  font-size: 10px;
+}
+
+.mypage-panel-heading h2 {
+  margin: 2px 0 0;
+  padding: 0;
+  border: 0;
+  color: #332e2a;
+  font-size: 17px;
+}
+
+.mypage-panel-heading h2 small {
+  margin-left: 5px;
+  color: #847c74;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.mypage-panel-heading>small,.mypage-panel-heading>p {
+  margin: 0;
+  color: #817a73;
+  font-size: 11px;
+}
+
+.mypage-page .profile-panel .checkout-fields {
+  gap: 11px;
+}
+
+.mypage-page .profile-panel .checkout-fields label {
+  color: #5a534d;
+  font-size: 11px;
+}
+
+.mypage-page .profile-panel .checkout-fields input {
+  height: 39px;
+  border-color: #e1dcd6;
+  border-radius: 3px;
+  background: #fff;
+}
+
+.mypage-page .profile-panel .checkout-fields input:focus {
+  outline: 2px solid #e8e1ec;
+  border-color: #9885a0;
+}
+
+.mypage-page .save-profile {
+  min-height: 39px;
+  margin-top: 13px;
+  border-radius: 3px;
+  background: #51413a;
+  box-shadow: none;
+  font-size: 12px;
+}
+
+.mypage-page .save-profile:hover {
+  background: #3d302a;
+}
+
+.mypage-page .order-panel .order-row {
+  grid-template-columns: 100px minmax(0,1fr) auto auto;
+  gap: 12px;
+  margin-top: 0;
+  padding: 13px 0;
+  border: 0;
+  border-bottom: 1px solid #eeeae5;
+  border-radius: 0;
+  background: #fff;
+}
+
+.order-book-thumbs {
+  display: flex;
+  align-items: center;
+  padding-left: 2px;
+}
+
+.order-book-thumbs img {
+  width: 34px;
+  height: 48px;
+  margin-left: -3px;
+  object-fit: contain;
+  border: 1px solid #eee9e3;
+  background: #f7f5f2;
+}
+
+.order-book-thumbs img:first-child {
+  margin-left: 0;
+}
+
+.order-book-thumbs>span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 48px;
+  margin-left: 3px;
+  background: #f2efeb;
+  color: #655d56;
+  font-size: 10px;
+}
+
+.mypage-page .order-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.mypage-page .order-copy>b {
+  color: #39332e;
+  font-size: 12px;
+}
+
+.mypage-page .order-copy .order-books {
+  overflow: hidden;
+  color: #69615b;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mypage-page .order-copy .order-items {
+  color: #8a8179;
+  font-size: 10px;
+}
+
+.mypage-page .order-status {
+  margin: 0;
+}
+
+.mypage-page .order-status span {
+  padding: 3px 7px;
+  border-radius: 2px;
+  background: #edf3ed;
+  color: #49664e;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.mypage-page .order-row>strong {
+  align-self: start;
+  padding-top: 2px;
+  color: #39322d;
+  font-size: 12px;
+}
+
+.mypage-page .order-delete {
+  min-height: 29px;
+  align-self: start;
+  padding: 4px 7px;
+  border-color: #e4dfda;
+  border-radius: 3px;
+  color: #746c65;
+}
+
+.mypage-page .my-empty {
+  padding: 24px 10px;
+}
+
+.mypage-page .my-empty span {
+  color: #3c3530;
+}
+
+.mypage-page .my-empty button,.wishlist-empty button {
+  min-height: 34px;
+  border-color: #d8d0c8;
+  border-radius: 3px;
+  color: #51413a;
+}
+
+.mypage-page .my-wishlist,.mypage-page .my-recommendations {
+  grid-column: 1/-1;
+}
+
+.mypage-page .my-wishlist .mypage-panel-heading,.mypage-page .my-recommendations .mypage-panel-heading {
+  margin-bottom: 13px;
+}
+
+.mypage-page .mini-book-grid {
+  grid-template-columns: repeat(5,minmax(0,1fr));
+  gap: 12px;
+}
+
+.mypage-page .mini-book-grid button {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
+  padding: 0 0 8px;
+  border: 0;
+  border-bottom: 1px solid #eeeae5;
+  border-radius: 0;
+  background: #fff;
+  text-align: left;
+}
+
+.mypage-page .mini-book-grid button:hover b {
+  color: #59436b;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.mypage-page .mini-book-grid img {
+  height: 145px;
+  padding: 5px;
+  border: 0;
+  border-radius: 2px;
+  background: #f5f2ee!important;
+}
+
+.mypage-page .mini-book-grid b {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #37312d;
+  font-size: 11px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.mypage-page .mini-book-grid small {
+  color: #837a72;
+  font-size: 10px;
+}
+
+.wishlist-empty {
+  display: grid;
+  justify-items: start;
+  gap: 5px;
+  padding: 14px 0;
+}
+
+.wishlist-empty>span {
+  color: #68536e;
+  font-size: 25px;
+}
+
+.wishlist-empty p {
+  margin: 0;
+  color: #39332e;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.wishlist-empty small {
+  color: #817971;
+  font-size: 11px;
+}
+
+.wishlist-empty button {
+  margin-top: 6px;
+  padding: 0 11px;
+  background: #fff;
+}
+
+.mypage-recommendations .mypage-panel-heading>button {
+  min-height: 30px;
+  padding: 0;
+  background: transparent;
+  color: #5d4b68;
+  font-size: 11px;
+}
+
+@media(max-width:760px) {
+
+  .mypage-page {
+    padding-top: 18px;
+  }
+
+  .mypage-welcome {
+    padding: 18px;
+  }
+
+  .mypage-welcome h1 {
+    font-size: 21px;
+  }
+
+  .mypage-overview {
+    margin: 11px 0 14px;
+  }
+
+  .mypage-overview article {
+    padding: 11px 10px;
+  }
+
+  .mypage-overview article:first-child {
+    padding-left: 0;
+  }
+
+  .mypage-overview strong {
+    font-size: 17px;
+  }
+
+  .mypage-page .mypage-grid {
+    grid-template-columns: 1fr;
+    gap: 11px;
+  }
+
+  .mypage-page .my-wishlist,.mypage-page .my-recommendations {
+    grid-column: auto;
+  }
+
+  .mypage-page .account-panel {
+    padding: 16px;
+  }
+
+  .mypage-page .order-panel .order-row {
+    grid-template-columns: 74px minmax(0,1fr) auto;
+    gap: 9px;
+    padding: 12px 0;
+  }
+
+  .mypage-page .order-book-thumbs img,.mypage-page .order-book-thumbs>span {
+    width: 27px;
+    height: 40px;
+  }
+
+  .mypage-page .order-copy {
+    grid-column: 2;
+    grid-row: 1/3;
+  }
+
+  .mypage-page .order-row>strong {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .mypage-page .order-delete {
+    grid-column: 3;
+    grid-row: 2;
+    justify-self: end;
+  }
+
+  .mypage-page .mini-book-grid {
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    gap: 11px;
+  }
+
+  .mypage-page .mini-book-grid img {
+    height: 125px;
+  }
+
+  .mypage-panel-heading>small {
+    max-width: 45%;
+    text-align: right;
+  }
+}
+
+@media(max-width:420px) {
+
+  .mypage-welcome {
+    padding: 15px;
+  }
+
+  .mypage-overview article {
+    display: grid;
+    gap: 4px;
+  }
+
+  .mypage-page .account-panel {
+    padding: 14px;
+  }
+
+  .mypage-page .profile-panel .checkout-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .mypage-page .profile-panel .checkout-fields .wide {
+    grid-column: auto;
+  }
+
+  .mypage-page .mini-book-grid img {
+    height: 105px;
+  }
+
+  .mypage-page .order-panel .order-row {
+    grid-template-columns: 62px minmax(0,1fr) auto;
+    gap: 7px;
+  }
+}
+
