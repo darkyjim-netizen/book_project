@@ -2,204 +2,312 @@
 
 ## 1. 설계 범위
 
-북적북적의 백엔드는 Python과 FastAPI로 구성한다. SQLAlchemy는 PostgreSQL 연결과 데이터 조회·저장을 맡고, Pydantic은 요청과 응답의 형식을 정의한다. 아래 구조도에는 현재 소스의 파일명을 사용했다. 같은 이름의 파일이 생기지 않도록 `user_model.py`와 `user_crud.py`처럼 파일명에 역할을 표시했다.
+이 문서는 `backend/app/main.py`에서 실행하는 FastAPI 앱의 현재 구조와 API 계약을 기록한다. PostgreSQL 연결과 조회·저장은 SQLAlchemy가 담당하고, 요청과 응답의 형식은 Pydantic 모델로 정의한다. 설치 방법과 화면 메뉴는 [README.md](README.md)를 참고한다.
 
 ## 2. 백엔드 파일 구조
 
 ```text
 backend/
 ├── app/
-│   ├── __init__.py                  # app 패키지
-│   ├── main.py                      # FastAPI 진입점, CORS·라우터·오류 처리 등록
-│   ├── database.py                  # PostgreSQL 연결과 요청별 DB 세션 관리
+│   ├── main.py                 # FastAPI 앱, 미들웨어, 예외 처리, 라우터 등록
 │   ├── core/
-│   │   ├── config.py                # CORS 허용 출처 등 환경 설정
-│   │   ├── security.py              # 비밀번호 해시와 검증
-│   │   └── api_errors.py            # HTTP 오류 응답과 입력 검증 오류 처리
-│   ├── models/
-│   │   ├── user_model.py            # 회원 정보와 권한
-│   │   ├── product_model.py         # 도서 상품과 리뷰
-│   │   ├── category_model.py        # 도서 분류
-│   │   ├── order_model.py           # 주문 항목, 배송지, 금액, 결제 상태
-│   │   └── cart_model.py            # 회원별 장바구니 상품과 수량
-│   ├── auth/
-│   │   ├── auth_router.py           # 회원가입·로그인·갱신·내 정보 API
-│   │   ├── auth_schemas.py          # 인증 요청·토큰·회원 응답 형식
-│   │   ├── auth_service.py          # 가입 중복 검사, 로그인과 갱신 처리
-│   │   ├── auth_dependencies.py     # Bearer JWT와 회원·관리자 권한 확인
-│   │   ├── jwt_tokens.py            # JWT 발급, 서명·만료·토큰 종류 검증
-│   │   ├── session_router.py        # 기존 화면용 세션 로그인 API
-│   │   └── session_dependencies.py  # 기존 세션의 회원·관리자 권한 확인
+│   │   ├── config.py           # 환경 변수와 앱 설정
+│   │   ├── database.py         # PostgreSQL 엔진, Base, 요청별 DB 세션
+│   │   ├── security.py         # 비밀번호, JWT, 회원 및 관리자 권한
+│   │   ├── exceptions.py       # 업무 예외와 공통 오류 응답
+│   │   └── logging_config.py   # 콘솔 및 파일 로깅
 │   ├── routers/
-│   │   ├── products_router.py       # 상품 목록·상세 조회, 관리자 상품 CRUD
-│   │   ├── cart_router.py           # 장바구니 조회·추가·수량 수정·삭제
-│   │   ├── orders_router.py         # 주문 생성·목록·상세 조회
-│   │   ├── ai_router.py             # 추천 도서와 리뷰 감정 요약
-│   │   ├── admin_dashboard_router.py # 관리자 요약 통계와 구매 분석
-│   │   ├── profile_router.py        # 기존 화면용 내 정보 조회·수정·탈퇴
-│   │   ├── admin_members_router.py  # 기존 화면용 관리자 회원 관리
-│   │   ├── product_schemas.py       # 상품 등록·수정 입력과 상품 응답
-│   │   ├── order_schemas.py         # 주문·결제 입력과 주문 응답
-│   │   ├── member_schemas.py        # 기존 회원·관리자 API 데이터 형식
-│   │   └── page_schema.py           # 공통 페이지 응답 PageResponse[T]
-│   └── crud/
-│       ├── user_crud.py             # 회원 조회와 등록
-│       ├── product_crud.py          # 도서 검색·정렬·페이지네이션
-│       └── order_crud.py            # 주문 저장과 재고·장바구니 반영
-├── tests/                           # [예정] 인증·상품·주문 Pytest 테스트
-├── alembic/                         # [예정] DB 변경 이력 관리
-│   └── versions/                    # [예정] 변경 버전별 마이그레이션
-├── .env                             # 로컬 환경 변수
-├── .env.example                     # [예정] 환경 변수 예시
-├── requirements.txt                 # Python 의존성
-├── alembic.ini                      # [예정] Alembic 설정
-└── BACKEND_STRUCTURE.md             # 백엔드 구조와 REST API 설계서
+│   │   ├── __init__.py         # 현재 앱에 등록되는 라우터와 API 접두사
+│   │   ├── auth.py, members.py  # 인증 및 회원 기능
+│   │   ├── books.py, cart.py, orders.py, reviews.py
+│   │   ├── support.py, chat.py  # 공지·FAQ·문의·상담 및 WebSocket
+│   │   ├── admin.py, ai_router.py
+│   │   ├── pages.py            # 서버 렌더링 페이지 라우트
+│   │   └── payments_router.py  # 별도 결제 라우터 파일, 현재 앱 등록 제외
+│   ├── schemas/               # 도서·회원·주문·리뷰·고객지원·AI·공통 모델
+│   ├── models/                # 도서·회원·장바구니·주문·리뷰·프로모션 등 ORM
+│   ├── services/              # 인증·주문·결제·배송·고객지원 등의 처리 로직
+│   ├── ai/                    # 추천·감성 분석·판매/고객 분석·배치
+│   └── static/                # 앱 로드 시 준비하는 정적 파일 디렉터리
+├── database/
+│   ├── schema.sql             # 신규 DB의 스키마·테이블·인덱스
+│   └── seed_master.sql        # 기본 데이터
+├── migrations/001_toss_payment.sql
+├── scripts/generate_demo_data.py
+├── tests/test_payment_flow.py
+├── .env.example
+├── requirements.txt
+├── README.md
+└── BACKEND_STRUCTURE.md
 ```
 
-### 요청이 처리되는 흐름
+### 요청 처리 흐름
 
-1. `main.py`에 등록한 라우터가 요청을 받는다. 본문과 경로·쿼리 값은 요청 모델과 타입으로 검증한다.
-2. 회원 전용 API는 `Depends`에서 Bearer JWT를 검사한다. 관리자 전용 API는 DB에서 현재 회원의 역할도 확인한다.
-3. 라우터가 서비스 또는 CRUD 함수에 처리를 위임한다. SQLAlchemy 모델과 DB 세션을 사용해 조회·저장한다.
-4. Pydantic 응답 모델에 맞춰 결과를 반환한다. 주문은 서버가 단가와 재고를 확인하고, 주문 저장·재고 차감·장바구니 반영을 한 트랜잭션에서 처리한다.
+1. `app/main.py`가 앱과 미들웨어를 구성하고, `routers/__init__.py`가 기능 라우터를 등록한다.
+2. FastAPI가 본문·경로·쿼리 값을 검증하고, 의존성에서 DB 세션과 회원 정보를 준비한다. 관리자 기능은 회원 권한까지 확인한다.
+3. 라우터와 서비스가 DB 세션을 사용해 처리하고, 선언된 응답 모델 또는 해당 라우트의 응답 형식으로 반환한다. 예외는 `core/exceptions.py`에 등록된 핸들러에서 처리한다.
 
-## 3. REST API 엔드포인트
+### 데이터베이스 구성
 
-`GET`은 조회, `POST`는 생성·인증, `PUT`은 전체 수정, `PATCH`는 일부 수정, `DELETE`는 삭제를 의미한다.
-
-| 메서드 | 경로 | 접근 권한 | 처리 및 성공 응답 |
-| --- | --- | --- | --- |
-| POST | `/api/auth/signup` | 공개 | 회원가입 · 201 `MemberMeResponse` |
-| POST | `/api/auth/login` | 공개 | 이메일 로그인 · 200 `TokenResponse` |
-| POST | `/api/auth/refresh` | 유효한 refresh 토큰 | 토큰 재발급 · 200 `TokenResponse` |
-| GET | `/api/auth/me` | 회원 | 로그인 회원 정보 · 200 `MemberMeResponse` |
-| GET | `/api/products` | 공개 | 검색·필터·정렬된 목록 · 200 `PageResponse[ProductResponse]` |
-| GET | `/api/products/{product_id}` | 공개 | 상품 상세 · 200 `ProductResponse` |
-| POST | `/api/products` | 관리자 | 상품 등록 · 201 `ProductResponse` |
-| PUT | `/api/products/{product_id}` | 관리자 | 상품 전체 수정 · 200 `ProductResponse` |
-| DELETE | `/api/products/{product_id}` | 관리자 | 상품 비활성화 · 200 |
-| GET | `/api/cart` | 회원 | 내 장바구니 · 200 `CartItemResponse[]` |
-| POST | `/api/cart` | 회원 | 새 항목 추가는 201, 기존 항목 수량 증가 시 200 · `CartItemResponse` |
-| PATCH | `/api/cart/{cart_item_id}` | 소유 회원 | 항목 수량 변경 · 200 `CartItemResponse` |
-| DELETE | `/api/cart/{cart_item_id}` | 소유 회원 | 항목 삭제 · 200 |
-| GET | `/api/orders` | 회원 | 내 주문 목록 · 200 `PageResponse[OrderResponse]` |
-| POST | `/api/orders` | 회원 | 주문 생성 · 201 `OrderResponse` |
-| GET | `/api/orders/{order_id}` | 소유 회원 | 주문 상세 · 200 `OrderResponse` |
-| GET | `/api/ai/recommendations` | 공개 | 추천 도서 · 200 `AIRecommendationResponse` |
-| GET | `/api/ai/reviews/{product_id}/sentiment` | 공개 | 리뷰 감정 요약 · 200 `SentimentResponse` |
-| GET | `/api/admin/dashboard/stats` | 관리자 | 매출·회원·주문 요약 · 200 `AdminStatsResponse` |
-| GET | `/api/admin/dashboard/analytics` | 관리자 | 지역·연령대·카테고리 분석 · 200 `AdminAnalyticsResponse` |
-
-회원 API는 `Authorization: Bearer <access_token>`을 사용한다. `/auth`, `/members`, `/admin/members`는 기존 화면과 연결되는 세션 인증 경로다.
-
-## 4. 경로 및 쿼리 매개변수
-
-경로 변수 `product_id`, `cart_item_id`, `order_id`는 각각 상품·장바구니 항목·주문의 정수 식별자다.
-
-| 쿼리 변수 | 타입 | 기본값 | 적용 범위 |
-| --- | --- | --- | --- |
-| `page` | 정수 | 1 | 상품 및 주문 목록 |
-| `size` | 정수 | 10 | 상품 및 주문 목록. 1~100개 |
-| `sort_by` | 문자열 | `created_at` | 상품 목록. `created_at` 또는 `price` |
-| `direction` | 문자열 | `desc` | 상품 목록. `asc` 또는 `desc` |
-| `keyword` | 문자열 | 생략 가능 | 상품 제목·작가의 부분 일치 |
-| `category_id` | 정수 | 생략 가능 | 상품 목록의 카테고리 일치 |
-
-상품 목록은 검색어와 카테고리를 함께 적용할 수 있다. 필터링된 건수로 `total`을 계산한 뒤, 허용된 열을 기준으로 `.order_by()`를 적용한다. 페이지 범위는 `.offset((page - 1) * size).limit(size)`로 가져온다. 추천 API도 `size`와 `category_id`를 지원하며 최대 50개까지 요청할 수 있다.
-
-## 5. 요청 및 응답 모델
-
-요청 예시는 스네이크 케이스로 작성했다. 명세의 `Email`, `ProductId`, `ReceiverName` 같은 이름도 해당 입력에서 허용한다. 응답 키에는 스네이크 케이스를 사용한다.
-
-| 요청 | 주요 본문 |
+| PostgreSQL 스키마 | 역할 |
 | --- | --- |
-| 회원가입 | `email`, `password`, `name` |
-| 로그인 | `email`, `password` |
-| 토큰 갱신 | `refresh_token` |
-| 상품 등록·전체 수정 | `title`, `author`, `price`, `stock`, `category_id` |
-| 장바구니 추가 | `product_id`, `quantity` |
-| 장바구니 수량 변경 | `quantity` |
-| 주문 생성 | `receiver_name`, `address`, `payment_info`, `items`. `region`, `age_group`은 선택 |
+| `shop` | 회원·주소·도서·카테고리·장바구니·주문·결제·배송·리뷰·쿠폰·고객지원 |
+| `ai` | 추천·도서 유사도·리뷰 감성·매출 집계·예측·고객 세그먼트·이탈 예측·실행 이력 |
+| `log` | 로그인·재고·검색·최근 조회·결제 이력 |
+
+`Coupon`, `MemberCoupon`, `Banner`는 [promotion.py](app/models/promotion.py)에 정의한다. 공지·첨부파일·문의·답변·FAQ·상담방·메시지는 [support.py](app/models/support.py)에 정의한다. 신규 개발 DB 구성은 [schema.sql](database/schema.sql)과 [seed_master.sql](database/seed_master.sql)을 기준으로 한다.
+
+## 3. 기존 REST API 설계 대비 변경점
+
+| 기존 설계 | 현재 등록된 메서드와 경로 | 요청 → 응답 |
+| --- | --- | --- |
+| `/api/auth/signup` | `POST /api/v1/auth/signup` | `SignupRequest` → `MemberResponse` (201) |
+| `/api/auth/login` | `POST /api/v1/auth/login` | `LoginRequest` → `TokenResponse` |
+| `/api/auth/refresh` | `POST /api/v1/auth/refresh` | `RefreshRequest` → `TokenResponse` |
+| `/api/auth/me` | `GET /api/v1/auth/me` | 로그인 회원 → `MemberResponse` |
+| `/api/products`, `/api/products/{product_id}` | `GET /api/v1/books`, `GET /api/v1/books/{book_id}` | `PageResponse[BookListItem]`, `BookDetailResponse` |
+| 상품 등록 요청 | `POST /api/v1/admin/books` | `BookCreateRequest` → `BookDetailResponse` (201) |
+| `/api/cart`, `/api/cart/{cart_item_id}` | `GET /api/v1/cart`, `POST /api/v1/cart/items`, `PUT`·`DELETE /api/v1/cart/items/{cart_item_id}` | 추가는 `CartItemAddRequest`, 수정은 `CartItemUpdateRequest`. 응답은 `CartResponse` |
+| `/api/orders`, `/api/orders/{order_id}` | `POST`·`GET /api/v1/orders`, `GET /api/v1/orders/{order_id}` | 생성은 `OrderCreateRequest` → `OrderResponse` (200), 목록은 `PageResponse[OrderResponse]` |
+| `/api/ai/recommendations` | `GET /api/v1/ai/recommendations` | `limit`, `algorithm` → `RecommendationResponse` |
+| `/api/ai/reviews/{product_id}/sentiment` | 도서별 `GET /api/v1/books/{book_id}/review-stats`, 텍스트 분석 `POST /api/v1/reviews/analyze-sentiment` | 도서 리뷰 통계는 `ReviewStatsResponse`, 입력한 텍스트 분석은 `SentimentAnalyzeRequest`의 `text` 사용 |
+| `/api/admin/dashboard/stats`, `/api/admin/dashboard/analytics` | `GET /api/v1/admin/dashboard`, `GET /api/v1/ai/sales/summary`, `GET /api/v1/ai/customers/analysis` | `DashboardResponse`, `SalesSummaryResponse`, `CustomerAnalysisResponse` |
+
+## 4. 메서드·매개변수·요청 및 응답
+
+- **HTTP 메서드**는 현재 `GET`, `POST`, `PUT`, `DELETE`가 등록돼 있습니다. 장바구니 수량과 선택 상태는 `PUT` 요청에서 전달된 항목만 바꿀 수 있습니다.
+- **경로 매개변수**인 `book_id`, `cart_item_id`, `order_id`는 정수입니다. 상품 번호를 전달하던 자리는 현재 도서 번호인 `book_id`를 사용합니다.
+- **페이지네이션**은 `page`, `size`로 받고 SQLAlchemy에서 `offset((page - 1) * size).limit(size)` 방식으로 조회합니다. 도서 목록은 기본 `page=1`, `size=20`이며 `size`의 범위는 1~100입니다. 도서 리뷰 목록은 기본 `size=10`입니다. `PageResponse[T]`는 `success`, `items`, `meta`를 반환하며 `meta`에는 `page`, `size`, `total`, `total_pages`가 있습니다.
+- **정렬과 검색**에서 도서 목록은 `sort_by`·`direction` 대신 `sort` 하나를 사용합니다. 선택값은 `recent`(기본), `sales`, `price_asc`, `price_desc`, `rating`, `review`, `title`입니다. `keyword`로 도서를 검색하고 `category_id`, `publisher_id`, `author_id`, 가격 범위, 국내 도서 여부, 재고 여부로 결과를 좁힐 수 있습니다.
+- **요청 본문**의 필드 이름은 `snake_case`입니다. 회원가입 필수 항목은 `email`, `password`, `password_confirm`, `name`입니다. 도서 등록은 `isbn13`, `title`, `category_id`, `publisher_id`, `list_price`, `sale_price` 등을 사용합니다. 장바구니 추가는 `book_id`, `quantity`를 받습니다. 주문 생성은 주문자 정보와 `receiver`, `receiver_phone`, `zipcode`, `address1` 등 배송지 정보를 받고, `items`를 생략하면 장바구니에서 선택한 항목을 사용합니다. `payment_method`로 결제 수단을 선택하고 실제 결제 요청은 주문 생성 후 `POST /orders/{order_id}/pay`로 진행합니다.
+- **인증**은 회원 API에서 FastAPI 의존성으로 확인합니다. HTTP 요청의 `Authorization: Bearer <access_token>` 또는 `access_token` 쿠키를 사용할 수 있습니다. 관리자 API는 `require_admin`, 일부 작업은 `require_superadmin`을 사용합니다. 비회원도 장바구니와 주문 생성에 접근할 수 있으며, 비회원 주문 조회에는 주문번호와 이메일이 필요합니다.
+
+[공통 응답 모델](app/schemas/common.py) · [도서 쿼리](app/routers/books.py) · [도서 조회 로직](app/services/book_service.py) · [회원 요청 모델](app/schemas/member.py) · [도서 요청 모델](app/schemas/book.py) · [장바구니·주문 요청 모델](app/schemas/order.py) · [인증 코드](app/core/security.py)
+
+## 5. 상태 코드 및 오류 응답
+
+| HTTP 상태 | 현재 처리 |
+| --- | --- |
+| `200 OK` | 일반 성공. 주문 생성 등 일부 POST 요청도 200을 반환 |
+| `201 Created` | 회원가입, 리뷰 작성, 문의 등록, 채팅방 생성, 관리자 도서·공지 등록 |
+| `400 Bad Request` | 업무 규칙 위반. 기본 `BUSINESS_ERROR`, 가입 이메일 중복은 `EMAIL_DUPLICATED` |
+| `401 Unauthorized` | 인증 실패. HTTP 예외는 `HTTP_401`, 잘못된 로그인 정보는 `INVALID_CREDENTIALS` |
+| `403 Forbidden` | 권한 부족. HTTP 예외는 `HTTP_403`, 업무 예외 유형에 따라 `FORBIDDEN` 등 |
+| `404 Not Found` | 리소스를 찾지 못함. 업무 예외는 `NOT_FOUND`, HTTP 예외는 `HTTP_404` |
+| `409 Conflict` | DB 제약 조건 위반 `DB_CONFLICT` |
+| `422 Unprocessable Entity` | Pydantic 요청 검증 실패 `VALIDATION_ERROR` |
+| `500 Internal Server Error` | DB 처리 오류 `DB_ERROR`, 예상하지 못한 오류 `INTERNAL_ERROR` |
+
+실행 중 오류 응답은 `{"success": false, "error": {"code": "NOT_FOUND", "message": "도서를 찾을 수 없습니다."}}` 형태입니다. 검증 실패 시 `error.detail`에 항목별 오류를 포함할 수 있습니다. `OUT_OF_STOCK`과 `PAYMENT_FAILED`도 예외 클래스로 정의돼 있으며, 실제 응답 코드는 각 서비스가 발생시킨 예외에 따릅니다. 프런트엔드에서 분기할 때는 설계서의 리소스별 예시 코드보다 현재 API의 `error.code`를 기준으로 확인합니다. [예외 처리](app/core/exceptions.py) · [인증 서비스](app/services/auth_service.py)
+
+## 6. AI 모델과 처리 방식
+
+AI 로직은 `app/ai/`에 있습니다. 관리자 API에서 학습·재계산 작업을 시작할 수 있고, 일부 API는 요청 시에도 계산합니다. 배치 파이프라인은 구현돼 있으며, 매일 밤 실행하는 자동 스케줄은 현재 백엔드 소스에서 확인되지 않았습니다.
+
+| 기능 | 현재 구현 | 관련 DB 테이블 |
+| --- | --- | --- |
+| 맞춤 추천 | 협업 필터링과 도서 정보 기반 추천. 추천 API가 요청 시 추천기를 통해 결과를 계산하고 배치도 결과를 저장할 수 있음 | `ai.recommendations`, `ai.book_similarities` |
+| 리뷰 감성분석 | 한국어 어휘 규칙과 학습된 로지스틱 회귀 모델 활용. 리뷰 작성·수정과 텍스트 분석 요청에서도 실행 | `ai.review_sentiments` |
+| 고객 세그먼트 | 최근 구매일·구매 빈도·구매 금액을 이용한 RFM 점수화와 K-means 군집화 | `ai.customer_segments` |
+| 이탈 예측 | 로지스틱 회귀 기반 위험도 예측 | `ai.churn_predictions` |
+| 판매 분석 및 예측 | 일별 매출 집계, 미래 판매량 예측. 예측 API는 `retrain=true` 옵션 제공 | `ai.sales_daily`, `ai.sales_forecasts` |
+| 실행 이력 | 학습·집계 파이프라인의 작업 결과 기록 | `ai.model_runs` |
+
+[추천 모델](app/ai/recommender.py) · [감성 분석](app/ai/sentiment.py) · [고객 분석](app/ai/customer_analytics.py) · [배치 파이프라인](app/ai/pipeline.py) · [AI API](app/routers/ai_router.py)
+
+## 7. 추가 등록 API 목록
+
+아래 표의 경로 앞에는 기본 접두사 `/api/v1`을 붙입니다. 예를 들어 `GET /auth/check-email`의 전체 주소는 `GET /api/v1/auth/check-email`입니다. 같은 경로에 여러 메서드가 등록된 경우도 각각 표시했습니다.
+
+- **공개**는 회원 로그인 의존성이 없는 경로입니다. 주문 조회처럼 요청 데이터 자체로 추가 확인을 하는 경로도 있습니다.
+- **선택**은 로그인 없이 호출할 수 있고, 로그인 정보가 있으면 활용하는 경로입니다.
+- **회원**, **관리자**, **최고 관리자**는 각각 해당 인증·권한이 필요합니다.
+
+#### 인증·회원·쿠폰
+
+| 메서드 | 경로 | 기능 | 접근 |
+| --- | --- | --- | --- |
+| `GET` | `/auth/check-email` | 이메일 중복 확인 | 공개 |
+| `POST` | `/auth/logout` | 로그아웃 | 공개 |
+| `PUT` | `/auth/password` | 비밀번호 변경 | 회원 |
+| `POST` | `/auth/password/reset` | 임시 비밀번호 발급 | 공개 |
+| `POST` | `/auth/withdraw` | 회원 탈퇴 | 회원 |
+| `GET` | `/members/me` | 내 정보 | 회원 |
+| `PUT` | `/members/me` | 내 정보 수정 | 회원 |
+| `GET` | `/members/me/stats` | 마이페이지 요약 | 회원 |
+| `GET` | `/members/me/addresses` | 배송지 목록 | 회원 |
+| `POST` | `/members/me/addresses` | 배송지 등록 | 회원 |
+| `PUT` | `/members/me/addresses/{address_id}` | 배송지 수정 | 회원 |
+| `DELETE` | `/members/me/addresses/{address_id}` | 배송지 삭제 | 회원 |
+| `GET` | `/members/me/points` | 포인트 내역 | 회원 |
+| `GET` | `/members/me/coupons` | 보유 쿠폰 | 회원 |
+| `POST` | `/members/me/coupons` | 쿠폰 코드 등록 | 회원 |
+| `GET` | `/members/me/coupons/available` | 적용 가능 쿠폰 | 회원 |
+| `GET` | `/members/me/reviews` | 내가 쓴 리뷰 | 회원 |
+| `GET` | `/members/me/reviewable` | 리뷰 작성 가능 상품 | 회원 |
+| `GET` | `/members/me/recommendations` | 내 맞춤 추천 도서 | 회원 |
+
+#### 도서·리뷰
+
+| 메서드 | 경로 | 기능 | 접근 |
+| --- | --- | --- | --- |
+| `GET` | `/books/categories` | 카테고리 트리 | 공개 |
+| `GET` | `/books/bestsellers` | 베스트셀러 | 공개 |
+| `GET` | `/books/new-releases` | 신간 목록 | 공개 |
+| `GET` | `/books/popular-keywords` | 인기 검색어 | 공개 |
+| `GET` | `/books/recent-views` | 최근 본 도서 | 선택 |
+| `GET` | `/books/{book_id}/reviews` | 도서 리뷰 목록 | 선택 |
+| `GET` | `/books/{book_id}/similar` | 유사 도서 추천 | 공개 |
+| `GET` | `/books/{book_id}/bought-together` | 함께 구매한 도서 | 공개 |
+| `POST` | `/reviews` | 리뷰 작성 | 회원 |
+| `PUT` | `/reviews/{review_id}` | 리뷰 수정 | 회원 |
+| `DELETE` | `/reviews/{review_id}` | 리뷰 삭제 | 회원 |
+| `POST` | `/reviews/{review_id}/like` | 리뷰 도움됨 토글 | 회원 |
+
+#### 장바구니·위시리스트·주문
+
+| 메서드 | 경로 | 기능 | 접근 |
+| --- | --- | --- | --- |
+| `POST` | `/cart/items/bulk-delete` | 장바구니 선택 삭제 | 선택 |
+| `POST` | `/cart/select-all` | 전체 선택/해제 | 선택 |
+| `DELETE` | `/cart` | 장바구니 비우기 | 선택 |
+| `GET` | `/wishlist` | 위시리스트 조회 | 회원 |
+| `POST` | `/wishlist/{book_id}` | 위시리스트 토글 | 회원 |
+| `GET` | `/orders/stats` | 내 주문 통계 | 회원 |
+| `GET` | `/orders/lookup` | 비회원 주문 조회 | 공개 |
+| `POST` | `/orders/{order_id}/pay` | 결제 요청 | 선택 |
+| `POST` | `/orders/payments/callback` | PG 결제 콜백 | 공개 |
+| `POST` | `/orders/{order_id}/cancel` | 주문 취소 | 회원 |
+| `POST` | `/orders/{order_id}/confirm` | 구매 확정 | 회원 |
+| `POST` | `/orders/{order_id}/return` | 반품 접수 | 회원 |
+| `GET` | `/orders/{order_id}/shipment` | 배송 조회 | 회원 |
+| `GET` | `/orders/{order_id}/tracking-url` | 택배사 조회 URL | 회원 |
+
+#### 고객지원·채팅
+
+| 메서드 | 경로 | 기능 | 접근 |
+| --- | --- | --- | --- |
+| `GET` | `/notices` | 공지 목록 | 공개 |
+| `GET` | `/notices/{notice_id}` | 공지 상세 | 공개 |
+| `GET` | `/notices/{notice_id}/adjacent` | 이전/다음 공지 | 공개 |
+| `GET` | `/qna` | Q&A 목록 | 선택 |
+| `POST` | `/qna` | 문의 등록 | 회원 |
+| `GET` | `/qna/{question_id}` | 문의 상세 | 선택 |
+| `DELETE` | `/qna/{question_id}` | 문의 삭제 | 회원 |
+| `GET` | `/faqs` | FAQ 목록 | 공개 |
+| `GET` | `/faqs/categories` | FAQ 카테고리 | 공개 |
+| `POST` | `/faqs` | FAQ 등록(관리자) | 관리자 |
+| `DELETE` | `/faqs/{faq_id}` | FAQ 삭제(관리자) | 관리자 |
+| `POST` | `/chat/rooms` | 상담 시작 | 회원 |
+| `GET` | `/chat/rooms` | 내 상담 목록 | 회원 |
+| `GET` | `/chat/rooms/{room_id}` | 상담 상세 | 회원 |
+| `GET` | `/chat/rooms/{room_id}/messages` | 메시지 조회 | 회원 |
+| `POST` | `/chat/rooms/{room_id}/messages` | 메시지 전송(REST) | 회원 |
+| `POST` | `/chat/rooms/{room_id}/close` | 상담 종료 | 회원 |
+| `POST` | `/chat/rooms/{room_id}/satisfaction` | 상담 만족도 평가 | 회원 |
+
+#### AI·분석
+
+| 메서드 | 경로 | 기능 | 접근 |
+| --- | --- | --- | --- |
+| `GET` | `/ai/sales/monthly` | 월별 매출 | 관리자 |
+| `GET` | `/ai/sales/categories` | 카테고리별 매출 | 관리자 |
+| `GET` | `/ai/sales/best-sellers` | 기간 베스트셀러 | 관리자 |
+| `GET` | `/ai/sales/forecast` | 판매 예측 | 관리자 |
+| `GET` | `/ai/sales/distribution` | 주문 시간/요일 분포 | 관리자 |
+| `GET` | `/ai/customers/purchase-analysis` | 구매 분석 | 관리자 |
+| `GET` | `/ai/customers/churn` | 이탈 예측 결과 | 관리자 |
+| `GET` | `/ai/customers/churn/feature-importance` | 이탈 예측 피처 중요도 | 관리자 |
+| `POST` | `/ai/train/{model_name}` | AI 모델 학습 실행 | 관리자 |
+| `GET` | `/ai/model-runs` | 모델 실행 이력 | 관리자 |
+
+#### 관리자
+
+| 메서드 | 경로 | 기능 | 접근 |
+| --- | --- | --- | --- |
+| `GET` | `/admin/dashboard/alerts` | 운영 알림 | 관리자 |
+| `GET` | `/admin/books` | 도서 목록(관리자) | 관리자 |
+| `PUT` | `/admin/books/{book_id}` | 도서 수정 | 관리자 |
+| `DELETE` | `/admin/books/{book_id}` | 도서 삭제 | 관리자 |
+| `POST` | `/admin/books/{book_id}/stock` | 재고 조정 | 관리자 |
+| `GET` | `/admin/books/low-stock` | 재고 부족 도서 | 관리자 |
+| `GET` | `/admin/books/{book_id}/stock-history` | 재고 변동 이력 | 관리자 |
+| `GET` | `/admin/orders` | 주문 목록(관리자) | 관리자 |
+| `GET` | `/admin/orders/{order_id}` | 주문 상세(관리자) | 관리자 |
+| `PUT` | `/admin/orders/{order_id}/status` | 주문 상태 변경 | 관리자 |
+| `POST` | `/admin/orders/{order_id}/cancel` | 주문 강제 취소 | 관리자 |
+| `POST` | `/admin/orders/{order_id}/refund` | 결제 환불 | 관리자 |
+| `GET` | `/admin/members` | 회원 목록 | 관리자 |
+| `GET` | `/admin/members/{member_id}` | 회원 상세 | 관리자 |
+| `PUT` | `/admin/members/{member_id}/status` | 회원 상태 변경 | 최고 관리자 |
+| `POST` | `/admin/members/{member_id}/points` | 포인트 수동 조정 | 관리자 |
+| `POST` | `/admin/batch/{job_name}` | 운영 배치 실행 | 최고 관리자 |
+| `POST` | `/admin/shipments/{order_id}/invoice` | 송장 등록 | 관리자 |
+| `POST` | `/admin/shipments/bulk-invoice` | 송장 일괄 등록 | 관리자 |
+| `POST` | `/admin/shipments/{order_id}/tracking` | 배송 이력 추가 | 관리자 |
+| `POST` | `/admin/shipments/{order_id}/simulate` | 배송 진행 시뮬레이션 | 관리자 |
+| `GET` | `/admin/shipments/pending` | 발송 대기 목록 | 관리자 |
+| `GET` | `/admin/shipments/stats` | 배송 상태 통계 | 관리자 |
+| `POST` | `/admin/reviews/{review_id}/reply` | 리뷰 답글 등록 | 관리자 |
+| `POST` | `/admin/reviews/{review_id}/blind` | 리뷰 블라인드 | 관리자 |
+| `POST` | `/admin/reviews/mark-best` | 베스트 리뷰 선정 | 관리자 |
+| `GET` | `/admin/notices` | 공지 목록(관리자) | 관리자 |
+| `POST` | `/admin/notices` | 공지 등록 | 관리자 |
+| `PUT` | `/admin/notices/{notice_id}` | 공지 수정 | 관리자 |
+| `DELETE` | `/admin/notices/{notice_id}` | 공지 삭제 | 관리자 |
+| `POST` | `/admin/qna/{question_id}/answer` | 답변 등록 | 관리자 |
+| `POST` | `/admin/qna/{question_id}/close` | 문의 종료 | 관리자 |
+| `GET` | `/admin/qna/waiting-count` | 미답변 건수 | 관리자 |
+| `GET` | `/admin/chat/rooms` | 상담 목록 | 관리자 |
+| `POST` | `/admin/chat/rooms/{room_id}/assign` | 상담원 배정 | 관리자 |
+| `GET` | `/admin/chat/stats` | 상담 통계 | 관리자 |
+
+#### 시스템
+
+| 메서드 | 경로 | 기능 | 접근 |
+| --- | --- | --- | --- |
+| `GET` | `/health` | 헬스 체크(API) | 공개 |
+
+## 8. WebSocket 및 별도 경로
+
+- 실시간 상담은 `/api/v1/chat/ws/{room_id}`에 WebSocket으로 연결합니다. HTTP 방식의 채팅 메시지 조회·전송은 위 채팅 표를 참고하세요.
+- 서버 상태 확인은 위 표의 `GET /api/v1/health`와 별도 경로인 `GET /health`를 모두 사용할 수 있습니다.
+- `app/routers/payments_router.py`의 `/api/payments` 라우터는 현재 앱에 등록되어 있지 않습니다. 등록된 결제 API는 위 주문 표의 경로를 사용합니다.
+- 검색·도서 상세·공지·FAQ·관리 화면 등 서버 렌더링 페이지는 [페이지 라우터](app/routers/pages.py)에서 제공합니다.
+
+## 9. 주문·결제 처리 흐름
+
+1. `POST /api/v1/orders`가 주문 항목을 확정한다. 서버에서 판매 상태·재고와 금액을 확인하고 주문·항목을 저장한다. 재고 차감과 선택한 장바구니 항목 반영은 주문 생성 트랜잭션에서 처리한다.
+2. `POST /api/v1/orders/{order_id}/pay`에서 별도로 결제를 요청한다. 게이트웨이는 `PG_MOCK_MODE` 설정에 따라 모의 처리 또는 결제 제공자 구현을 선택한다. `POST /api/v1/orders/payments/callback`도 주문 라우터에 등록돼 있다.
+3. 회원은 주문 상세와 배송 상태를 확인한다. 비회원은 `GET /api/v1/orders/lookup`에 주문번호와 이메일을 보낸다. 취소·반품·구매 확정과 관리자 송장·환불은 각각 별도 API다.
+
+주문 생성 본문 예시는 다음과 같다. `book_id`는 개발 DB에 등록된 도서 번호를 사용한다.
 
 ```json
 {
-  "receiver_name": "홍길동",
-  "address": "서울시 예시로 1",
-  "payment_info": { "method": "test" },
-  "items": [{ "product_id": 1, "quantity": 2 }]
+  "items": [{"book_id": 1, "quantity": 2}],
+  "orderer_name": "홍길동",
+  "orderer_phone": "010-1234-5678",
+  "orderer_email": "reader@example.com",
+  "receiver": "홍길동",
+  "receiver_phone": "010-1234-5678",
+  "zipcode": "04524",
+  "address1": "서울시 예시로 1",
+  "payment_method": "CARD"
 }
 ```
 
-| 응답 모델 | 주요 필드 |
-| --- | --- |
-| `ProductResponse` | `id`, `title`, `author`, `price`, `stock`, `category_id`, `created_at` |
-| `PageResponse[T]` | `items`, `total`, `page`, `size` |
-| `TokenResponse` | `access_token`, `refresh_token`, `token_type` |
-| `MemberMeResponse` | `id`, `email`, `name`, `role`, `is_active`, `created_at` |
-| `CartItemResponse` | `id`, `product_id`, `quantity` |
-| `OrderResponse` | `id`, `receiver_name`, `address`, `items`, `total`, `payment_status`, `created_at` |
-| `AIRecommendationResponse` | `items`, `strategy` |
-| `SentimentResponse` | `product_id`, `review_count`, 긍정·부정 비율과 키워드별 집계 |
-| `AdminStatsResponse` | `total_sales`, `member_count`, `order_count`, `daily_orders` |
-| `AdminAnalyticsResponse` | `orders_by_region`, `orders_by_age_group`, `units_by_category` |
+[주문 서비스](app/services/order_service.py) · [결제 라우트](app/routers/orders.py) · [결제 게이트웨이](app/services/payment_gateway.py)
 
-## 6. 상태 코드 및 오류 응답
+## 10. 실행과 통합 검증
 
-| 상태 | 발생 조건 | 오류 코드 |
-| --- | --- | --- |
-| 200 OK | 조회·수정·삭제 및 인증 처리 성공 | |
-| 201 Created | 회원·상품·장바구니 항목·주문 생성 성공 | |
-| 400 Bad Request | 입력 검증 실패, 중복 이메일, 재고 부족 | `INVALID_INPUT_VALUE`, `DUPLICATE_EMAIL`, `OUT_OF_STOCK` |
-| 401 Unauthorized | 토큰 누락·만료·검증 실패, 로그인 정보 불일치 또는 토큰의 회원 없음 | `UNAUTHORIZED_ACCESS`, `MEMBER_NOT_FOUND` |
-| 403 Forbidden | 회원에게 관리자 권한이 없음 | `ADMIN_PERMISSION_REQUIRED` |
-| 404 Not Found | 상품, 내 장바구니 항목 또는 내 주문을 찾을 수 없음 | `PRODUCT_NOT_FOUND`, `CART_ITEM_NOT_FOUND`, `ORDER_NOT_FOUND` |
-| 500 Internal Server Error | 처리되지 않은 서버 내부 오류 | |
-
-도메인 오류는 `code`와 `message`를 반환한다. 입력 검증 오류는 문제가 발생한 필드를 `fields`에 함께 제공한다.
-
-## 7. 아직 구현하지 못한 항목과 다음 작업
-
-### 남은 API와 백엔드 구조 한눈에 보기
-
-3절에 정리한 확정 REST API는 메서드 기준 20개 모두 라우터가 연결되어 있다. 아래의 신규 API 경로와 파일명은 후속 작업에서 사용할 제안이다.
-
-| 작업 | 남은 API 또는 처리 | 백엔드 구조 항목 |
-| --- | --- | --- |
-| 카테고리 | 카테고리 초기 데이터를 준비하거나 관리자 등록 API `POST /api/categories`를 추가한다. 프런트엔드 필터에 필요하면 공개 목록 `GET /api/categories`도 추가한다. | 기존 `app/models/category_model.py` 활용. API를 추가할 경우 `app/routers/categories_router.py` 추가 |
-| 리뷰 등록 | 회원이 도서 리뷰를 저장하는 `POST /api/products/{product_id}/reviews`를 추가한다. | 기존 `app/models/product_model.py`의 `Review` 활용. `app/routers/reviews_router.py` 추가 |
-| 개인화 추천 | 기존 `GET /api/ai/recommendations`에 회원의 찜·구매 이력 기반 추천을 추가한다. | `app/routers/ai_router.py` 확장. 찜 데이터의 저장·조회 범위 확정 |
-| 감정 분석 고도화 | 기존 `GET /api/ai/reviews/{product_id}/sentiment`의 키워드 규칙을 모델 기반 분석으로 확장하는 경우 분석 기준을 정한다. | `app/routers/ai_router.py`의 분석 로직 확장 |
-| 실제 결제 | 결제사를 연동하는 경우 승인·실패·취소·환불을 처리한다. 별도 API 경로는 결제사 연동 방식에 맞춰 확정한다. | `app/crud/order_crud.py`의 주문 처리와 결제 결과 저장 구조 확장 |
-| 자동화 테스트 | 기존 API의 입력 검증, 권한, 조회 및 주문 흐름을 검증한다. | `tests/test_auth.py`, `tests/test_products.py`, `tests/test_orders.py` |
-| DB 마이그레이션 | 테이블·컬럼 변경 이력을 관리한다. | `alembic.ini`, `alembic/versions/` |
-| 환경 변수 예시 | DB·세션·JWT·CORS 설정 방법을 공유한다. | `.env.example` |
-| 통합 검증 | 실제 PostgreSQL과 프런트엔드에서 기존 API를 호출해 인증·주문 흐름을 확인한다. | DB 연결 설정 및 프런트엔드 API 호출부 |
-
-### 아직 없는 기능과 프로젝트 설정
-
-- [ ] **카테고리 초기 데이터 또는 관리 API** · 상품 등록에 필요한 카테고리를 추가하는 방법을 마련한다. 현재는 DB에 이미 등록된 카테고리만 상품에 지정할 수 있다.
-- [ ] **리뷰 등록 API** · 리뷰를 저장하는 API를 추가한다. 현재 리뷰 감정 요약 API는 DB에 저장된 리뷰를 읽어서 집계한다.
-- [ ] **Alembic 마이그레이션** · `alembic.ini`와 `alembic/versions/`를 추가하고 첫 마이그레이션을 작성한다. 현재 앱은 시작할 때 없는 테이블을 생성한다.
-- [ ] **환경 변수 예시** · `.env.example`에 DB 연결, 세션 키, JWT 키, CORS 설정에 필요한 변수명과 예시 값을 정리한다.
-- [ ] **Pytest 자동화 테스트** · 인증과 관리자 권한, 상품 검색과 페이지네이션, 장바구니와 주문의 소유권 및 재고 차감을 검증하는 테스트를 추가한다.
-
-### 기본 구현을 확장할 항목
-
-- [ ] **개인화 추천** · 현재 최신 상품 기준 추천에 회원의 찜·구매 이력을 활용하는 개인화 규칙이나 모델을 추가한다.
-- [ ] **리뷰 감정 분석 고도화** · 현재 긍정·부정 키워드 빈도를 집계한다. 모델 기반 분석을 적용할 경우 한국어 리뷰로 결과를 비교하고 비율 계산 기준을 정한다.
-- [ ] **실제 결제 연동** · 현재 주문은 테스트 결제로 처리된다. 실제 결제가 필요하면 승인 확인, 실패·취소·환불 처리를 구현하고 관리자 매출에서 테스트 주문과 실제 거래를 구분한다.
-
-### 구현 후 확인할 항목
-
-- [ ] **PostgreSQL과 프런트엔드 연동 검증** · PostgreSQL에서 가입부터 장바구니·주문까지 실제 HTTP 요청으로 실행하고, 프런트엔드에서 Bearer 토큰 전달과 갱신, 오류 응답 표시를 확인한다.
-
-## 8. 실행 및 API 확인
-
-Windows CMD에서 `C:\jh\miniproject02\backend`로 이동해 실행한다.
+`backend` 폴더에서 기존 `dl` 가상환경을 사용해 실행한다.
 
 ```cmd
 ..\dl\Scripts\python.exe -m uvicorn app.main:app --reload
 ```
 
-의존성 설치가 필요하면 같은 가상환경에서 `..\dl\Scripts\python.exe -m pip install -r requirements.txt`를 실행한다. 서버가 시작되면 [Swagger API 문서](http://127.0.0.1:8000/docs)에서 요청과 응답 형식을 확인할 수 있다.
-
+- [Swagger UI](http://127.0.0.1:8000/docs)와 [OpenAPI JSON](http://127.0.0.1:8000/openapi.json)에서 요청·응답 정의를 확인한다. [헬스 체크](http://127.0.0.1:8000/health) 응답의 `database`가 `connected`이면 앱의 DB 접속 확인을 통과한 상태다.
+- [결제 테스트 파일](tests/test_payment_flow.py)은 현재 구조에서 사라진 `app.models.order_model`, `app.auth.jwt_tokens` 등의 경로를 참조한다. 기존 테스트를 현재 서비스와 라우터에 맞춰 갱신해야 한다.
+- [SQL 마이그레이션 파일](migrations/001_toss_payment.sql)이 있다. 신규 DB는 `database/schema.sql`을 기준으로 초기화하고, 기존 DB에 마이그레이션을 적용하기 전에는 대상 테이블과 현재 DB 구조를 확인한다.
+- Vue 화면은 별도 프로젝트의 `/shop/...` 계약을 사용한다. 이 앱의 `/api/v1/...`에 연결하려면 API 경로, 인증, 요청·응답 형식을 맞춰야 한다. [Vue 메뉴와 연동 항목](README.md#북스토어-메뉴-구조도)
