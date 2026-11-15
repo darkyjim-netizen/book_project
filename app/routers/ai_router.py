@@ -51,38 +51,16 @@ def recommendations(
 
     # 추천 시스템은 이 API에서 사용할 때 불러온다.
     from app.ai.recommender import get_recommender
+    from app.ai.stored_recs import stored_recommendations
 
     recommender = get_recommender(db)
 
-    # 로그인 여부와 요청한 알고리즘에 따라 추천 방식을 선택한다.
-    if member is None:
-        # 비회원은 과거 구매 정보가 없으므로 인기 도서로 시작한다.
-        triples = recommender._cold_start(None, limit)
+    triples, algorithm_used = [], None
+    if member is not None:
+        triples, algorithm_used = stored_recommendations(db, member.member_id, limit)
+    if not triples:
+        triples = recommender._cold_start(member.member_id if member else None, limit)
         algorithm_used = "POPULAR"
-
-    elif algorithm == "user_cf":
-        # 비슷한 회원들의 구매 기록을 바탕으로 추천한다.
-        triples = recommender.user_based_recommend(
-            member.member_id,
-            limit,
-        )
-        algorithm_used = "USER_CF"
-
-    elif algorithm == "popular":
-        # 회원 여부와 관계없이 인기 도서 목록을 사용한다.
-        triples = recommender._cold_start(
-            member.member_id,
-            limit,
-        )
-        algorithm_used = "POPULAR"
-
-    else:
-        # 기본값은 회원의 도서 이용 기록을 바탕으로 추천하는 item_cf다.
-        triples = recommender.recommend_for_member(
-            member.member_id,
-            limit,
-        )
-        algorithm_used = "ITEM_CF"
 
     # 추천 결과의 도서 번호를 이용해 도서 상세 정보를 가져온다.
     book_service = BookService(db)

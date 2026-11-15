@@ -280,12 +280,15 @@ def my_recommendations(
 
     # 이 API에서만 필요한 기능이므로 요청을 처리할 때 모듈을 불러온다.
     from app.ai.recommender import get_recommender
+    from app.ai.stored_recs import stored_recommendations
     from app.services.book_service import BookService
 
     recommender = get_recommender(db)
 
     # 추천 결과는 (도서 번호, 추천 점수, 추천 이유) 형태의 묶음으로 받는다.
-    triples = recommender.recommend_for_member(member.member_id, limit)
+    triples, _ = stored_recommendations(db, member.member_id, limit)
+    if not triples:
+        triples = recommender.recommend_for_member(member.member_id, limit)
 
     # 추천된 도서의 상세 정보를 한 번에 조회해 도서 번호로 찾기 쉽게 만든다.
     book_service = BookService(db)
