@@ -7,7 +7,8 @@ export const useAuthStore = defineStore('auth', () => {
   const initialized = ref(false)
   const loading = ref(false)
   const isAuthenticated = computed(() => Boolean(user.value))
-  const isAdmin = computed(() => user.value?.role === 'admin')
+  // [백엔드 연동 수정] 백엔드의 권한 값은 소문자 'admin' 이 아니라 대문자 'USER' / 'ADMIN' 입니다.
+  const isAdmin = computed(() => user.value?.role === 'ADMIN')
 
   async function fetchMe() {
     loading.value = true

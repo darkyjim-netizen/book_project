@@ -9,8 +9,9 @@
       <AlertMessage :message="error" />
       <AlertMessage v-if="route.query.registered === '1'" message="회원가입이 완료되었습니다. 로그인해 주세요." type="success" />
       <form class="login-form" @submit.prevent="submit">
-        <label class="sr-only" for="login-username">아이디</label>
-        <input id="login-username" v-model.trim="form.username" autocomplete="username" required minlength="4" maxlength="50" placeholder="아이디" />
+        <!-- [백엔드 연동 수정] 아이디(username) 로그인 → 이메일 로그인. 백엔드는 POST /auth/login 에 { email, password } 를 받습니다. -->
+        <label class="sr-only" for="login-email">이메일</label>
+        <input id="login-email" v-model.trim="form.email" type="email" autocomplete="username" required maxlength="255" placeholder="이메일" />
         <label class="sr-only" for="login-password">비밀번호</label>
         <input id="login-password" v-model="form.password" type="password" autocomplete="current-password" required placeholder="비밀번호" />
         <button class="login-button" type="submit" :disabled="auth.loading">{{ auth.loading ? '로그인 중...' : '로그인' }}</button>
@@ -32,7 +33,8 @@ const auth = useAuthStore()
 const route = useRoute()
 const router = useRouter()
 const error = ref('')
-const form = reactive({ username: '', password: '' })
+// [백엔드 연동 수정] username → email (백엔드 LoginRequest 필드 이름)
+const form = reactive({ email: '', password: '' })
 
 async function submit() {
   error.value = ''
