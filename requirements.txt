@@ -60,7 +60,7 @@ python-jose[cryptography]
 passlib[bcrypt]
 
 ## 비밀번호를 bcrypt 방식으로 해시하고 검증하는 기능을 제공
-bcrypt
+bcrypt==4.0.1
 
 
 # --- AI / 데이터 분석 --------------------------------------------------------
