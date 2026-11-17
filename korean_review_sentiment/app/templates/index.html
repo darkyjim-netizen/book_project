@@ -1,0 +1,188 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-lg-9">
+
+        <div class="card shadow-sm">
+
+            <div class="card-body p-4">
+
+                <h2 class="text-center mb-3">
+                    한국어 리뷰 감정 분석
+                </h2>
+
+                <p class="text-center text-muted">
+                    상품 리뷰를 입력하면 AI가 긍정 또는 부정을 분석합니다.
+                </p>
+
+                <form action="/analyze"
+                      method="post">
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-bold">
+                            상품 리뷰 입력
+                        </label>
+
+                        <textarea
+                            name="review_text"
+                            class="form-control"
+                            rows="5"
+                            minlength="2"
+                            maxlength="5000"
+                            required
+                            placeholder="예: 배송도 빠르고 제품 품질도 정말 만족스럽습니다."
+                        ></textarea>
+
+                    </div>
+
+                    <button type="submit"
+                            class="btn btn-primary w-100">
+
+                        AI 감정 분석하기
+
+                    </button>
+
+                </form>
+
+                {% if error %}
+
+                    <div class="alert alert-danger mt-4">
+                        {{ error }}
+                    </div>
+
+                {% endif %}
+
+
+                {% if result %}
+
+                    <hr class="my-4">
+
+                    <h4 class="mb-3">
+                        감정 분석 결과
+                    </h4>
+
+                    {% if result.sentiment == "긍정" %}
+
+                        <div class="alert alert-success">
+
+                            <h3>😊 긍정 리뷰</h3>
+
+                            상품에 대한 긍정적인 감정이
+                            분석되었습니다.
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="alert alert-danger">
+
+                            <h3>😞 부정 리뷰</h3>
+
+                            상품에 대한 부정적인 감정이
+                            분석되었습니다.
+
+                        </div>
+
+                    {% endif %}
+
+
+                    <div class="mb-3">
+
+                        <label class="fw-bold">
+                            분석된 리뷰
+                        </label>
+
+                        <div class="border rounded p-3 mt-2">
+                            {{ result.review_text }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="mb-3">
+
+                        <label class="fw-bold">
+                            감정 분류 신뢰도
+                        </label>
+
+                        <h3>
+                            {{ "%.2f"|format(result.confidence * 100) }}%
+                        </h3>
+
+                        <div class="progress">
+
+                            <div
+                                class="progress-bar bg-primary"
+                                style="width: {{ result.confidence * 100 }}%">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="row text-center">
+
+                        <div class="col-6">
+
+                            <div class="card border-danger">
+
+                                <div class="card-body">
+
+                                    <h6>부정 확률</h6>
+
+                                    <h4 class="text-danger">
+
+                                        {{ "%.2f"|format(
+                                            result.negative_score * 100
+                                        ) }}%
+
+                                    </h4>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-6">
+
+                            <div class="card border-success">
+
+                                <div class="card-body">
+
+                                    <h6>긍정 확률</h6>
+
+                                    <h4 class="text-success">
+
+                                        {{ "%.2f"|format(
+                                            result.positive_score * 100
+                                        ) }}%
+
+                                    </h4>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

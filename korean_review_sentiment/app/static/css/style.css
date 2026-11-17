@@ -1,0 +1,27 @@
+
+body {
+    background-color: #f5f7fa;
+    font-family: Arial, sans-serif;
+}
+
+.card {
+    border: none;
+    border-radius: 12px;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.progress {
+    height: 15px;
+    border-radius: 10px;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+footer {
+    margin-top: 50px;
+}
