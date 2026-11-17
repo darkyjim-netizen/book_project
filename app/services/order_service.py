@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session, selectinload
 from app.core.config import settings
 from app.core.exceptions import BusinessError, NotFoundError
 from app.models.book import Book, StockHistory
-from app.models.cart import CartItem
+from app.models.cart import Cart, CartItem
 from app.models.enums import (
     BookStatus,
     OrderStatus,
@@ -173,10 +173,12 @@ class OrderService:
         self,
         member: Optional[Member],
         payload: OrderCreateRequest,
-    ) -> List[Tuple[Book, int]]:
+        cart_session_key: Optional[str],
+    ) -> Tuple[List[Tuple[Book, int]], List[int]]:
         """요청에서 주문할 도서와 수량을 찾아 목록으로 만든다."""
 
         pairs: List[Tuple[Book, int]] = []
+        cart_item_ids: List[int] = []
 
         # 요청에 상품 목록이 직접 들어 있으면 그 목록으로 주문한다.
         if payload.items:
@@ -191,17 +193,16 @@ class OrderService:
 
                 pairs.append((book, req.quantity))
 
-        # 상품 목록이 요청에 없으면 회원 장바구니의 선택 상품으로 주문한다.
+        # 상품 목록이 없으면 회원 또는 비회원의 장바구니에서 가져온다.
         else:
-            if member is None:
+            if member is not None:
+                condition = Cart.member_id == member.member_id
+            elif cart_session_key:
+                condition = (Cart.member_id.is_(None)) & (Cart.session_key == cart_session_key)
+            else:
                 raise BusinessError("주문 상품 정보가 필요합니다.")
 
-            # 이 함수 안에서만 Cart 모델을 사용하므로 여기서 가져온다.
-            from app.models.cart import Cart
-
-            cart = self.db.scalar(
-                select(Cart).where(Cart.member_id == member.member_id)
-            )
+            cart = self.db.scalar(select(Cart).where(condition))
 
             if cart is None:
                 raise BusinessError("장바구니가 비어 있습니다.")
@@ -212,7 +213,7 @@ class OrderService:
                     select(CartItem).where(
                         CartItem.cart_id == cart.cart_id,
                         CartItem.is_selected == True,  # noqa: E712
-                    )
+                    ).with_for_update(of=CartItem)
                 ).unique()
             )
 
@@ -228,22 +229,24 @@ class OrderService:
                     continue
 
                 pairs.append((book, item.quantity))
+                cart_item_ids.append(item.cart_item_id)
 
         # 어떤 방식으로도 주문 상품을 찾지 못했다면 오류를 발생시킨다.
         if not pairs:
             raise BusinessError("주문할 상품이 없습니다.")
 
-        return pairs
+        return pairs, cart_item_ids
 
     def create_order(
         self,
         member: Optional[Member],
         payload: OrderCreateRequest,
+        cart_session_key: Optional[str] = None,
     ) -> Order:
         """주문을 만들고 재고, 쿠폰, 포인트, 결제 정보를 처리한다."""
 
         # 요청 상품 또는 장바구니에서 주문 대상 도서와 수량을 가져온다.
-        pairs = self._resolve_items(member, payload)
+        pairs, cart_item_ids = self._resolve_items(member, payload, cart_session_key)
 
         item_amount = 0.0  # 판매가 기준 상품 금액 합계
         list_amount = 0.0  # 정가 기준 상품 금액 합계
@@ -462,18 +465,10 @@ class OrderService:
         )
 
         # 장바구니에서 주문한 경우, 주문에 사용한 선택 항목을 장바구니에서 지운다.
-        if member is not None and not payload.items:
-            from app.models.cart import Cart
-
-            cart = self.db.scalar(
-                select(Cart).where(Cart.member_id == member.member_id)
-            )
-
-            if cart:
-                self.db.query(CartItem).filter(
-                    CartItem.cart_id == cart.cart_id,
-                    CartItem.is_selected == True,  # noqa: E712
-                ).delete(synchronize_session=False)
+        if cart_item_ids:
+            self.db.query(CartItem).filter(
+                CartItem.cart_item_id.in_(cart_item_ids),
+            ).delete(synchronize_session=False)
 
         # 주문, 상품, 재고, 포인트, 쿠폰, 결제 정보를 한 번에 저장한다.
         self.db.commit()

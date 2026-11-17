@@ -1,5 +1,6 @@
 """도서 조회, 검색, 등록, 수정과 재고 관리를 담당하는 서비스."""
 import logging
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional, Tuple
 
 from sqlalchemy import Select, and_, func, or_, select, text
@@ -19,6 +20,7 @@ from app.models.book import (
 )
 from app.models.cart import Wishlist
 from app.models.enums import BookStatus
+from app.models.order import Order, OrderItem
 from app.schemas.book import (
     BookCreateRequest,
     BookDetailResponse,
@@ -219,14 +221,22 @@ class BookService:
                 .where(Author.name.ilike(kw))
             )
 
-            # 제목, 부제, 소개, ISBN, 저자명 중 하나라도 일치하면 포함한다.
+            publisher_subq = select(Publisher.publisher_id).where(Publisher.name.ilike(kw))
+            category_subq = select(Category.category_id).where(
+                or_(Category.name.ilike(kw), Category.full_path.ilike(kw))
+            )
+
+            # 제목, 저자, 출판사, 분야, 책 소개를 함께 검색한다.
             conditions.append(
                 or_(
                     Book.title.ilike(kw),
                     Book.subtitle.ilike(kw),
                     Book.summary.ilike(kw),
+                    Book.description.ilike(kw),
                     Book.isbn13 == params.keyword.strip(),
                     Book.book_id.in_(author_subq),
+                    Book.publisher_id.in_(publisher_subq),
+                    Book.category_id.in_(category_subq),
                 )
             )
 
@@ -313,6 +323,7 @@ class BookService:
         self,
         limit: int = 10,
         category_id: Optional[int] = None,
+        days: Optional[int] = None,
     ) -> List[BookListItem]:
         """판매 수량이 많은 도서를 조회한다."""
 
@@ -326,7 +337,23 @@ class BookService:
                 )
             )
 
-        stmt = stmt.order_by(Book.sales_count.desc()).limit(limit)
+        if days is None:
+            stmt = stmt.order_by(Book.sales_count.desc(), Book.book_id)
+        else:
+            cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+            sales = (
+                select(OrderItem.book_id, func.sum(OrderItem.quantity).label("quantity"))
+                .join(Order, Order.order_id == OrderItem.order_id)
+                .where(
+                    Order.paid_at >= cutoff,
+                    Order.status.in_(("PAID", "PREPARING", "SHIPPING", "DELIVERED", "CONFIRMED")),
+                )
+                .group_by(OrderItem.book_id)
+                .subquery()
+            )
+            stmt = stmt.join(sales, sales.c.book_id == Book.book_id)
+            stmt = stmt.order_by(sales.c.quantity.desc(), Book.book_id)
+        stmt = stmt.limit(limit)
         return [
             self.to_list_item(book)
             for book in self.db.scalars(stmt).unique()

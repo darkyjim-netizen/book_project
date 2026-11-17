@@ -81,6 +81,14 @@ class Settings(BaseSettings):
     PG_MID: str = "INIpayTest"       # 결제대행사에서 사용하는 테스트 가맹점 ID
     PG_API_KEY: str = "test-api-key" # 결제 API를 호출할 때 사용하는 테스트 키
     PG_MOCK_MODE: bool = True        # 실제 결제 대신 모의 결제 처리를 사용할지 여부
+    
+    # 토스 키도 다른 결제 설정과 함께 환경 변수와 .env 파일에서 읽는다.
+    TOSS_CLIENT_KEY: str = ""
+    TOSS_SECRET_KEY: str = ""
+
+    # 환경 변수 또는 backend/.env에서 우체국 인증키를 읽는다.
+    # 키가 비어 있으면 우편번호 검색 요청을 받을 때 설정 오류를 반환한다.
+    DATA_GO_KEY: str = ""
 
     # ------------------------------------------------------------------- AI
     AI_MODEL_DIR: str = "app/ai/artifacts"  # 학습한 모델 파일을 저장하거나 불러올 폴더
@@ -175,12 +183,12 @@ def backend_url() -> str:
 
 # 토스페이먼츠 결제창을 여는 데 쓰는 공개 키입니다.
 def toss_client_key() -> str:
-    return os.getenv("TOSS_CLIENT_KEY", "")
+    return get_settings().TOSS_CLIENT_KEY
 
 
 # 토스페이먼츠 승인·취소 API를 호출할 때 쓰는 비밀 키입니다. 서버 밖으로 내보내지 않습니다.
 def toss_secret_key() -> str:
-    return os.getenv("TOSS_SECRET_KEY", "")
+    return get_settings().TOSS_SECRET_KEY
 
 
 def toss_api_base_url() -> str:

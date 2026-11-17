@@ -79,22 +79,31 @@ class PaymentService:
         예: {"payment_key": "토스에서_받은_결제키"}
         """
 
-        # 주문이 실제로 존재하는지 확인한다.
-        order = self.db.get(Order, order_id)
+        # 동시에 들어온 승인 요청은 같은 주문 행을 잠가 순서대로 처리한다.
+        order = self.db.get(Order, order_id, populate_existing=True, with_for_update=True)
         if order is None:
             raise NotFoundError("주문을 찾을 수 없습니다.")
+
+        extra = extra or {}
+        payment = self.get_payment(order_id)
+        self.db.refresh(payment)
+        payment_key = extra.get("payment_key")
+        if (
+            not settings.PG_MOCK_MODE
+            and payment.status == PaymentStatus.PAID
+            and payment_key
+            and payment.pg_tid == payment_key
+        ):
+            return payment
 
         # 결제 대기 상태인 주문만 승인 요청할 수 있다.
         if order.status != OrderStatus.PENDING:
             raise BusinessError("결제 대기 상태의 주문만 결제할 수 있습니다.")
 
-        payment = self.get_payment(order_id)
-
         # 이미 결제된 주문의 중복 승인을 막는다.
         if payment.status == PaymentStatus.PAID:
             raise BusinessError("이미 결제가 완료된 주문입니다.")
 
-        extra = extra or {}
 
         # payment_key는 토스에서 프론트엔드 결제창으로 받은 값이다.
         # 로그에는 결제 키를 남기지 않도록 별도로 제외한다.

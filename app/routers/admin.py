@@ -33,6 +33,43 @@ router = APIRouter(prefix="/admin", tags=["관리자"])
 # =============================================================================
 # 관리자 대시보드
 # =============================================================================
+@router.get("/purchase-demographics", summary="연령대·배송지별 결제 주문 집계")
+def purchase_demographics(
+    days: int = Query(90, ge=7, le=365),
+    _admin: Member = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    """개인 정보 없이 결제 주문을 연령대 및 배송 주소 첫 단어별로 집계한다."""
+    counts = db.execute(
+        text(
+            """
+            WITH purchases AS (
+                SELECT CASE
+                           WHEN m.birth_date IS NULL OR m.birth_date > o.ordered_at::date THEN '미상'
+                           ELSE (EXTRACT(YEAR FROM age(o.ordered_at::date, m.birth_date))::int / 10 * 10)::text || '대'
+                       END AS age_group,
+                       COALESCE(NULLIF(split_part(btrim(o.address1), ' ', 1), ''), '미상') AS region
+                FROM shop.orders o
+                LEFT JOIN shop.members m ON m.member_id = o.member_id
+                WHERE o.paid_at >= now() - make_interval(days => :days)
+                  AND o.status IN ('PAID', 'PREPARING', 'SHIPPING', 'DELIVERED', 'CONFIRMED')
+            )
+            SELECT 'age_groups' AS kind, age_group AS label, COUNT(*) AS order_count
+            FROM purchases GROUP BY age_group
+            UNION ALL
+            SELECT 'regions', region, COUNT(*)
+            FROM purchases GROUP BY region
+            ORDER BY kind, order_count DESC, label
+            """
+        ),
+        {"days": days},
+    ).mappings()
+    result = {"age_groups": [], "regions": []}
+    for row in counts:
+        result[row["kind"]].append({"label": row["label"], "order_count": row["order_count"]})
+    return result
+
+
 @router.get(
     "/dashboard",
     response_model=DashboardResponse,

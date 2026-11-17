@@ -6,7 +6,7 @@ register_routers(app)을 호출해 모든 라우터를 애플리케이션에 등
 from fastapi import APIRouter, FastAPI
 
 from app.core.config import settings
-from app.routers import admin, ai_router, auth, books, cart, chat, members, orders, pages, reviews, support
+from app.routers import admin, ai_router, auth, books, cart, chat, members, orders, pages, postal, reviews, support
 
 
 def register_routers(app: FastAPI) -> None:
@@ -17,6 +17,8 @@ def register_routers(app: FastAPI) -> None:
     # 사용자 API: 인증, 회원, 도서, 장바구니, 위시리스트, 주문, 리뷰
     api.include_router(auth.router)
     api.include_router(members.router)
+    # postal 라우터를 연결하면 기본 주소는 /api/v1/postal/search가 된다.
+    api.include_router(postal.router)
     api.include_router(books.router)
     api.include_router(cart.router)
     api.include_router(cart.wishlist_router)

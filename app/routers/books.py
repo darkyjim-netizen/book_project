@@ -93,10 +93,11 @@ def categories(db: Session = Depends(get_db)):
 def bestsellers(
     limit: int = Query(10, ge=1, le=50),  # 가져올 도서 수
     category_id: Optional[int] = None,  # 지정하면 해당 카테고리 내에서 검색
+    days: Optional[int] = Query(None, ge=1, le=365),
     db: Session = Depends(get_db),
 ):
     """판매량 기준 베스트셀러를 반환한다."""
-    return BookService(db).list_bestsellers(limit, category_id)
+    return BookService(db).list_bestsellers(limit, category_id, days)
 
 
 @router.get(

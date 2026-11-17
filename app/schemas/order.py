@@ -234,6 +234,13 @@ class OrderResponse(BaseModel):
     is_cancelable: bool = False  # 현재 주문을 취소할 수 있는지 여부
 
 
+class OrderCreateResponse(OrderResponse):
+    """비회원 결제 인증 토큰을 포함할 수 있는 주문 생성 응답이다."""
+
+    # 회원 주문에는 None이며, 비회원은 결제 단계에서 이 토큰을 제출한다.
+    guest_order_token: Optional[str] = None
+
+
 class OrderCancelRequest(BaseModel):
     """주문 취소를 요청할 때 받을 데이터."""
 

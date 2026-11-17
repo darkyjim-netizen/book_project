@@ -202,7 +202,16 @@ class TossPgGateway(PgGateway):
         if response_data.get("result_code"):
             return response_data
 
-        # TossPaymentService의 응답을 기존 PaymentService가 쓰는 형식으로 변환한다.
+        # 카드·계좌이체는 토스가 승인 완료를 반환한 경우에만 완료로 처리한다.
+        if payment.method in (PaymentMethod.CARD, PaymentMethod.TRANSFER) and (
+            response_data.get("status") != "DONE"
+            or response_data.get("paymentKey") != payment_key
+            or response_data.get("orderId") != order.order_no
+            or response_data.get("totalAmount") != int(payment.amount)
+        ):
+            raise PaymentError("토스 결제 승인 결과가 주문 정보와 일치하지 않습니다.")
+
+        # 토스의 응답을 기존 PaymentService가 쓰는 형식으로 변환한다.
         result = {
             "result_code": "0000",
             "result_msg": "정상 승인",

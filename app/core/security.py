@@ -99,6 +99,15 @@ def create_refresh_token(member_id: int) -> str:
     )
 
 
+def create_guest_order_token(order_id: int) -> str:
+    """비회원 주문 한 건에만 사용할 수 있는 서명 토큰을 발급한다."""
+    return _create_token(
+        {"order_id": order_id},
+        expires_minutes=120,
+        token_type="guest_order",
+    )
+
+
 def decode_token(token: str) -> Dict[str, Any]:
     """JWT 서명과 만료 시각을 검증하고 페이로드를 반환한다."""
     try:
@@ -119,6 +128,25 @@ def _extract_token(request: Request, bearer: Optional[str]) -> Optional[str]:
     if bearer:
         return bearer
     return request.cookies.get("access_token")
+
+
+def verify_guest_order_token(token: Optional[str], order_id: int) -> None:
+    """서명된 비회원 토큰이 요청한 주문에만 유효한지 확인한다."""
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="비회원 주문 인증 토큰이 필요합니다.",
+        )
+
+    payload = decode_token(token)
+    if (
+        payload.get("type") != "guest_order"
+        or payload.get("order_id") != order_id
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="해당 주문에 접근할 수 없습니다.",
+        )
 
 
 def get_current_member_optional(
