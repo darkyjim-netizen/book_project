@@ -11,6 +11,13 @@ from typing import Dict, List, Optional, Tuple
 
 from app.core.config import settings
 
+# 추가
+from pathlib import Path
+
+import torch
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
+#여기까지
+
 logger = logging.getLogger(__name__)
 
 # 설정 파일에 지정된 모델 버전을 사용한다.
@@ -397,6 +404,48 @@ class MlSentimentModel:
             return None
 
 
+class HuggingFaceSentimentModel:
+    def __init__(self):
+        self.available = False
+        self.tokenizer = None
+        self.model = None
+
+        model_path = Path(settings.MODEL_PATH)
+        if not model_path.exists():
+            logger.warning("Hugging Face 모델 폴더를 찾을 수 없습니다: %s", model_path)
+            return
+
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            str(model_path), local_files_only=True
+        )
+        self.model = AutoModelForSequenceClassification.from_pretrained(
+            str(model_path), local_files_only=True
+        )
+        self.model.to(self.device)
+        self.model.eval()
+        self.available = True
+
+    def predict_proba(self, text: str) -> Optional[float]:
+        if not self.available:
+            return None
+
+        inputs = self.tokenizer(
+            text or "",
+            return_tensors="pt",
+            truncation=True,
+            padding=True,
+            max_length=128,
+        )
+        inputs = {key: value.to(self.device) for key, value in inputs.items()}
+
+        with torch.inference_mode():
+            logits = self.model(**inputs).logits
+            probabilities = torch.softmax(logits, dim=-1)[0]
+
+        # 모델 레이블에서 1은 긍정으로 정의되어 있음
+        return float(probabilities[1].item())
+
 # -----------------------------------------------------------------------------
 # 사전 분석과 머신러닝 결과를 합치는 분석기
 # -----------------------------------------------------------------------------
@@ -414,10 +463,12 @@ class SentimentAnalyzer:
     def __init__(self) -> None:
         self.lexicon = LexiconSentimentAnalyzer()
         self.model = MlSentimentModel()
-
+        
         # 저장된 학습 모델이 있으면 불러온다.
         self.model.load()
 
+        self.hf_model = HuggingFaceSentimentModel()
+        
     def analyze(self, text: str) -> Dict:
         """문장을 분석해 감성 라벨, 점수, 키워드를 반환한다."""
 
@@ -425,7 +476,9 @@ class SentimentAnalyzer:
         lex_score, pos_kw, neg_kw = self.lexicon.score(text)
 
         # 학습된 모델이 있으면 긍정 확률을 계산한다.
-        model_proba = self.model.predict_proba(text)
+        model_proba = self.hf_model.predict_proba(text)
+        if model_proba is None:
+            model_proba = self.model.predict_proba(text)
 
         if model_proba is not None:
             # 긍정 확률 0~1을 감성 점수 -1~1로 변환한다.
@@ -466,7 +519,8 @@ class SentimentAnalyzer:
             # 모델이 실제 사용됐는지에 따라 버전 이름을 구분한다.
             "model_version": (
                 MODEL_VERSION
-                if self.model.available
+                # if self.model.available
+                if self.hf_model.available or self.model.available
                 else f"{MODEL_VERSION}-lexicon"
             ),
             "used_ml_model": model_proba is not None,

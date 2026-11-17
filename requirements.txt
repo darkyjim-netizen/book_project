@@ -109,3 +109,8 @@ pytest-cov
 
 ## 가상의 이름, 이메일, 주소 등 테스트에 쓸 데이터를 만드는 도구
 faker
+
+## 리뷰감정분석에 필요한 도구
+torch
+transformers
+safetensors

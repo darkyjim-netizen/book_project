@@ -84,7 +84,7 @@ class Settings(BaseSettings):
 
     # ------------------------------------------------------------------- AI
     AI_MODEL_DIR: str = "app/ai/artifacts"  # 학습한 모델 파일을 저장하거나 불러올 폴더
-
+    MODEL_PATH: str = "app/ai/models/sentiment_model"
     # CF는 협업 필터링을 뜻한다. 여러 사용자의 행동 패턴을 비교해 상품을 추천하는 방식이다.
     CF_MIN_INTERACTIONS: int = 2  # 추천에 사용할 최소 사용자 행동 기록 수
     CF_TOP_N: int = 20            # 추천 결과에 포함할 상품 수
