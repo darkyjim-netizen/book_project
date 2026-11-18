@@ -1,5 +1,6 @@
 <template>
-  <div class="min-h-screen">
+  <RouterView v-if="$route.meta.storefrontView" />
+  <div v-else class="min-h-screen">
     <AppHeader v-if="$route.name !== 'login' && $route.name !== 'register'" />
     <main><RouterView /></main>
     <footer v-if="$route.name !== 'login' && $route.name !== 'register'" class="site-footer">

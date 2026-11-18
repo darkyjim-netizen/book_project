@@ -7,13 +7,16 @@ export const useAuthStore = defineStore('auth', () => {
   const initialized = ref(false)
   const loading = ref(false)
   const isAuthenticated = computed(() => Boolean(user.value))
-  // [백엔드 연동 수정] 백엔드의 권한 값은 소문자 'admin' 이 아니라 대문자 'USER' / 'ADMIN' 입니다.
-  const isAdmin = computed(() => user.value?.role === 'ADMIN')
+  const isAdmin = computed(() => ['ADMIN', 'STAFF'].includes(user.value?.role))
+
+  function normalizeMember(member) {
+    return member ? { ...member, id: member.member_id, username: member.email, display_name: member.nickname || member.name, is_active: member.status === 'ACTIVE' } : null
+  }
 
   async function fetchMe() {
     loading.value = true
     try {
-      user.value = await authApi.me()
+      user.value = normalizeMember(await authApi.me())
       return user.value
     } catch (error) {
       user.value = null
@@ -29,7 +32,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const result = await authApi.login(payload)
       // 응답의 member는 화면 상태에 반영하고, 세션 쿠키는 브라우저가 관리합니다.
-      user.value = result.member
+      user.value = normalizeMember(result.member)
       initialized.value = true
       return result
     } finally {

@@ -1,0 +1,956 @@
+/* Vue 관리자 화면 통합 스타일 */
+
+.admin-shell {
+  min-height: calc(100vh - 250px);
+  display: grid;
+  place-items: center;
+  padding: 28px 12px;
+}
+
+.admin-shell .login-panel {
+  width: min(100%,425px);
+  text-align: center;
+}
+
+.admin-shell .login-logo {
+  display: block;
+  width: 260px;
+  height: 190px;
+  object-fit: contain;
+  margin: 0 auto 16px;
+}
+
+.admin-shell .login-form {
+  display: grid;
+  gap: 10px;
+  text-align: left;
+}
+
+.admin-shell .login-form>input,.admin-shell .password-field {
+  width: 100%;
+  height: 55px;
+  border: 1px solid #cfd4d6;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.admin-shell .login-form>input,.admin-shell .password-field input {
+  padding: 0 17px;
+  font-size: 16px;
+  color: #1b2b31;
+  outline: none;
+}
+
+.admin-shell .login-form>input:focus,.admin-shell .password-field:focus-within {
+  border-color: #142d34;
+  box-shadow: 0 0 0 1px #142d34;
+}
+
+.admin-shell .password-field {
+  display: flex;
+  align-items: center;
+}
+
+.admin-shell .password-field input {
+  height: 100%;
+  width: 100%;
+  border: 0;
+  background: transparent;
+}
+
+.admin-shell .eye-button {
+  height: 44px;
+  width: 48px;
+  flex: none;
+  border: 0;
+  background: transparent;
+  color: #71817d;
+  display: grid;
+  place-items: center;
+}
+
+.admin-shell .remember-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: max-content;
+  min-height: 36px;
+  font-size: 15px;
+  color: #263642;
+  cursor: pointer;
+}
+
+.admin-shell .remember-row input,.admin-shell .consent-row input {
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  border: 1px solid #cdd4d7;
+  border-radius: 5px;
+  background: #fff;
+}
+
+.admin-shell .remember-row input:checked,.admin-shell .consent-row input:checked {
+  background: #147d78;
+  border-color: #147d78;
+}
+
+.admin-shell .login-button {
+  height: 58px;
+  width: 100%;
+  border: 0;
+  border-radius: 9px;
+  background: #147d78;
+  color: #fff;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.admin-shell .login-button:disabled {
+  background: #bfc3c4;
+  cursor: not-allowed;
+}
+
+.admin-shell .login-error {
+  margin: 0;
+  color: #c33d40;
+  font-size: 13px;
+}
+
+.admin-shell .account-links {
+  margin-top: 19px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 13px;
+  flex-wrap: wrap;
+}
+
+.admin-shell .account-links button,.admin-back-link {
+  border: 0;
+  background: transparent;
+  color: #526762;
+  font-size: 14px;
+}
+
+.admin-shell .account-links span {
+  height: 14px;
+  border-left: 1px solid #d7dcde;
+}
+
+.admin-shell .demo-hint {
+  margin: 20px 0 0;
+  color: #73817f;
+  font-size: 12px;
+}
+
+.admin-shell .demo-hint b {
+  color: #3e5853;
+}
+
+.admin-shell .signup-panel {
+  width: min(100%,480px);
+  text-align: left;
+}
+
+.admin-shell .signup-back {
+  padding: 0;
+  background: transparent;
+  color: #526762;
+  font-size: 14px;
+}
+
+.admin-shell .signup-panel h1 {
+  margin: 20px 0 6px;
+  font-size: 27px;
+}
+
+.admin-shell .signup-intro {
+  margin: 0 0 18px;
+  color: #657571;
+  font-size: 14px;
+}
+
+.admin-shell .signup-form {
+  display: grid;
+  gap: 8px;
+}
+
+.admin-shell .signup-form>label:not(.consent-row) {
+  margin-top: 3px;
+  color: #536268;
+  font-size: 13px;
+}
+
+.admin-shell .signup-form>input {
+  width: 100%;
+  height: 45px;
+  padding: 0 13px;
+  border: 1px solid #cfd4d6;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 14px;
+  outline: none;
+}
+
+.admin-shell .consent-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 9px 0 3px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.admin-back-link {
+  margin-top: 18px;
+}
+
+/* 관리자 대시보드와 판매 현황 */
+.admin-dashboard {
+  background: #f5f8f8;
+  margin: 0 -5.3%;
+  padding-bottom: 12px;
+}
+
+.admin-dashboard .dashboard-header {
+  height: 76px;
+  padding: 0 clamp(20px,5vw,72px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border-bottom: 1px solid #e8edef;
+}
+
+.admin-dashboard .dashboard-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-dashboard .dashboard-brand img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.admin-dashboard .dashboard-brand b,.admin-dashboard .dashboard-brand small {
+  display: block;
+}
+
+.admin-dashboard .dashboard-brand b {
+  font-size: 18px;
+}
+
+.admin-dashboard .dashboard-brand small {
+  margin-top: 3px;
+  color: #7b8589;
+  font-size: 11px;
+}
+
+.admin-dashboard .header-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.admin-dashboard .admin-greeting {
+  color: #657378;
+  font-size: 13px;
+}
+
+.admin-dashboard .logout-button {
+  min-height: 40px;
+  padding: 0 15px;
+  border: 1px solid #dce4e6;
+  border-radius: 8px;
+  background: #fff;
+  color: #3f5258;
+  font-size: 13px;
+}
+
+.admin-dashboard .dashboard-content {
+  width: min(1240px,calc(100% - 48px));
+  margin: 0 auto;
+  padding: 36px 0 30px;
+}
+
+.admin-dashboard .page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 23px;
+}
+
+.admin-dashboard .page-heading h1 {
+  margin: 0;
+  font-size: 30px;
+}
+
+.admin-dashboard .page-heading p:last-child {
+  margin: 8px 0 0;
+  color: #657579;
+  font-size: 14px;
+}
+
+.admin-dashboard .eyebrow {
+  margin: 0 0 8px;
+  color: #108b8d;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .15em;
+}
+
+.admin-dashboard .metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 14px;
+}
+
+.admin-dashboard .dashboard-card {
+  background: #fff;
+  border: 1px solid #e7eeef;
+  border-radius: 12px;
+  box-shadow: 0 5px 18px #17384108;
+}
+
+.admin-dashboard .metric-card {
+  min-height: 150px;
+  padding: 19px;
+}
+
+.admin-dashboard .metric-top,.admin-dashboard .metric-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-dashboard .metric-top>span:first-child {
+  font-size: 13px;
+  color: #53676d;
+}
+
+.admin-dashboard .metric-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+}
+
+.admin-dashboard .metric-icon.mint {
+  background: #e3f5ef;
+  color: #188b69;
+}
+
+.admin-dashboard .metric-icon.lavender {
+  background: #f0ebff;
+  color: #8064c9;
+}
+
+.admin-dashboard .metric-icon.blue {
+  background: #e7f2fc;
+  color: #4882ba;
+}
+
+.admin-dashboard .metric-icon.peach {
+  background: #fff0e6;
+  color: #dc874c;
+}
+
+.admin-dashboard .metric-value {
+  display: block;
+  margin: 15px 0 11px;
+  font-size: 25px;
+  font-weight: 700;
+}
+
+.admin-dashboard .metric-bottom {
+  justify-content: flex-start;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.admin-dashboard .metric-bottom>span:last-child {
+  color: #738187;
+}
+
+.admin-dashboard .positive {
+  color: #21916f;
+  font-weight: 700;
+}
+
+.admin-dashboard .admin-profile {
+  margin-top: 17px;
+  padding: 22px 24px;
+}
+
+.admin-dashboard .profile-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #edf1f2;
+}
+
+.admin-dashboard .profile-symbol {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: #e6f4f1;
+  color: #108b8d;
+  font-size: 22px;
+}
+
+.admin-dashboard .profile-heading .eyebrow {
+  margin: 0 0 4px;
+}
+
+.admin-dashboard .profile-heading h2 {
+  margin: 0;
+  font-size: 19px;
+}
+
+.admin-dashboard .profile-heading p:last-child {
+  margin: 4px 0 0;
+  color: #6c7b80;
+  font-size: 12px;
+}
+
+.admin-dashboard .importance-badge {
+  margin-left: auto;
+  padding: 8px 12px;
+  border-radius: 30px;
+  background: #f0ebff;
+  color: #6b55a2;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.admin-dashboard .profile-grid {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 0 24px;
+  margin: 0;
+}
+
+.admin-dashboard .profile-item {
+  padding: 13px 0 11px;
+  border-bottom: 1px solid #f0f3f4;
+}
+
+.admin-dashboard .profile-item dt {
+  margin-bottom: 5px;
+  color: #748287;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.admin-dashboard .profile-item dd {
+  margin: 0;
+  color: #273a40;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.admin-dashboard .dashboard-lower {
+  display: grid;
+  grid-template-columns: minmax(0,1.35fr) minmax(300px,.9fr);
+  gap: 16px;
+  margin-top: 17px;
+}
+
+.admin-dashboard .sales-card,.admin-dashboard .activity-card {
+  padding: 20px;
+}
+
+.admin-dashboard .card-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-dashboard .card-heading h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.admin-dashboard .card-heading p {
+  margin: 6px 0 0;
+  color: #738187;
+  font-size: 11px;
+}
+
+.admin-dashboard .demo-tag {
+  padding: 6px 9px;
+  border-radius: 6px;
+  background: #f0f5f5;
+  color: #65777c;
+  font-size: 10px;
+}
+
+.admin-dashboard .donut-layout {
+  display: grid;
+  grid-template-columns: minmax(170px,.85fr) minmax(180px,1fr);
+  align-items: center;
+  gap: 15px;
+  min-height: 220px;
+  margin-top: 9px;
+}
+
+.admin-dashboard .donut-chart {
+  width: min(210px,100%);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  margin: auto;
+  position: relative;
+}
+
+.admin-dashboard .donut-chart:before {
+  content: "";
+  position: absolute;
+  inset: 17%;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.admin-dashboard .donut-chart>div {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  text-align: center;
+  gap: 3px;
+}
+
+.admin-dashboard .donut-chart strong {
+  font-size: 29px;
+  line-height: 1;
+  color: #243b42;
+}
+
+.admin-dashboard .donut-chart>div span {
+  font-size: 11px;
+  color: #718187;
+}
+
+.admin-dashboard .donut-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.admin-dashboard .donut-legend li {
+  display: grid;
+  grid-template-columns: 10px 1fr auto;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 0;
+  border-bottom: 1px solid #edf1f2;
+}
+
+.admin-dashboard .donut-legend li:last-child {
+  border: 0;
+}
+
+.admin-dashboard .legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #52b9a1;
+}
+
+.admin-dashboard .legend-dot.lavender {
+  background: #8064c9;
+}
+
+.admin-dashboard .legend-dot.blue {
+  background: #4882ba;
+}
+
+.admin-dashboard .legend-copy b,.admin-dashboard .legend-copy small {
+  display: block;
+}
+
+.admin-dashboard .legend-copy b {
+  font-size: 12px;
+  color: #33494f;
+}
+
+.admin-dashboard .legend-copy small {
+  margin-top: 4px;
+  color: #738187;
+  font-size: 10px;
+}
+
+.admin-dashboard .donut-legend li>strong {
+  font-size: 13px;
+  color: #263b42;
+}
+
+.admin-dashboard .workload-item {
+  margin-top: 22px;
+}
+
+.admin-dashboard .workload-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-dashboard .workload-label b {
+  font-size: 12px;
+  color: #33484e;
+}
+
+.admin-dashboard .workload-label span {
+  font-size: 12px;
+  font-weight: 700;
+  color: #3c555c;
+}
+
+.admin-dashboard .progress-track {
+  height: 8px;
+  margin-top: 8px;
+  overflow: hidden;
+  border-radius: 9px;
+  background: #edf2f2;
+}
+
+.admin-dashboard .progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg,#52b9a1,#168b8b);
+}
+
+.admin-dashboard .progress-track span.lavender {
+  background: linear-gradient(90deg,#b3a2e3,#8064c9);
+}
+
+.admin-dashboard .progress-track span.blue {
+  background: linear-gradient(90deg,#8bbce0,#4882ba);
+}
+
+.admin-dashboard .workload-item small {
+  display: block;
+  margin-top: 6px;
+  color: #748287;
+  font-size: 10px;
+}
+
+.admin-dashboard .profile-footnote {
+  margin-top: 21px;
+  padding: 12px;
+  border-radius: 9px;
+  background: #f3f8f8;
+  color: #657579;
+  font-size: 11px;
+}
+
+.admin-dashboard .profile-footnote b {
+  margin-left: 7px;
+  color: #108b8d;
+}
+
+.admin-dashboard .data-note {
+  margin: 18px 0 0;
+  text-align: right;
+  color: #7a878b;
+  font-size: 10px;
+}
+
+@media(max-width:850px) {
+
+  .admin-dashboard .profile-grid {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+  }
+
+  .admin-dashboard .dashboard-lower {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media(max-width:600px) {
+
+  .admin-dashboard {
+    margin: 0 -5%;
+  }
+
+  .admin-dashboard .dashboard-content {
+    width: calc(100% - 32px);
+    padding: 26px 0;
+  }
+
+  .admin-dashboard .dashboard-header {
+    height: 66px;
+    padding: 0 16px;
+  }
+
+  .admin-dashboard .dashboard-brand img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .admin-dashboard .admin-greeting {
+    display: none;
+  }
+
+  .admin-dashboard .page-heading h1 {
+    font-size: 22px;
+  }
+
+  .admin-dashboard .page-heading p:last-child {
+    font-size: 11px;
+  }
+
+  .admin-dashboard .metric-grid {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 9px;
+  }
+
+  .admin-dashboard .metric-card {
+    min-height: 130px;
+    padding: 13px;
+  }
+
+  .admin-dashboard .metric-top>span:first-child {
+    font-size: 11px;
+  }
+
+  .admin-dashboard .metric-value {
+    font-size: 20px;
+  }
+
+  .admin-dashboard .metric-bottom {
+    font-size: 9px;
+  }
+
+  .admin-dashboard .admin-profile {
+    padding: 16px;
+  }
+
+  .admin-dashboard .profile-heading {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .admin-dashboard .profile-heading h2 {
+    font-size: 17px;
+  }
+
+  .admin-dashboard .importance-badge {
+    margin-left: 57px;
+    font-size: 10px;
+  }
+
+  .admin-dashboard .profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-dashboard .profile-item dd {
+    font-size: 12px;
+  }
+
+  .admin-dashboard .donut-layout {
+    grid-template-columns: 1fr;
+    gap: 5px;
+    padding: 10px 0;
+  }
+
+  .admin-dashboard .donut-chart {
+    width: 175px;
+  }
+
+  .admin-dashboard .donut-legend li {
+    padding: 9px 0;
+  }
+}
+
+.new-book-label {
+  font-size: 11px;
+  color: #5e706c;
+}
+
+.cart-page {
+  padding: 30px 0 55px;
+}
+
+.cart-heading {
+  margin-bottom: 24px;
+}
+
+.cart-heading h1 {
+  margin: 14px 0 4px;
+  font-size: 28px;
+}
+
+.cart-heading p {
+  margin: 0;
+  color: #788782;
+}
+
+.cart-back {
+  padding: 0;
+  background: none;
+  color: #147d78;
+}
+
+.cart-layout {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) 300px;
+  gap: 24px;
+  align-items: start;
+}
+
+.cart-list,.cart-summary {
+  border: 1px solid #e6ecea;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px;
+  border-bottom: 1px solid #edf1f0;
+}
+
+.cart-item:last-child {
+  border: 0;
+}
+
+.cart-item img {
+  width: 68px;
+  height: 96px;
+  object-fit: contain;
+  background: #f3f6f5;
+}
+
+.cart-item-info {
+  flex: 1;
+}
+
+.cart-item-info span {
+  font-size: 12px;
+  color: #147d78;
+}
+
+.cart-item-info h2 {
+  margin: 5px 0;
+  font-size: 16px;
+}
+
+.cart-item-info p {
+  margin: 0;
+  color: #788782;
+  font-size: 13px;
+}
+
+.cart-item>strong {
+  white-space: nowrap;
+}
+
+.cart-summary {
+  padding: 20px;
+}
+
+.cart-summary h2 {
+  margin: 0 0 18px;
+  font-size: 18px;
+}
+
+.cart-summary>div {
+  display: flex;
+  justify-content: space-between;
+  margin: 14px 0;
+  font-size: 14px;
+}
+
+.cart-summary .cart-discount {
+  color: #c96f62;
+}
+
+.cart-summary .cart-total {
+  padding-top: 16px;
+  border-top: 1px solid #e8efed;
+  font-weight: 700;
+}
+
+.cart-total strong {
+  font-size: 19px;
+}
+
+.cart-summary>button,.cart-empty button {
+  width: 100%;
+  height: 48px;
+  border-radius: 7px;
+  background: #147d78;
+  color: #fff;
+  font-weight: 700;
+}
+
+.cart-summary>button:disabled {
+  background: #bbc7c3;
+  cursor: not-allowed;
+}
+
+.cart-empty {
+  padding: 70px 20px;
+  text-align: center;
+}
+
+.cart-empty>span {
+  font-size: 36px;
+}
+
+.cart-empty h2 {
+  font-size: 18px;
+}
+
+.cart-empty p {
+  color: #788782;
+}
+
+.cart-empty button {
+  max-width: 180px;
+}
+
+@media(max-width:760px) {
+
+  .cart-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .cart-summary {
+    order: -1;
+  }
+
+  .cart-item {
+    gap: 12px;
+    padding: 13px;
+  }
+
+  .cart-item img {
+    width: 54px;
+    height: 78px;
+  }
+
+  .cart-item>strong {
+    font-size: 13px;
+  }
+}
+
+
+/* 대시보드 배경을 본문 전체에 이어 붙여 위아래 흰 여백을 없앤다. */
+.content.content-dashboard { padding: 0; }
+.content-dashboard .admin-dashboard { margin: 0; padding-bottom: 0; }

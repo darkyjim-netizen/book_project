@@ -18,7 +18,7 @@
         <input id="signup-password" v-model="form.password" type="password" required minlength="8" maxlength="64" autocomplete="new-password" placeholder="비밀번호 (8~64자)" />
         <label for="signup-password-confirm">비밀번호 확인</label>
         <input id="signup-password-confirm" v-model="passwordConfirm" type="password" required autocomplete="new-password" placeholder="비밀번호를 다시 입력해 주세요" />
-        <p class="signup-note">가입 후 기본 권한으로 계정이 생성됩니다.</p>
+        <p class="signup-note">이메일로 로그인하며, 가입 후 일반 회원 권한으로 계정이 생성됩니다.</p>
         <button class="login-button signup-submit" type="submit" :disabled="saving">{{ saving ? '가입 처리 중...' : '가입하기' }}</button>
       </form>
     </div>

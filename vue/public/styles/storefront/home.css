@@ -1,0 +1,3822 @@
+/* 인기 도서, 신간, 주제별 책장 */
+
+#shop-view .section#books {
+  margin-top: 30px;
+  padding: 30px;
+  border: 1px solid #ece6df;
+  border-radius: 24px;
+  background: linear-gradient(145deg, #fff 0%, #fbf8f3 100%);
+  box-shadow: 0 18px 45px #3327190b;
+}
+
+#shop-view .section#books > .section-head h3 {
+  color: #2d2635;
+  font-size: clamp(22px, 2.4vw, 30px);
+  letter-spacing: -.045em;
+}
+
+#shop-view .section#books > .section-head .catalog-count {
+  margin-left: auto;
+  padding: 8px 13px;
+  border-radius: 999px;
+  background: #f1eaf8;
+  color: #6744a5;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+#shop-view .section#books .categories { margin: 20px 0 24px; }
+#shop-view .section#books .book-grid { gap: 18px; }
+#shop-view .section#books .book-card {
+  border: 1px solid #eee9e2;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 5px 18px #33271908;
+  transition: transform .2s, box-shadow .2s, border-color .2s;
+}
+#shop-view .section#books .book-card:hover {
+  transform: translateY(-4px);
+  border-color: #d8c8e9;
+  box-shadow: 0 14px 28px #33271915;
+}
+
+#domestic-view {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 34px 28px 70px;
+}
+
+#domestic-view > .catalog-section-head {
+  margin: 0 0 22px;
+  padding: 30px;
+  border: 1px solid #eee8e1;
+  border-radius: 22px;
+  background: radial-gradient(ellipse at 100% 0%, #f1eafa 0, transparent 40%), #fff;
+  box-shadow: 0 14px 38px #3327190b;
+}
+
+#domestic-view > .catalog-section-head h1 {
+  color: #2d2635;
+  font-size: clamp(28px, 3.2vw, 40px);
+  letter-spacing: -.05em;
+}
+
+#domestic-view > .categories { margin: 0 0 24px; }
+#domestic-view .catalog-grid { gap: 20px 18px; }
+#domestic-view .book-card {
+  overflow: hidden;
+  border: 1px solid #ece7e0;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 5px 18px #33271909;
+  transition: transform .2s, box-shadow .2s, border-color .2s;
+}
+#domestic-view .book-card:hover {
+  transform: translateY(-4px);
+  border-color: #d8c8e9;
+  box-shadow: 0 14px 28px #33271916;
+}
+
+@media (max-width: 700px) {
+  #shop-view .section#books { padding: 20px 15px; border-radius: 18px; }
+  #domestic-view { padding: 22px 14px 48px; }
+  #domestic-view > .catalog-section-head { padding: 22px 18px; border-radius: 18px; }
+}
+
+#shop-view .home-new-section,#shop-view .home-theme-section {
+  margin-top: 42px;
+}
+
+#shop-view .home-new-grid {
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 18px 15px;
+}
+
+#shop-view .home-new-grid .book-art {
+  height: 205px;
+}
+
+#shop-view .home-theme-section>.section-head {
+  margin-bottom: 15px;
+}
+
+/* 주제별 책장과 신간·인기 도서 */
+.theme-shelf-list {
+  border-top: 1px solid #e3ded8;
+}
+
+.theme-shelf {
+  display: grid;
+  grid-template-columns: minmax(170px,.55fr) minmax(0,1.45fr);
+  gap: 24px;
+  padding: 17px 0;
+  border-bottom: 1px solid #e3ded8;
+}
+
+.theme-shelf-heading h3 {
+  margin: 0;
+  color: #302b28;
+  font-size: 15px;
+  letter-spacing: -.03em;
+}
+
+.theme-shelf-heading p {
+  margin: 5px 0 0;
+  color: #77716b;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.theme-shelf-books {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 12px;
+}
+
+.theme-shelf-books button {
+  display: grid;
+  grid-template-columns: 48px minmax(0,1fr);
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.theme-shelf-books button:hover b {
+  color: #59436b;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.theme-shelf-books img {
+  width: 48px;
+  height: 64px;
+  object-fit: contain;
+  background: #f4f1ed;
+}
+
+.theme-shelf-books button>span {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.theme-shelf-books b {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #39332e;
+  font-size: 11px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.theme-shelf-books small {
+  overflow: hidden;
+  color: #817971;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.theme-shelf-books i {
+  grid-column: 2;
+  color: #6d5b77;
+  font-size: 10px;
+  font-style: normal;
+}
+
+@media(max-width:900px) {
+
+  #shop-view .home-new-grid {
+    grid-template-columns: repeat(3,minmax(0,1fr));
+  }
+
+  .theme-shelf {
+    grid-template-columns: 150px minmax(0,1fr);
+    gap: 16px;
+  }
+
+  .theme-shelf-books {
+    gap: 8px;
+  }
+
+  .theme-shelf-books button {
+    grid-template-columns: 40px minmax(0,1fr);
+    gap: 7px;
+  }
+
+  .theme-shelf-books img {
+    width: 40px;
+    height: 56px;
+  }
+}
+
+@media(max-width:700px) {
+
+  #shop-view .home-new-section,#shop-view .home-theme-section {
+    margin-top: 32px;
+  }
+
+  #shop-view .home-new-grid {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 18px 12px;
+  }
+
+  #shop-view .home-new-grid .book-art {
+    height: 185px;
+  }
+
+  .theme-shelf {
+    grid-template-columns: 1fr;
+    gap: 11px;
+    padding: 15px 0;
+  }
+
+  .theme-shelf-books {
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    gap: 8px;
+  }
+
+  .theme-shelf-books button {
+    grid-template-columns: 34px minmax(0,1fr);
+    gap: 6px;
+  }
+
+  .theme-shelf-books img {
+    width: 34px;
+    height: 48px;
+  }
+
+  .theme-shelf-books i {
+    font-size: 9px;
+  }
+}
+
+@media(max-width:420px) {
+
+  .theme-shelf-books {
+    grid-template-columns: 1fr;
+  }
+
+  .theme-shelf-books button {
+    grid-template-columns: 42px minmax(0,1fr) auto;
+  }
+
+  .theme-shelf-books img {
+    width: 42px;
+    height: 58px;
+  }
+
+  .theme-shelf-books i {
+    grid-column: 3;
+    grid-row: 1;
+  }
+}
+
+/* 홈 화면 주제별 책장과 닫기 가능한 안내 */
+
+.theme-shelf-list {
+  border-top: 0!important;
+}
+
+.theme-shelf {
+  border-bottom: 0!important;
+  padding: 13px 0;
+}
+
+/* 홈 화면과 분야 메뉴 구분선 조정 */
+
+#shop-view .section-head,#domestic-view>.section-head {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+#shop-view .categories,#domestic-view>.categories {
+  border-bottom: 0;
+}
+
+.category-menu {
+  border-bottom: 0;
+}
+
+/* 도서 목록 스타일의 구분선 최종 조정 */
+
+#shop-view .section-head,#domestic-view>.section-head {
+  padding-bottom: 0!important;
+  border-bottom: 0!important;
+}
+
+#shop-view .categories,#domestic-view>.categories,.category-menu {
+  border-bottom: 0!important;
+}
+
+#shop-view .book-card,#domestic-view .book-card {
+  border-bottom: 0!important;
+}
+
+/* 큐레이션 페이지의 한글 서체와 간격 */
+
+#curation-view {
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+#curation-view .curation-welcome {
+  display: block;
+  padding: 25px 0 22px;
+  border-radius: 0;
+  border-bottom: 1px solid #e9e5ee;
+  background: #fff;
+}
+
+#curation-view .curation-welcome .eyebrow {
+  color: #746b7e;
+  font-size: 11px;
+  letter-spacing: 0;
+}
+
+#curation-view .curation-welcome h1 {
+  margin: 8px 0 5px;
+  color: #28242d;
+  font-size: 29px;
+  font-weight: 700;
+  letter-spacing: -.06em;
+}
+
+#curation-view .curation-welcome p {
+  color: #6d6871;
+  font-size: 14px;
+}
+
+#curation-view .curation-guides {
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 0;
+  margin: 0 0 30px;
+  padding: 15px 0;
+  border-bottom: 1px solid #e9e5ee;
+}
+
+#curation-view .curation-guides article {
+  grid-template-columns: 22px 1fr;
+  column-gap: 9px;
+  padding: 4px 16px;
+  border: 0;
+  border-right: 1px solid #eeeaf1;
+  border-radius: 0;
+  background: transparent;
+}
+
+#curation-view .curation-guides article:first-child {
+  padding-left: 0;
+}
+
+#curation-view .curation-guides article:last-child {
+  border-right: 0;
+}
+
+#curation-view .curation-guides article>span {
+  grid-row: 1/3;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #f0edf4;
+  color: #5e4a77;
+  font-size: 11px;
+}
+
+#curation-view .curation-guides b {
+  color: #35313a;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+#curation-view .curation-guides small {
+  color: #817b85;
+  font-size: 11px;
+}
+
+#curation-view .curation-section-head {
+  align-items: end;
+  margin: 0 0 13px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd8e2;
+}
+
+#curation-view .curation-section-head h2 {
+  font-size: 19px;
+  color: #2c2831;
+  letter-spacing: -.04em;
+}
+
+#curation-view .curation-section-head p {
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+#curation-view .curation-section-head .catalog-count {
+  background: transparent;
+  color: #756b80;
+}
+
+#curation-view .curation-grid {
+  grid-template-columns: repeat(5,minmax(0,1fr));
+  gap: 15px;
+  align-items: stretch;
+}
+
+#curation-view .curation-book {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+  transition: opacity .15s;
+}
+
+#curation-view .curation-book:hover,#curation-view .curation-book:focus-visible {
+  transform: none;
+  outline: 2px solid #a895ba;
+  outline-offset: 4px;
+  box-shadow: none;
+}
+
+#curation-view .curation-cover {
+  height: 205px;
+  border-radius: 2px;
+  background: #f4f2f5!important;
+}
+
+#curation-view .curation-cover>span {
+  top: 8px;
+  left: 9px;
+  color: #766e7d;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+#curation-view .curation-cover img {
+  max-width: 70%;
+  height: 78%;
+  box-shadow: 5px 7px 12px #24202b24;
+}
+
+#curation-view .curation-copy {
+  padding: 10px 1px 0;
+}
+
+#curation-view .curation-copy .category {
+  color: #756b80;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+#curation-view .curation-copy h3 {
+  margin: 5px 0 4px;
+  color: #2d2932;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+#curation-view .curation-copy .author {
+  color: #77717b;
+  font-size: 11px;
+}
+
+#curation-view .curation-reason {
+  min-height: 0;
+  margin: 8px 0;
+  color: #615c64;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+#curation-view .curation-more {
+  padding-top: 8px;
+  border-top: 1px solid #ece9ee;
+  color: #58466f;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.book-info-page {
+  max-width: 1240px;
+}
+
+.book-info-back {
+  margin-bottom: 14px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #5c4b70;
+  font-weight: 600;
+}
+
+.book-info-layout {
+  grid-template-columns: minmax(260px,.68fr) minmax(0,1.32fr);
+  gap: 42px;
+  padding: 22px 0;
+  border: 0;
+  border-top: 1px solid #e5e0e8;
+  border-bottom: 1px solid #e5e0e8;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.book-info-visual {
+  position: sticky;
+  top: 22px;
+  min-height: 410px;
+  border-radius: 2px;
+  background: #f5f3f6!important;
+}
+
+.book-info-visual img {
+  max-width: 68%;
+  max-height: 340px;
+  box-shadow: 8px 10px 18px #28232f24;
+}
+
+.book-info-kicker {
+  color: #756b80;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.book-info-content>h1 {
+  color: #29252e;
+  font-size: 32px;
+  letter-spacing: -.055em;
+}
+
+.book-info-byline {
+  color: #77717b;
+}
+
+.book-info-meta {
+  gap: 16px;
+  margin: 17px 0;
+  padding: 12px 0;
+  border-color: #e9e5eb;
+}
+
+.book-info-meta span {
+  padding: 0;
+  background: transparent;
+  color: #77717b;
+}
+
+.book-info-content section {
+  margin-top: 21px;
+}
+
+.book-info-content section h2 {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.book-info-intro {
+  color: #514c55;
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+.book-info-contents {
+  gap: 0;
+}
+
+.book-info-contents li {
+  padding: 10px 0;
+  border: 0;
+  border-bottom: 1px solid #eeeaf0;
+  border-radius: 0;
+  color: #514c55;
+}
+
+.book-info-contents li span {
+  color: #827b88;
+}
+
+.book-editor-note {
+  margin-top: 18px;
+  padding: 13px 0;
+  border-top: 1px solid #e9e5eb;
+  border-radius: 0;
+  background: transparent;
+  color: #39333f;
+}
+
+.book-editor-note b {
+  font-size: 13px;
+}
+
+.book-editor-note p {
+  color: #625b68;
+  font-size: 13px;
+}
+
+.book-info-purchase {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-color: #e9e5eb;
+}
+
+.book-info-purchase strong {
+  color: #322a39;
+  font-size: 21px;
+}
+
+.book-info-purchase button {
+  background: #493657;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.book-info-purchase button:hover {
+  background: #382842;
+}
+
+@media(max-width:900px) {
+
+  #curation-view .curation-grid {
+    grid-template-columns: repeat(3,minmax(0,1fr));
+  }
+}
+
+@media(max-width:700px) {
+
+  #curation-view .curation-guides {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 12px 0;
+  }
+
+  #curation-view .curation-guides article,#curation-view .curation-guides article:first-child {
+    padding: 3px 0;
+    border-right: 0;
+  }
+
+  #curation-view .curation-grid {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 18px 13px;
+  }
+
+  #curation-view .curation-cover {
+    height: 190px;
+  }
+
+  #curation-view .curation-reason {
+    min-height: 0;
+  }
+
+  .book-info-layout {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    padding: 16px 0;
+  }
+
+  .book-info-visual {
+    position: static;
+    min-height: 270px;
+  }
+
+  .book-info-visual img {
+    max-height: 225px;
+  }
+
+  .book-info-content>h1 {
+    font-size: 26px;
+  }
+}
+
+/* 홈과 도서 목록의 카드 스타일 통일 */
+
+#shop-view,#domestic-view {
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+#shop-view .hero {
+  border-radius: 3px;
+  box-shadow: none;
+}
+
+#shop-view .discovery-board {
+  border-radius: 3px;
+  background: #faf9f7;
+}
+
+#shop-view .section {
+  margin-top: 36px;
+}
+
+#shop-view .section-head,#domestic-view>.section-head {
+  align-items: end;
+  margin-bottom: 13px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #dedbd7;
+}
+
+#shop-view .section-head h3,#domestic-view>.section-head h1 {
+  margin: 0;
+  color: #2d2926;
+  font-size: 20px;
+  letter-spacing: -.04em;
+}
+
+#shop-view .section-head p,#domestic-view>.section-head p {
+  margin-top: 5px;
+  color: #77716c;
+  font-size: 12px;
+}
+
+#shop-view .categories,#domestic-view>.categories {
+  gap: 7px;
+  margin: 0 0 17px;
+}
+
+#shop-view .category-tile,#domestic-view .chip {
+  min-height: 35px;
+  padding: 0 12px;
+  border: 1px solid #e3dfda;
+  border-radius: 3px;
+  background: #fff;
+  color: #5e5954;
+  font-size: 12px;
+  font-weight: 500;
+  transform: none;
+}
+
+#shop-view .category-tile span {
+  display: none;
+}
+
+#shop-view .category-tile:hover,#shop-view .category-tile.active,#domestic-view .chip:hover,#domestic-view .chip.active {
+  border-color: #51413a;
+  background: #51413a;
+  color: #fff;
+}
+
+#shop-view .book-grid,#domestic-view .book-grid {
+  grid-template-columns: repeat(5,minmax(0,1fr));
+  gap: 18px 14px;
+}
+
+#shop-view .book-card,#domestic-view .book-card {
+  padding: 0 0 10px;
+  border: 0;
+  border-bottom: 1px solid #e8e4df;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+  transition: opacity .15s;
+}
+
+#shop-view .book-card:hover,#domestic-view .book-card:hover {
+  transform: none;
+  box-shadow: none;
+  opacity: .88;
+}
+
+#shop-view .book-art,#domestic-view .book-art {
+  height: 214px;
+  border-radius: 2px;
+  background: #f4f2ef!important;
+}
+
+#shop-view .book-art .rank,#domestic-view .book-art .rank {
+  top: 8px;
+  left: 9px;
+  border-radius: 0;
+  background: #fff;
+  color: #5a514b;
+  box-shadow: none;
+}
+
+#shop-view .book-art .book-cover-img,#domestic-view .book-art .book-cover-img {
+  max-width: 70%;
+  height: 78%;
+  box-shadow: 5px 7px 12px #28231e20;
+}
+
+#shop-view .book-meta,#domestic-view .book-meta {
+  padding: 10px 1px 0;
+}
+
+#shop-view .book-meta .category,#domestic-view .book-meta .category {
+  color: #746d67;
+  font-size: 10px;
+}
+
+#shop-view .book-meta h3,#domestic-view .book-meta h3 {
+  margin: 5px 0 3px;
+  color: #302c29;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+#shop-view .book-meta .author,#domestic-view .book-meta .author {
+  color: #77716b;
+  font-size: 11px;
+}
+
+#shop-view .price-line,#domestic-view .price-line {
+  margin-top: 8px;
+}
+
+#shop-view .price,#domestic-view .price {
+  color: #332d29;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+#shop-view .discount,#domestic-view .discount {
+  color: #a34f43;
+  font-size: 11px;
+}
+
+#shop-view .rating,#domestic-view .rating {
+  margin-top: 5px;
+  color: #98703c;
+  font-size: 10px;
+}
+
+#shop-view .rating span,#domestic-view .rating span {
+  color: #77716b;
+}
+
+#shop-view .buy-row,#domestic-view .buy-row {
+  gap: 6px;
+  margin-top: 9px;
+}
+
+#shop-view .buy-row button,#domestic-view .buy-row button {
+  min-height: 34px;
+  padding: 0 7px;
+  border: 1px solid #d9d4ce;
+  border-radius: 3px;
+  background: #fff;
+  color: #514a44;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+#shop-view .buy-row button:first-child,#domestic-view .buy-row button:first-child {
+  border-color: #51413a;
+  background: #51413a;
+  color: #fff;
+}
+
+#shop-view .wish,#domestic-view .wish {
+  border-radius: 2px;
+  background: #fff;
+  color: #544b46;
+}
+
+#domestic-view {
+  padding-top: 10px;
+}
+
+#domestic-view>.section-head {
+  margin-bottom: 18px;
+}
+
+#domestic-view>.section-head h1 {
+  font-size: 25px;
+}
+
+/* 도서 상품 상세 페이지 */
+.product-page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 22px 0 48px;
+  color: #302b28;
+}
+
+.product-back {
+  min-height: 36px;
+  padding: 0 0 12px;
+  background: transparent;
+  color: #665c55;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.product-main {
+  display: grid;
+  grid-template-columns: minmax(280px,.8fr) minmax(0,1.2fr);
+  gap: 46px;
+  padding: 18px 0 26px;
+  border-top: 1px solid #e3ded8;
+  border-bottom: 1px solid #e3ded8;
+}
+
+.product-cover-panel {
+  min-height: 400px;
+  display: grid;
+  place-items: center;
+  background: #f3f0ec!important;
+}
+
+.product-cover-panel img {
+  max-width: 68%;
+  max-height: 330px;
+  object-fit: contain;
+  box-shadow: 9px 12px 20px #30272028;
+}
+
+.product-summary {
+  padding: 16px 0;
+}
+
+.product-category {
+  margin: 0;
+  color: #756a61;
+  font-size: 12px;
+}
+
+.product-category span {
+  margin-left: 7px;
+  color: #aaa19a;
+}
+
+.product-summary h1 {
+  margin: 11px 0 6px;
+  color: #2c2825;
+  font-size: 31px;
+  line-height: 1.3;
+  letter-spacing: -.05em;
+}
+
+.product-author {
+  margin: 0;
+  color: #77706a;
+  font-size: 13px;
+}
+
+.product-author span {
+  margin: 0 5px;
+  color: #b4aca5;
+}
+
+.product-rating {
+  margin-top: 15px;
+  color: #98703c;
+  font-size: 12px;
+}
+
+.product-rating span {
+  margin-left: 6px;
+  color: #77716b;
+}
+
+.product-price-block {
+  display: flex;
+  align-items: baseline;
+  gap: 11px;
+  margin-top: 26px;
+  padding: 18px 0;
+  border-top: 1px solid #e8e4df;
+  border-bottom: 1px solid #e8e4df;
+}
+
+.product-price-block del {
+  color: #aaa19a;
+  font-size: 12px;
+}
+
+.product-price-block strong {
+  color: #302b28;
+  font-size: 25px;
+}
+
+.product-price-block>span {
+  color: #a34f43;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.product-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 17px;
+}
+
+.product-actions button {
+  min-height: 44px;
+  padding: 0 20px;
+  border: 1px solid #51413a;
+  border-radius: 3px;
+  background: #51413a;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.product-actions .product-wish {
+  background: #fff;
+  color: #51413a;
+}
+
+.product-shipping {
+  margin: 13px 0 0;
+  color: #77716b;
+  font-size: 11px;
+}
+
+.product-shipping span {
+  margin: 0 5px;
+  color: #bbb2aa;
+}
+
+.product-description-grid {
+  display: grid;
+  grid-template-columns: minmax(0,1.5fr) minmax(250px,.7fr);
+  gap: 50px;
+  padding: 28px 0;
+}
+
+.product-description h2,.product-facts h2 {
+  margin: 0 0 12px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid #e3ded8;
+  color: #302b28;
+  font-size: 16px;
+}
+
+.product-description p {
+  margin: 0 0 25px;
+  color: #514b46;
+  font-size: 14px;
+  line-height: 1.9;
+  white-space: pre-line;
+}
+
+.product-description ul {
+  margin: 0;
+  padding-left: 19px;
+  color: #514b46;
+  font-size: 13px;
+  line-height: 2;
+}
+
+.product-facts dl {
+  margin: 0;
+}
+
+.product-facts dl div {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #eeeae5;
+  font-size: 12px;
+}
+
+.product-facts dt {
+  color: #817971;
+}
+
+.product-facts dd {
+  margin: 0;
+  color: #403a35;
+}
+
+@media(max-width:900px) {
+
+  #shop-view .book-grid,#domestic-view .book-grid {
+    grid-template-columns: repeat(4,minmax(0,1fr));
+    gap: 16px 12px;
+  }
+
+  .product-main {
+    gap: 28px;
+  }
+
+  .product-cover-panel {
+    min-height: 350px;
+  }
+}
+
+@media(max-width:700px) {
+
+  #shop-view .section {
+    margin-top: 29px;
+  }
+
+  #shop-view .book-grid,#domestic-view .book-grid {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 17px 12px;
+  }
+
+  #shop-view .book-art,#domestic-view .book-art {
+    height: 190px;
+  }
+
+  #shop-view .book-meta,#domestic-view .book-meta {
+    padding-top: 8px;
+  }
+
+  #shop-view .buy-row button,#domestic-view .buy-row button {
+    flex: 1;
+  }
+
+  .product-page {
+    padding-top: 12px;
+  }
+
+  .product-main {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding-top: 10px;
+  }
+
+  .product-cover-panel {
+    min-height: 275px;
+  }
+
+  .product-cover-panel img {
+    max-height: 220px;
+  }
+
+  .product-summary {
+    padding: 0;
+  }
+
+  .product-summary h1 {
+    font-size: 25px;
+  }
+
+  .product-price-block {
+    margin-top: 18px;
+    padding: 13px 0;
+  }
+
+  .product-description-grid {
+    grid-template-columns: 1fr;
+    gap: 25px;
+    padding: 22px 0;
+  }
+}
+
+.book-card[role="link"] {
+  cursor: pointer;
+}
+
+.book-card[role="link"]:focus-visible {
+  outline: 2px solid #8e7a9d;
+  outline-offset: 4px;
+}
+
+#shop-view .buy-row button:first-child,#domestic-view .buy-row button:first-child {
+  border-color: #d9d4ce;
+  background: #fff;
+  color: #514a44;
+}
+
+#shop-view .buy-row button:last-child,#domestic-view .buy-row button:last-child {
+  border-color: #51413a;
+  background: #51413a;
+  color: #fff;
+}
+
+@media(max-width:700px) {
+
+  #shop-view .buy-row,#domestic-view .buy-row {
+    display: flex;
+  }
+
+  #shop-view .buy-row button,#domestic-view .buy-row button {
+    min-width: 0;
+    white-space: nowrap;
+  }
+}
+
+/* 최종 화면 정리 */
+
+.theme-shelf-list {
+  border-top: 0;
+}
+
+.theme-shelf {
+  border-bottom: 0;
+  padding: 13px 0;
+}
+
+/* 카테고리 버튼 색과 모양 통일 */
+
+.category-menu-item,#shop-view .category-tile,#domestic-view .chip,.subcategory-chip {
+  border: 1px solid #e1d6ef!important;
+  border-radius: 999px!important;
+  background: #f7f3fb!important;
+  color: #59466f!important;
+  font-weight: 600;
+  transition: background-color .16s,border-color .16s,color .16s;
+}
+
+.category-menu-item:hover,.category-menu-item.active,#shop-view .category-tile:hover,#shop-view .category-tile.active,#domestic-view .chip:hover,#domestic-view .chip.active,.subcategory-chip:hover,.subcategory-chip.active {
+  border-color: #6842b8!important;
+  background: #6842b8!important;
+  color: #fff!important;
+}
+
+#shop-view .categories,#domestic-view>.categories,.subcategory-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+#shop-view .category-tile,#domestic-view .chip,.subcategory-chip {
+  min-height: 38px;
+  padding: 0 15px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.category-menu {
+  gap: 7px;
+  scrollbar-width: thin;
+  scrollbar-color: #d8c9e9 transparent;
+}
+
+.category-menu-item {
+  min-height: 36px;
+  padding: 0 14px;
+  white-space: nowrap;
+}
+
+@media(max-width:700px) {
+
+  #shop-view .categories,#domestic-view>.categories,.subcategory-bar {
+    gap: 7px;
+  }
+
+  #shop-view .category-tile,#domestic-view .chip,.subcategory-chip {
+    min-height: 36px;
+    padding: 0 12px;
+    font-size: 11px;
+  }
+
+  .category-menu {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  .category-menu-item {
+    flex: none;
+    min-height: 34px;
+    padding: 0 12px;
+    font-size: 11px;
+  }
+}
+
+@media(max-width:380px) {
+
+  #shop-view .categories,#domestic-view>.categories,.subcategory-bar {
+    gap: 6px;
+  }
+
+  #shop-view .category-tile,#domestic-view .chip,.subcategory-chip {
+    min-height: 34px;
+    padding: 0 10px;
+    font-size: 10px;
+  }
+}
+
+/* 상단 분야 메뉴 모양 복구 */
+
+.category-menu-item {
+  border-radius: 8px!important;
+}
+
+/* 상단 분야 메뉴를 가로 글자 메뉴로 표시 */
+
+.category-menu {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  min-height: 54px;
+  padding: 0 max(24px,calc((100% - 1288px)/2));
+  border-bottom: 1px solid #ece9e5!important;
+  background: #fff;
+  backdrop-filter: none;
+  scrollbar-width: none;
+}
+
+.category-menu::-webkit-scrollbar {
+  display: none;
+}
+
+.category-menu-item {
+  flex: none;
+  min-height: 44px;
+  padding: 0 1px;
+  border: 0!important;
+  border-radius: 0!important;
+  background: transparent!important;
+  color: #514d53!important;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.category-menu-item:hover,.category-menu-item.active {
+  border: 0!important;
+  background: transparent!important;
+  color: #6842b8!important;
+}
+
+.category-menu-item.active {
+  font-weight: 700;
+}
+
+.category-menu-item:focus-visible {
+  outline: 2px solid #9b80bf;
+  outline-offset: 3px;
+}
+
+@media(max-width:700px) {
+
+  .category-menu {
+    min-height: 48px;
+    gap: 18px;
+    padding: 0 16px;
+  }
+
+  .category-menu-item {
+    min-height: 40px;
+    font-size: 12px;
+  }
+}
+
+/* 헤더 검색창은 좌우 메뉴 사이에서 균형 있게 배치 */
+
+@media(min-width:901px) {
+
+  .header>.search {
+    flex: 0 1 400px;
+    width: min(400px,32vw);
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media(max-width:900px) {
+
+  .header>.search {
+    grid-area: search;
+    flex: initial;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+}
+
+/* 스크롤 중에도 상단 메뉴를 화면에 고정 */
+
+.header {
+  position: sticky!important;
+  top: 0!important;
+  z-index: 100!important;
+  background: #fff;
+}
+
+.category-menu {
+  position: sticky;
+  top: 72px;
+  z-index: 90;
+}
+
+@media(max-width:900px) {
+
+  .category-menu {
+    top: 132px;
+  }
+}
+
+@media(max-width:600px) {
+
+  .category-menu {
+    top: 150px;
+  }
+}
+
+/* 상단 안내와 전체 메뉴를 한 묶음으로 고정 */
+
+.site-top {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  background: #fff;
+}
+
+.site-top>.header {
+  position: relative!important;
+  top: auto!important;
+  z-index: auto!important;
+}
+
+.category-menu {
+  top: 108px;
+  z-index: 90;
+}
+
+@media(max-width:900px) {
+
+  .category-menu {
+    top: 176px;
+  }
+}
+
+@media(max-width:760px) {
+
+  .category-menu {
+    top: 168px;
+  }
+}
+
+@media(max-width:600px) {
+
+  .category-menu {
+    top: 182px;
+  }
+}
+
+/* 상단 로고와 메뉴를 배너와 같은 가운데 폭에 정렬 */
+
+.site-top {
+  border-bottom: 1px solid #e6deeb;
+}
+
+.site-top>.header {
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding-left: 0;
+  padding-right: 0;
+  border-bottom: 0;
+}
+
+@media(min-width:901px) and (max-width:1200px) {
+
+  .site-top>.header {
+    gap: 20px;
+    padding: 0 18px;
+  }
+
+  .site-top>.header>.search {
+    max-width: 330px;
+  }
+}
+
+@media(max-width:900px) {
+
+  .site-top>.header {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding-left: 4%;
+    padding-right: 4%;
+  }
+}
+
+@media(max-width:600px) {
+
+  .site-top>.header {
+    padding-left: 5%;
+    padding-right: 5%;
+  }
+}
+
+/* 검색창을 가운데 고정하고 주요 메뉴를 아이콘 쪽으로 정렬 */
+
+@media(min-width:1101px) {
+
+  .site-top>.header {
+    display: flex;
+    position: relative;
+  }
+
+  .site-top>.header>.nav {
+    margin-left: auto;
+    gap: 22px;
+  }
+
+  .site-top>.header>.search {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    flex: none;
+    width: min(400px,30vw);
+    max-width: 400px;
+    margin: 0;
+  }
+
+  .site-top>.header>.head-actions {
+    margin-left: 25px;
+  }
+}
+
+@media(min-width:601px) and (max-width:1100px) {
+
+  .site-top>.header {
+    height: auto;
+    min-height: 82px;
+    display: grid;
+    grid-template-areas: "brand nav actions" "search search search";
+    grid-template-columns: minmax(150px,auto) minmax(0,1fr) auto;
+    gap: 10px 16px;
+    padding: 12px 4%;
+  }
+
+  .site-top>.header>.brand {
+    grid-area: brand;
+  }
+
+  .site-top>.header>.nav {
+    grid-area: nav;
+    min-width: 0;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-left: 0;
+  }
+
+  .site-top>.header>.nav a:nth-child(n) {
+    display: block;
+  }
+
+  .site-top>.header>.search {
+    position: static;
+    top: auto;
+    left: auto;
+    grid-area: search;
+    transform: none;
+    flex: initial;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+
+  .site-top>.header>.head-actions {
+    grid-area: actions;
+    gap: 12px;
+    margin-left: 0;
+  }
+}
+
+@media(max-width:600px) {
+
+  .site-top>.header {
+    grid-template-areas: "brand actions" "nav nav" "search search";
+    grid-template-columns: minmax(0,1fr) auto;
+    gap: 10px 12px;
+    padding: 12px 5%;
+  }
+
+  .site-top>.header>.brand {
+    grid-area: brand;
+  }
+
+  .site-top>.header>.nav {
+    grid-area: nav;
+    justify-content: flex-start;
+    gap: 18px;
+    margin-left: 0;
+  }
+
+  .site-top>.header>.search {
+    position: static;
+    top: auto;
+    left: auto;
+    grid-area: search;
+    transform: none;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+
+  .site-top>.header>.head-actions {
+    grid-area: actions;
+    margin-left: 0;
+  }
+}
+
+/* 로고와 주요 메뉴를 왼쪽에 모으고 검색은 중앙에 배치 */
+
+@media(min-width:1281px) {
+
+  .site-top>.header {
+    display: flex;
+    gap: 0;
+  }
+
+  .site-top>.header>.nav {
+    margin: 0 0 0 18px;
+    justify-content: flex-start;
+    gap: 14px;
+    font-size: 13px;
+  }
+
+  .site-top>.header>.search {
+    left: 50%;
+    width: min(380px,28vw);
+    transform: translate(-50%,-50%);
+  }
+
+  .site-top>.header>.head-actions {
+    margin-left: auto;
+    gap: 16px;
+  }
+}
+
+@media(min-width:601px) and (max-width:1280px) {
+
+  .site-top>.header {
+    height: auto;
+    min-height: 82px;
+    display: grid;
+    grid-template-areas: "brand nav actions" "search search search";
+    grid-template-columns: auto minmax(0,1fr) auto;
+    gap: 10px 14px;
+    padding: 12px 4%;
+  }
+
+  .site-top>.header>.brand {
+    grid-area: brand;
+  }
+
+  .site-top>.header>.nav {
+    grid-area: nav;
+    justify-self: start;
+    justify-content: flex-start;
+    gap: 10px;
+    margin: 0;
+    font-size: 12px;
+  }
+
+  .site-top>.header>.search {
+    position: static;
+    top: auto;
+    left: auto;
+    grid-area: search;
+    transform: none;
+    flex: initial;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+
+  .site-top>.header>.head-actions {
+    grid-area: actions;
+    gap: 10px;
+    margin: 0;
+  }
+}
+
+@media(max-width:600px) {
+
+  .site-top>.header {
+    grid-template-areas: "brand actions" "nav nav" "search search";
+    grid-template-columns: minmax(0,1fr) auto;
+    gap: 10px 12px;
+    padding: 12px 5%;
+  }
+
+  .site-top>.header>.brand {
+    grid-area: brand;
+  }
+
+  .site-top>.header>.nav {
+    grid-area: nav;
+    justify-self: stretch;
+    justify-content: flex-start;
+    gap: 18px;
+    margin: 0;
+  }
+
+  .site-top>.header>.search {
+    position: static;
+    top: auto;
+    left: auto;
+    grid-area: search;
+    transform: none;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+
+  .site-top>.header>.head-actions {
+    grid-area: actions;
+    margin: 0;
+  }
+}
+
+/* 왼쪽 메뉴 간격과 글자 크기 보정 */
+
+@media(min-width:1281px) {
+
+  .site-top>.header>.brand {
+    width: 230px;
+    height: 62px;
+  }
+
+  .site-top>.header>.brand-logo {
+    height: 60px;
+    max-height: 60px;
+  }
+
+  .site-top>.header>.nav {
+    margin-left: 6px;
+    gap: 13px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .site-top>.header>.search {
+    width: min(340px,26vw);
+  }
+
+  .site-top>.header>.head-actions {
+    gap: 12px;
+  }
+
+  .site-top>.header .icon-btn {
+    min-width: 28px;
+    min-height: 28px;
+    font-size: 22px;
+  }
+}
+
+@media(min-width:901px) and (max-width:1280px) {
+
+  .site-top>.header>.brand {
+    width: 220px;
+    height: 58px;
+  }
+
+  .site-top>.header>.brand-logo {
+    height: 56px;
+    max-height: 56px;
+  }
+
+  .site-top>.header>.nav {
+    gap: 11px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .site-top>.header>.head-actions {
+    gap: 10px;
+  }
+
+  .site-top>.header .icon-btn {
+    font-size: 21px;
+  }
+}
+
+/* 홈 로고는 작게, 도서 목록과 주제별 책장 글자는 크게 */
+
+@media(min-width:1281px) {
+
+  .site-top>.header>.brand {
+    width: 195px;
+    height: 54px;
+  }
+
+  .site-top>.header>.brand-logo {
+    height: 52px;
+    max-height: 52px;
+  }
+
+  .site-top>.header>.nav {
+    margin-left: 8px;
+  }
+}
+
+#shop-view #books .section-head h3 {
+  font-size: 23px;
+  letter-spacing: -.04em;
+}
+
+#shop-view #books .section-head .more {
+  font-size: 14px;
+}
+
+#shop-view .book-art .rank {
+  font-size: 12px;
+}
+
+#shop-view .book-meta .category {
+  font-size: 12px;
+}
+
+#shop-view .book-meta h3 {
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+#shop-view .book-meta .author {
+  font-size: 13px;
+}
+
+#shop-view .price {
+  font-size: 16px;
+}
+
+#shop-view .discount {
+  font-size: 12px;
+}
+
+#shop-view .rating {
+  font-size: 12px;
+}
+
+#shop-view .buy-row button {
+  min-height: 38px;
+  padding: 0 11px;
+  font-size: 13px;
+}
+
+#shop-view .home-new-section .section-head h2,#shop-view .home-theme-section .section-head h2 {
+  font-size: 23px;
+  letter-spacing: -.04em;
+}
+
+#shop-view .home-new-section .section-head p,#shop-view .home-theme-section .section-head p {
+  font-size: 14px;
+}
+
+#shop-view .home-new-grid .book-meta .category {
+  font-size: 12px;
+}
+
+#shop-view .home-new-grid .book-meta h3 {
+  font-size: 16px;
+}
+
+#shop-view .home-new-grid .book-meta .author {
+  font-size: 13px;
+}
+
+#shop-view .home-new-grid .price {
+  font-size: 16px;
+}
+
+#shop-view .home-new-grid .rating {
+  font-size: 12px;
+}
+
+#shop-view .home-new-grid .buy-row button {
+  min-height: 38px;
+  font-size: 13px;
+}
+
+.theme-shelf-heading h3 {
+  font-size: 17px;
+}
+
+.theme-shelf-heading p {
+  font-size: 13px;
+}
+
+.theme-shelf-books b {
+  font-size: 13px;
+}
+
+.theme-shelf-books small {
+  font-size: 12px;
+}
+
+.theme-shelf-books i {
+  font-size: 12px;
+}
+
+#shop-view .home-theme-section>.section-head .more {
+  font-size: 13px;
+}
+
+@media(max-width:700px) {
+
+  #shop-view #books .section-head h3,#shop-view .home-new-section .section-head h2,#shop-view .home-theme-section .section-head h2 {
+    font-size: 20px;
+  }
+
+  #shop-view .book-meta .category,#shop-view .home-new-grid .book-meta .category {
+    font-size: 11px;
+  }
+
+  #shop-view .book-meta h3,#shop-view .home-new-grid .book-meta h3 {
+    font-size: 14px;
+  }
+
+  #shop-view .book-meta .author,#shop-view .home-new-grid .book-meta .author {
+    font-size: 12px;
+  }
+
+  #shop-view .price,#shop-view .home-new-grid .price {
+    font-size: 14px;
+  }
+
+  #shop-view .rating,#shop-view .buy-row button,#shop-view .home-new-grid .buy-row button {
+    font-size: 11px;
+  }
+
+  .theme-shelf-heading h3 {
+    font-size: 15px;
+  }
+
+  .theme-shelf-heading p {
+    font-size: 12px;
+  }
+
+  .theme-shelf-books b {
+    font-size: 12px;
+  }
+
+  .theme-shelf-books small,.theme-shelf-books i {
+    font-size: 11px;
+  }
+}
+
+/* 마이페이지 간격과 프로필 편집 상태 */
+
+.mypage-page {
+  font-size: 15px;
+}
+
+.mypage-welcome {
+  padding: 27px 30px;
+}
+
+.mypage-kicker {
+  font-size: 14px;
+}
+
+.mypage-welcome h1 {
+  font-size: 29px;
+}
+
+.mypage-welcome p {
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.mypage-bookmark {
+  width: 60px;
+  height: 70px;
+  font-size: 15px;
+}
+
+.mypage-overview {
+  gap: 12px;
+  margin: 17px 0 22px;
+  border: 0;
+}
+
+.mypage-overview article,.mypage-overview article:first-child {
+  padding: 16px 20px;
+  border: 1px solid #e5e0da;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.mypage-page .mypage-overview article:last-child {
+  border: 1px solid #e5e0da;
+  background: #fff;
+}
+
+.mypage-overview article>span {
+  font-size: 14px;
+}
+
+.mypage-overview strong {
+  font-size: 24px;
+}
+
+.mypage-overview strong small {
+  font-size: 13px;
+}
+
+.mypage-page .mypage-grid {
+  grid-template-columns: minmax(0,1fr) minmax(0,1.08fr);
+  gap: 18px;
+  align-items: stretch;
+}
+
+.mypage-page .account-panel {
+  padding: 23px 24px;
+  border-radius: 10px;
+  box-shadow: 0 5px 18px #382c1710;
+}
+
+.mypage-panel-heading {
+  margin-bottom: 17px;
+  padding-bottom: 13px;
+}
+
+.mypage-panel-heading>div>span {
+  font-size: 13px;
+}
+
+.mypage-panel-heading h2 {
+  font-size: 21px;
+}
+
+.mypage-panel-heading h2 small {
+  font-size: 14px;
+}
+
+.mypage-panel-heading>small,.mypage-panel-heading>p {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.mypage-page .profile-panel .checkout-fields {
+  gap: 15px 14px;
+}
+
+.mypage-page .profile-panel .checkout-fields label {
+  font-size: 15px;
+  gap: 8px;
+}
+
+.mypage-page .profile-panel .checkout-fields input {
+  height: 48px;
+  padding: 0 14px;
+  border-radius: 7px;
+  font-size: 15px;
+}
+
+.mypage-page .profile-panel .checkout-fields input[readonly] {
+  background: #f8f7f5;
+  color: #59534e;
+  cursor: default;
+}
+
+.mypage-page .profile-panel .checkout-fields input:not([readonly]) {
+  background: #fff;
+}
+
+.profile-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.mypage-page .profile-actions .save-profile {
+  flex: 1;
+  width: auto;
+  min-height: 46px;
+  margin: 0;
+  border-radius: 7px;
+  font-size: 15px;
+}
+
+.mypage-page .profile-actions .cancel-profile {
+  border: 1px solid #ded8d1;
+  background: #fff;
+  color: #51413a;
+}
+
+.mypage-page .order-panel .order-row {
+  grid-template-columns: 110px minmax(0,1fr) auto auto;
+  gap: 14px;
+  padding: 16px 0;
+}
+
+.mypage-page .order-copy>b {
+  font-size: 14px;
+}
+
+.mypage-page .order-copy .order-books {
+  font-size: 13px;
+}
+
+.mypage-page .order-copy .order-items {
+  font-size: 12px;
+}
+
+.mypage-page .order-status span {
+  padding: 4px 9px;
+  font-size: 12px;
+}
+
+.mypage-page .order-row>strong {
+  font-size: 14px;
+}
+
+.mypage-page .order-delete {
+  min-height: 36px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.mypage-page .my-empty span {
+  font-size: 16px;
+}
+
+.mypage-page .my-empty small,.mypage-page .wishlist-empty small {
+  font-size: 14px;
+}
+
+.mypage-page .my-empty button,.mypage-page .wishlist-empty button {
+  min-height: 42px;
+  padding: 0 15px;
+  border-radius: 7px;
+  font-size: 14px;
+}
+
+.mypage-page .mini-book-grid {
+  gap: 16px;
+}
+
+.mypage-page .mini-book-grid button {
+  gap: 8px;
+  padding-bottom: 11px;
+}
+
+.mypage-page .mini-book-grid img {
+  height: 160px;
+  border-radius: 6px;
+}
+
+.mypage-page .mini-book-grid b {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.mypage-page .mini-book-grid small {
+  font-size: 13px;
+}
+
+.mypage-recommendations .mypage-panel-heading>button {
+  min-height: 38px;
+  font-size: 14px;
+}
+
+.mypage-page .wishlist-empty p {
+  font-size: 16px;
+}
+
+@media(max-width:760px) {
+
+  .mypage-page .mypage-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .mypage-page .my-wishlist,.mypage-page .my-recommendations {
+    grid-column: auto;
+  }
+
+  .mypage-page .account-panel {
+    padding: 19px;
+  }
+
+  .mypage-page .order-panel .order-row {
+    grid-template-columns: 74px minmax(0,1fr) auto;
+    gap: 10px;
+    padding: 14px 0;
+  }
+
+  .mypage-page .mini-book-grid {
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    gap: 12px;
+  }
+
+  .mypage-page .mini-book-grid img {
+    height: 135px;
+  }
+}
+
+@media(max-width:420px) {
+
+  .mypage-welcome {
+    padding: 18px;
+  }
+
+  .mypage-welcome h1 {
+    font-size: 24px;
+  }
+
+  .mypage-overview {
+    gap: 7px;
+  }
+
+  .mypage-overview article,.mypage-overview article:first-child {
+    padding: 11px 9px;
+  }
+
+  .mypage-overview article>span {
+    font-size: 12px;
+  }
+
+  .mypage-overview strong {
+    font-size: 21px;
+  }
+
+  .mypage-page .account-panel {
+    padding: 16px;
+  }
+
+  .mypage-page .profile-panel .checkout-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .mypage-page .profile-panel .checkout-fields .wide {
+    grid-column: auto;
+  }
+
+  .mypage-page .order-panel .order-row {
+    grid-template-columns: 62px minmax(0,1fr) auto;
+    gap: 8px;
+  }
+
+  .mypage-page .mini-book-grid img {
+    height: 112px;
+  }
+}
+
+.mypage-page .my-cart-panel {
+  grid-column: 1/-1;
+}
+
+.my-cart-list {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  column-gap: 24px;
+}
+
+.my-cart-list>article {
+  display: grid;
+  grid-template-columns: 58px minmax(0,1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 13px 0;
+  border-bottom: 1px solid #eeeae5;
+}
+
+.my-cart-list img {
+  width: 52px;
+  height: 68px;
+  object-fit: contain;
+  border: 1px solid #eee9e3;
+  border-radius: 5px;
+  background: #fff;
+}
+
+.my-cart-list>article>span {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.my-cart-list>article b {
+  overflow: hidden;
+  color: #39332e;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.my-cart-list>article small {
+  color: #746c65;
+  font-size: 13px;
+}
+
+.my-cart-list>article strong {
+  color: #39322d;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.my-cart-total {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  grid-column: 1/-1;
+  margin-top: 12px;
+  padding-top: 14px;
+  border-top: 1px solid #e5e0da;
+  color: #4e473f;
+  font-size: 14px;
+}
+
+.my-cart-total strong {
+  color: #382b51;
+  font-size: 18px;
+}
+
+.my-cart-empty {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.my-cart-empty>div {
+  display: grid;
+  gap: 5px;
+}
+
+.my-cart-empty b {
+  font-size: 15px;
+}
+
+.my-cart-empty small {
+  color: #817971;
+  font-size: 14px;
+}
+
+.my-cart-empty button {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid #d8d0c8;
+  border-radius: 7px;
+  background: #fff;
+  color: #51413a;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+@media(max-width:760px) {
+
+  .mypage-page .my-cart-panel {
+    grid-column: auto;
+  }
+
+  .my-cart-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media(max-width:420px) {
+
+  .my-cart-empty {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+
+/* 메인 추천 배너: 자동 재생 없이 화살표로 직접 넘기는 고정형 슬라이드 */
+.hero {
+  min-height: 390px;
+  padding: 0;
+  border: 1px solid #e9def4;
+  border-radius: 14px;
+  background: #f2ebf8;
+  box-shadow: 0 18px 48px #4330570d;
+}
+
+.hero-carousel {
+  border-radius: inherit;
+}
+
+.hero-slide,
+.hero-slide.sage,
+.hero-slide.mist,
+.hero-slide.sun,
+.hero-slide.lavender,
+.hero-slide.clay {
+  padding: 52px 6.2%;
+  background: linear-gradient(112deg, #fbf9fd 0%, #f2ebf8 57%, #e9def3 100%);
+}
+
+.hero-slide.active {
+  animation: bannerIn .35s ease both;
+}
+
+.hero-copy {
+  z-index: 2;
+  width: min(57%, 620px);
+  max-width: 620px;
+}
+
+.hero-slide .eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  color: #6842b8;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+.hero-slide .eyebrow::before {
+  width: 20px;
+  height: 1px;
+  background: currentColor;
+  content: '';
+}
+
+.hero-slide h1 {
+  margin: 0 0 16px;
+  color: #292239;
+  font-family: 'Gowun Dodum', sans-serif;
+  font-size: clamp(34px, 4.1vw, 54px);
+  font-weight: 700;
+  letter-spacing: -.055em;
+  line-height: 1.28;
+  word-break: keep-all;
+}
+
+.hero-slide p {
+  color: #655b70;
+  font-size: 14px;
+  line-height: 1.9;
+  word-break: keep-all;
+}
+
+.hero-slide .banner-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 13px 18px;
+  border-radius: 6px;
+  background: #5b367f;
+  box-shadow: none;
+  font-size: 13px;
+}
+
+.hero-slide .banner-cta:hover {
+  background: #482965;
+}
+
+.hero-art {
+  right: 5%;
+  width: 42%;
+  overflow: visible;
+}
+
+.hero-art::before {
+  position: absolute;
+  top: 17%;
+  right: 4%;
+  color: #76599a;
+  content: '✦';
+  font-size: 28px;
+  opacity: .7;
+}
+
+.art-orbit {
+  top: 50%;
+  right: 14%;
+  width: clamp(230px, 27vw, 330px);
+  height: clamp(230px, 27vw, 330px);
+  border: 1px solid #8c70a52b;
+  background: #fff6;
+  transform: translateY(-50%);
+}
+
+.hero-poster {
+  width: clamp(172px, 20vw, 226px);
+  height: clamp(238px, 28vw, 310px);
+  overflow: hidden;
+  border: 7px solid #fff;
+  border-radius: 3px 8px 8px 3px;
+  background: #fff;
+  box-shadow: 12px 18px 32px #35244c35;
+  transform: rotate(-6deg);
+  transition: transform .35s ease, box-shadow .35s ease;
+}
+
+.hero-slide:hover .hero-poster {
+  box-shadow: 18px 23px 38px #35244c42;
+  transform: rotate(-3deg) translateY(-4px);
+}
+
+.hero-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-poster:before {
+  z-index: 1;
+  left: 4px;
+  border-color: #ffffff80;
+}
+
+.hero-controls {
+  left: 6.2%;
+  bottom: 20px;
+  gap: 8px;
+}
+
+.hero-count {
+  margin-right: 3px;
+  color: #806d91;
+  font-size: 12px;
+  letter-spacing: .08em;
+}
+
+.hero-count strong {
+  color: #39264c;
+  font-weight: 700;
+}
+
+.hero-arrow {
+  width: 34px;
+  height: 34px;
+  min-height: 34px;
+  border: 1px solid #8c70a566;
+  background: #ffffff70;
+  color: #583879;
+  font-size: 21px;
+}
+
+.hero-arrow:hover {
+  border-color: #5b367f;
+  background: #5b367f;
+  color: #fff;
+}
+
+@media(max-width: 900px) {
+  .hero {
+    min-height: 365px;
+  }
+
+  .hero-slide {
+    padding: 45px 5%;
+  }
+
+  .hero-copy {
+    width: 58%;
+  }
+
+  .hero-art {
+    right: 2%;
+    width: 42%;
+  }
+
+  .hero-controls {
+    left: 5%;
+  }
+}
+
+@media(max-width: 600px) {
+  .hero {
+    min-height: 500px;
+    border-radius: 12px;
+  }
+
+  .hero-slide {
+    align-items: flex-start;
+    padding: 30px 23px 188px;
+  }
+
+  .hero-copy {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .hero-slide .eyebrow {
+    margin-bottom: 12px;
+    font-size: 11px;
+  }
+
+  .hero-slide h1 {
+    max-width: 440px;
+    margin-bottom: 10px;
+    font-size: clamp(28px, 8vw, 38px);
+  }
+
+  .hero-slide p {
+    max-width: 440px;
+    font-size: 12px;
+    line-height: 1.7;
+  }
+
+  .hero-slide .banner-cta {
+    margin-top: 14px;
+    padding: 11px 14px;
+    font-size: 12px;
+  }
+
+  .hero-art {
+    right: 4%;
+    bottom: 25px;
+    top: auto;
+    width: 54%;
+    height: 195px;
+    transform: none;
+  }
+
+  .art-orbit {
+    right: 8%;
+    width: 190px;
+    height: 190px;
+  }
+
+  .hero-art::before {
+    right: 4%;
+    font-size: 23px;
+  }
+
+  .hero-poster {
+    width: 126px;
+    height: 172px;
+    border-width: 5px;
+  }
+
+  .hero-controls {
+    left: 22px;
+    bottom: 18px;
+    gap: 6px;
+  }
+
+  .hero-count {
+    margin-right: 2px;
+    font-size: 11px;
+  }
+
+  .hero-arrow {
+    width: 32px;
+    height: 32px;
+    min-height: 32px;
+  }
+}
+
+@media(prefers-reduced-motion: reduce) {
+  .hero-slide.active {
+    animation: none;
+  }
+
+  .hero-poster {
+    transition: none;
+  }
+}
+
+
+/* 배너의 제목, 설명, 탐색 버튼 간격을 맞추고 겹침 방지 */
+.hero {
+  min-height: 430px;
+}
+
+.hero-copy {
+  transform: translateY(-24px);
+}
+
+.hero-art::before {
+  display: none;
+}
+
+.hero-slide .eyebrow {
+  margin-bottom: 16px;
+  font-family: inherit;
+  font-size: 12px;
+  letter-spacing: .02em;
+  line-height: 1.5;
+}
+
+.hero-slide h1 {
+  margin: 0;
+  font-size: clamp(38px, 4vw, 52px);
+  letter-spacing: -.035em;
+  line-height: 1.34;
+}
+
+.hero-slide p {
+  margin: 16px 0 0;
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: -.01em;
+  line-height: 1.85;
+}
+
+.hero-slide .banner-cta {
+  margin-top: 20px;
+  font-family: inherit;
+  letter-spacing: 0;
+  line-height: 1.45;
+}
+
+.hero-controls {
+  align-items: center;
+  min-height: 36px;
+  gap: 9px;
+}
+
+.hero-count {
+  margin-right: 5px;
+  font-family: inherit;
+  font-size: 12px;
+  letter-spacing: .04em;
+  line-height: 1;
+}
+
+.hero-arrow {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  line-height: 1;
+}
+
+@media(max-width: 900px) {
+  .hero-copy {
+    transform: translateY(-16px);
+  }
+}
+
+@media(max-width: 600px) {
+  .hero {
+    min-height: 520px;
+  }
+
+  .hero-copy {
+    transform: none;
+  }
+
+  .hero-slide .eyebrow {
+    margin-bottom: 12px;
+    font-size: 11px;
+  }
+
+  .hero-slide h1 {
+    font-size: clamp(28px, 7.4vw, 36px);
+    letter-spacing: -.03em;
+    line-height: 1.35;
+  }
+
+  .hero-slide p {
+    margin-top: 12px;
+    font-size: 12px;
+    line-height: 1.75;
+  }
+
+  .hero-slide .banner-cta {
+    margin-top: 14px;
+  }
+}
+
+
+/* 배너마다 책의 표지 배경색을 옅게 적용 */
+.hero-slide,
+.hero-slide.sage,
+.hero-slide.mist,
+.hero-slide.sun,
+.hero-slide.lavender,
+.hero-slide.clay {
+  background: linear-gradient(112deg, #ffffffc9 0%, #ffffff55 56%, #ffffff12 100%), var(--banner-bg, #f2ebf8);
+}
+
+/* 메인 화면 찜 하트는 배경 박스 없이 표시 */
+#shop-view .wish {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: none;
+  color: #fff;
+  font-size: 24px;
+  line-height: 1;
+  text-shadow: 0 1px 5px #0008;
+}
+
+#shop-view .wish:hover {
+  background: transparent;
+  transform: scale(1.12);
+}
+
+#shop-view .wish.on {
+  background: transparent;
+  color: #e65b70;
+  text-shadow: 0 1px 3px #fff9;
+}
+
+/* 상품 상세 페이지의 책 소개와 도서 정보 가독성 확대 */
+.product-category {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.product-author {
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.product-rating {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.product-rating span {
+  font-size: 14px;
+}
+
+.product-price-block del,
+.product-price-block > span {
+  font-size: 14px;
+}
+
+.product-actions button {
+  font-size: 15px;
+}
+
+.product-shipping {
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.product-description-grid {
+  gap: 56px;
+  padding: 34px 0;
+}
+
+.product-description h2,
+.product-facts h2 {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  font-size: 19px;
+  line-height: 1.5;
+}
+
+.product-description p {
+  margin-bottom: 30px;
+  font-size: 16px;
+  line-height: 2.05;
+  word-break: keep-all;
+}
+
+.product-description ul {
+  font-size: 15px;
+  line-height: 2.1;
+}
+
+.product-facts dl div {
+  grid-template-columns: 92px 1fr;
+  gap: 14px;
+  padding: 13px 0;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+@media(max-width: 700px) {
+  .product-category {
+    font-size: 13px;
+  }
+
+  .product-author,
+  .product-rating,
+  .product-rating span {
+    font-size: 14px;
+  }
+
+  .product-description-grid {
+    gap: 28px;
+    padding: 26px 0;
+  }
+
+  .product-description h2,
+  .product-facts h2 {
+    font-size: 18px;
+  }
+
+  .product-description p {
+    font-size: 15px;
+    line-height: 1.95;
+  }
+
+  .product-description ul,
+  .product-facts dl div {
+    font-size: 14px;
+  }
+}
+
+/* Final home/catalog overrides: keep these after the legacy component rules. */
+html body #shop-view .section#books, html body #domestic-view > .catalog-section-head { border:1px solid #ece6df; border-radius:22px; background:linear-gradient(145deg,#fff,#fbf8f3); box-shadow:0 16px 38px #33271910; }
+html body #shop-view .section#books { padding:30px; }
+html body #shop-view .section#books .book-card, html body #domestic-view .book-card { border:1px solid #eee9e2; border-radius:16px; background:#fff; box-shadow:0 5px 18px #33271909; transition:transform .2s,box-shadow .2s,border-color .2s; }
+html body #shop-view .section#books .book-card:hover, html body #domestic-view .book-card:hover { transform:translateY(-4px); border-color:#d8c8e9; box-shadow:0 14px 28px #33271916; }
+html body #domestic-view { max-width:1440px; margin:0 auto; padding:0 28px 70px; }
+html body #domestic-view > .catalog-section-head { margin:0 0 22px; padding:30px; }
+html body #shop-view .section#books .categories, html body #domestic-view > .categories { margin-bottom:24px; }
+html body #shop-view .section#books .book-grid, html body #domestic-view .catalog-grid { gap:20px 18px; }
+@media(max-width:700px) { html body #shop-view .section#books { padding:20px 15px; } html body #domestic-view { padding:0 14px 48px; } html body #domestic-view > .catalog-section-head { padding:22px 18px; } }
+/* Home recommendations: compact curated sets, with book cards visible in every shelf. */
+html body #shop-view .home-new-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:18px; }
+html body #shop-view .home-new-grid .book-card { display:block; min-width:0; overflow:hidden; border:1px solid #eee8e1; border-radius:16px; background:#fff; box-shadow:0 8px 24px #30243f0b; }
+html body #shop-view .home-new-grid .book-art { height:190px; }
+html body #shop-view .theme-shelf-list { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; border:0; }
+html body #shop-view .theme-shelf { display:flex; flex-direction:column; gap:15px; padding:20px; border:1px solid #eee8e1; border-radius:18px; background:linear-gradient(145deg,#fff,#fbf9f5); box-shadow:0 8px 24px #30243f0b; }
+html body #shop-view .theme-shelf-books { grid-template-columns:1fr; gap:12px; }
+html body #shop-view .theme-shelf-books button { grid-template-columns:52px minmax(0,1fr); padding:8px; border:1px solid #f0ece6; border-radius:12px; background:#fff; }
+html body #shop-view .theme-shelf-books img { width:52px; height:68px; border-radius:5px; }
+@media(max-width:900px) { html body #shop-view .home-new-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } html body #shop-view .theme-shelf-list { grid-template-columns:1fr; } }
+@media(max-width:600px) { html body #shop-view .home-new-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } html body #shop-view .home-new-grid .book-art { height:170px; } }
+/* 국내도서 분야별 책장 */
+.domestic-shelf { padding:clamp(24px,4vw,36px) 0; border-bottom:1px solid #ece6ef; }
+.domestic-shelf-head { display:flex; flex-wrap:wrap; align-items:center; gap:8px 18px; margin:0 0 16px; }
+.domestic-shelf-head h1 { margin:0; color:#241a31; font-size:clamp(20px,2vw,25px); letter-spacing:-.03em; }
+.domestic-shelf-sort { display:flex; flex-wrap:wrap; align-items:center; gap:4px; }
+.domestic-shelf-sort button { min-height:36px; padding:6px 9px; border:1px solid transparent; border-radius:7px; background:transparent; color:#5e5365; font:inherit; font-size:13px; white-space:nowrap; cursor:pointer; }
+.domestic-shelf-sort button[aria-pressed="true"] { border-color:#e4d7f1; background:#f1e9fa; color:#512d83; font-weight:700; }
+.domestic-shelf-sort button:hover { background:#f6f1fa; color:#512d83; }
+.domestic-shelf-sort button:focus-visible { outline:2px solid #8664c0; outline-offset:2px; }
+#domestic-view .domestic-shelf .book-meta h3 { color:#241a31; font-size:16px; line-height:1.4; }
+#domestic-view .domestic-shelf .book-meta .author { color:#564d60; }
+@media (max-width:700px) {
+  .domestic-shelf { padding:20px 0; }
+}
+@media (max-width:540px) {
+  .domestic-shelf-head .domestic-shelf-sort,
+  #shop-view #books .section-head .domestic-shelf-sort { flex-basis:100%; }
+  .domestic-shelf-sort button { min-height:40px; padding-inline:7px; }
+}
+
+.cover-category-label { position:absolute; left:50%; bottom:20px; transform:translateX(-50%); max-width:75%; padding:5px 11px; border-radius:999px; background:rgba(255,250,245,.92); color:#62495e; font-size:11px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; box-shadow:0 3px 10px #38253120; }
+
+.domestic-pagination { display:flex; align-items:center; justify-content:center; gap:16px; margin-top:28px; }
+@media (min-width: 1000px) {
+  html body #domestic-view .domestic-shelf .catalog-grid { grid-template-columns:repeat(5,minmax(0,1fr)); }
+}
+
+/* 홈의 추천 도서와 신간 */
+html body #shop-view .section#books,
+html body #shop-view .section.home-new-section {
+  padding:24px 0 30px;
+  background:transparent;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+}
+#shop-view #books .section-head,
+#shop-view .section.home-new-section .section-head {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px 14px;
+  margin:0;
+}
+#shop-view #books .section-head h3 { margin:0; letter-spacing:-.025em; }
+#shop-view #books .section-head .more { margin:0 0 0 auto; white-space:nowrap; }
+html body #shop-view .section#books .categories {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:18px 0 24px;
+  padding:0 0 16px;
+  border-bottom:1px solid #eee8f2;
+}
+html body #shop-view .section#books .book-grid,
+html body #shop-view .section.home-new-section .book-grid {
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:22px 18px;
+}
+@media (max-width:900px) {
+  html body #shop-view .section#books .book-grid,
+  html body #shop-view .section.home-new-section .book-grid {
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+}
+@media (max-width:600px) {
+  html body #shop-view .section#books .book-grid,
+  html body #shop-view .section.home-new-section .book-grid {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+#shop-view #books .book-card,
+#shop-view .section.home-new-section .book-card { display:flex; flex-direction:column; min-width:0; }
+#shop-view #books .book-meta,
+#shop-view .section.home-new-section .book-meta {
+  display:flex;
+  flex:1;
+  flex-direction:column;
+  gap:6px;
+  padding:14px clamp(10px, 1.3vw, 18px) 16px;
+}
+#shop-view #books .book-meta h3,
+#shop-view .section.home-new-section .book-meta h3 {
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+  white-space:normal;
+  overflow:hidden;
+  overflow-wrap:anywhere;
+  margin:0;
+  color:#261d31;
+  font-size:15px;
+  line-height:1.45;
+  letter-spacing:-.015em;
+}
+#shop-view #books .book-meta .author,
+#shop-view .section.home-new-section .book-meta .author {
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  color:#5e5566;
+  line-height:1.45;
+}
+#shop-view #books .price-line,
+#shop-view .section.home-new-section .price-line { margin-top:auto; padding-top:6px; }
+#shop-view #books .buy-row,
+#shop-view .section.home-new-section .buy-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
+
+html body #shop-view .section.home-new-section {
+  margin-top:clamp(28px, 4vw, 48px);
+  padding-block:clamp(24px, 3vw, 36px);
+}
+#shop-view .section.home-new-section .section-head {
+  margin:0 0 24px;
+  padding-bottom:16px;
+  border-bottom:1px solid #eee8f2;
+}
+#shop-view .home-new-section .section-head h2 {
+  margin:0;
+  color:#2d2635;
+  font-size:clamp(22px, 2.4vw, 30px);
+  letter-spacing:-.025em;
+}
+#shop-view .home-new-section .catalog-count { margin-left:auto; }
+html body #shop-view .home-new-grid .book-card {
+  display:flex;
+  flex-direction:column;
+  box-shadow:0 5px 18px #33271908;
+}
+
+.product-section-nav { display:flex; gap:24px; border-bottom:1px solid #e6ded7; }
+.product-section-nav button { padding:12px 18px; background:none; border:0; border-bottom:2px solid transparent; color:#514741; font-size:16px; }
+.product-section-nav button[aria-pressed="true"] { border-bottom-color:#653b9f; color:#512d83; font-weight:700; }
+.product-section-nav span { margin-left:4px; }
+.product-reading-text { white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.8; }
+.product-description > p:empty { display:none; }
+.product-expand { margin:14px 0 24px; border:1px solid #e6ded7; border-radius:8px; padding:12px 16px; }
+.product-expand summary { cursor:pointer; color:#512d83; font-weight:650; }
+
+/* 책 상세 내용을 읽기 편한 간격으로 정리 */
+.product-description h2:not(:first-child) { margin-top: 36px; }
+.product-description > .product-reading-text { margin-bottom: 16px; line-height: 1.9; }
+.product-description > .product-reading-text + h2 { margin-top: 36px; }
+.product-facts { align-self: start; }
+.product-facts dl div:last-child { border-bottom: 0; }
+.site-top > .header { align-items: center; }
+.site-top > .header > .brand { align-items: center; }
+.site-top > .header > .brand > .brand-logo { height: 100%; max-height: 100%; transform: scale(.9); transform-origin: left center; }
+.site-top > .header > .nav, .site-top > .header > .head-actions { align-items: center; }
+.site-top > .header > .nav { flex-wrap: wrap; overflow: visible; }
+.header-category-menu { position: relative; flex: none; }
+.header-category-menu summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+  color: #39294f;
+  font-weight: 700;
+  cursor: pointer;
+}
+.header-category-menu summary::-webkit-details-marker { display: none; }
+.header-category-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid #ded5e7;
+  border-radius: 50%;
+  background: #fff;
+}
+.header-category-icon span {
+  width: 15px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  box-shadow: 0 -5px currentColor, 0 5px currentColor;
+}
+.header-category-menu[open] .header-category-icon,
+.header-category-menu summary:hover .header-category-icon { background: #f2eafb; color: #59388b; }
+.header-category-panel {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 8px);
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  width: min(230px, 86vw);
+  max-height: min(540px, 65vh);
+  overflow: auto;
+  border: 1px solid #e7deee;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 12px 32px #33204424;
+}
+.header-category-panel h2 {
+  position: sticky;
+  top: 0;
+  margin: 0;
+  padding: 10px 14px;
+  background: #39294f;
+  color: #fff;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.header-category-panel button {
+  flex: none;
+  min-height: 36px;
+  padding: 6px 14px;
+  border: 0;
+  border-bottom: 1px solid #f3edf7;
+  background: transparent;
+  color: #39294f;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.header-category-panel button:hover,
+.header-category-panel button[aria-current="true"] { background: #f2eafb; color: #512d83; }
+.header-category-menu summary:focus-visible,
+.header-category-panel button:focus-visible { outline: 2px solid #8664c0; outline-offset: 2px; }
+.header-category-panel button:focus-visible { outline-offset: -3px; }
+.site-top > .storefront-header {
+  display: grid;
+  grid-template-areas: "brand search actions" "nav nav nav";
+  grid-template-columns: minmax(220px, 1fr) minmax(0, 660px) minmax(220px, 1fr);
+  gap: 10px clamp(18px, 3vw, 44px);
+  width: min(100%, 1376px);
+  max-width: none;
+  height: auto;
+  padding: 14px clamp(16px, 3vw, 28px) 0;
+}
+.site-top > .storefront-header > .brand {
+  grid-area: brand;
+  width: clamp(120px, 15vw, 185px);
+  height: 52px;
+}
+.storefront-search {
+  grid-area: search;
+  position: relative;
+  z-index: 25;
+  width: 100%;
+  min-width: 0;
+}
+.storefront-search > .search {
+  position: static;
+  transform: none;
+  width: 100%;
+  max-width: 660px;
+  min-width: 0;
+  height: 48px;
+  margin: 0;
+  padding: 0 8px 0 16px;
+  border: 1px solid #cdbbdf;
+  background: #fff;
+  color: #4d3463;
+}
+.storefront-header .search:focus-within { outline: 2px solid #8664c0; outline-offset: 2px; }
+.storefront-header .search input { min-width: 0; font-size: 14px; }
+.storefront-header .search input::placeholder { color: #6a6074; }
+.storefront-header .search input::-webkit-search-cancel-button { appearance: none; }
+.storefront-header .search .store-search-clear,
+.storefront-header .search .store-search-submit {
+  position: static;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #f3edf9;
+  color: #513478;
+  cursor: pointer;
+}
+.store-search-submit span {
+  position: relative;
+  width: 13px;
+  height: 13px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+.store-search-submit span::after {
+  position: absolute;
+  right: -5px;
+  bottom: -3px;
+  width: 6px;
+  height: 2px;
+  background: currentColor;
+  transform: rotate(45deg);
+  content: '';
+}
+.site-top > .storefront-header > .head-actions { grid-area: actions; justify-self: end; gap: 6px; margin: 0; }
+.store-search-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  width: min(800px, calc(100vw - 36px));
+  max-height: min(650px, 72vh);
+  overflow: auto;
+  padding: 20px;
+  transform: translateX(-50%);
+  border: 1px solid #d9c9eb;
+  border-radius: 14px;
+  background: #fff;
+  color: #30263a;
+  box-shadow: 0 16px 42px #33204425;
+}
+.store-search-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.store-search-columns > section { min-width: 0; }
+.store-search-columns > section:first-child { padding-right: 20px; border-right: 1px solid #eee8f3; }
+.store-search-columns > section + section { padding-left: 20px; }
+.store-search-panel header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.store-search-panel h2 { margin: 0; font-size: 16px; line-height: 1.4; }
+.store-search-panel :is(ul, ol) { display: grid; gap: 4px; margin: 12px 0 0; padding: 0; list-style: none; }
+.store-search-panel button { color: inherit; cursor: pointer; font: inherit; }
+.store-search-panel button:focus-visible, .store-search-panel a:focus-visible { outline: 2px solid #8664c0; outline-offset: 1px; }
+.store-search-history li { display: flex; justify-content: space-between; gap: 8px; }
+.store-search-panel .search-panel-action { padding: 5px 6px; color: #6a6074; font-size: 12px; }
+.search-panel-term, .store-search-best button { padding: 5px; border-radius: 6px; text-align: left; }
+.search-panel-term:hover, .store-search-best button:hover { background: #f7f2fb; }
+.store-search-best button { display: flex; align-items: center; gap: 10px; width: 100%; }
+.store-search-best img { width: 34px; height: 46px; flex: none; border-radius: 3px; object-fit: contain; background: #f4f1f7; }
+.store-search-best button > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.store-search-best strong { color: #6841a3; font-size: 13px; }
+.store-search-empty { margin-top: 16px; color: #756981; font-size: 13px; }
+.store-search-keywords { margin-top: 20px; padding-top: 16px; border-top: 1px solid #eee8f3; }
+.store-search-keywords > div { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.store-search-keywords button { padding: 6px 12px; border-radius: 18px; background: #f2ecf8; font-size: 13px; }
+.store-search-keywords button:hover { background: #e8dcf4; }
+.store-search-panel > footer { display: flex; justify-content: flex-end; margin-top: 12px; }
+.site-top > .storefront-header .icon-btn {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  min-width: 49px;
+  padding: 4px;
+  color: #473455;
+  font-size: 19px;
+  line-height: 1.15;
+}
+.storefront-header .icon-btn > span { position: relative; }
+.storefront-header .icon-btn small { color: #574960; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.site-top > .storefront-header > .nav {
+  grid-area: nav;
+  justify-self: stretch;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 55px;
+  gap: 4px clamp(10px, 2vw, 26px);
+  margin: 0;
+  border-top: 1px solid #eee8f3;
+  font-size: 15px;
+}
+.storefront-header .nav > a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  border-bottom: 2px solid transparent;
+  color: #493c53;
+}
+.storefront-header .nav > a.active { border-bottom-color: #7045a1; color: #59388b; font-weight: 800; }
+.storefront-header .nav > a:focus-visible,
+.storefront-header .icon-btn:focus-visible { outline: 2px solid #8664c0; outline-offset: 2px; }
+#shop-view .hero { margin-top: 0; border: 0; border-radius: 16px; background: #352a44; }
+#shop-view .hero-slide { background: linear-gradient(112deg, #2e243a, #49365c 62%, #5e4771); }
+#shop-view .hero-slide.mist { background: linear-gradient(112deg, #282740, #494467 68%, #696481); }
+#shop-view .hero-slide.sun { background: linear-gradient(112deg, #352631, #563647 65%, #754e62); }
+#shop-view .hero-copy { transform: none; }
+#shop-view .hero-slide h1 {
+  color: #fff;
+  font-family: inherit;
+  font-size: clamp(30px, 4.2vw, 52px);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+#shop-view .hero-slide .eyebrow, #shop-view .hero-slide p { color: #eee3f6; }
+#shop-view .hero-slide .banner-cta { background: #fff; color: #422b58; }
+#shop-view .art-orbit { border-color: #ffffff29; background: #ffffff12; }
+#shop-view .hero-controls {
+  right: clamp(14px, 3vw, 28px);
+  bottom: 16px;
+  left: auto;
+  padding: 3px 5px;
+  border-radius: 24px;
+  background: #20182dd9;
+}
+#shop-view .hero-count, #shop-view .hero-count strong { margin: 0; color: #fff; }
+#shop-view .hero-arrow { border-color: #ffffff66; background: transparent; color: #fff; }
+#shop-view .hero-arrow:hover { background: #ffffff29; }
+#home-books-title { scroll-margin-top: 156px; }
+@media (max-width: 700px) {
+  .site-top > .storefront-header {
+    grid-template-areas: "brand actions" "search search" "nav nav";
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px 6px;
+    padding-top: 8px;
+  }
+  .site-top > .storefront-header > .brand { height: 42px; }
+  .site-top > .storefront-header .icon-btn { min-width: 37px; padding-inline: 1px; }
+  .storefront-header .icon-btn small { font-size: 9px; }
+  .site-top > .storefront-header > .nav { min-height: 46px; gap: 2px clamp(8px, 2.3vw, 16px); font-size: clamp(12px, 3.4vw, 14px); }
+  #home-books-title { scroll-margin-top: 210px; }
+}
+@media (max-width: 520px) {
+  .store-search-panel { padding: 15px; }
+  .store-search-columns { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .store-search-columns > section:first-child { padding: 0 0 12px; border-right: 0; border-bottom: 1px solid #eee8f3; }
+  .store-search-columns > section + section { padding-left: 0; }
+}
+.postal-field { display: grid; gap: 7px; min-width: 0; }
+.book-sort { display: inline-flex; align-items: center; gap: 7px; color: #6e6278; font-size: 13px; white-space: nowrap; }
+.book-sort select { padding: 8px 30px 8px 10px; border: 1px solid #ded4e8; border-radius: 8px; background: #fff; color: #493957; font: inherit; cursor: pointer; }
+.book-sort select:focus-visible { outline: 2px solid #8664c0; outline-offset: 2px; }
+.delivery-address-field { display: grid; gap: 7px; color: #4c4655; font-size: 12px; font-weight: 600; }
+.delivery-address-field em { color: #c15757; font-style: normal; }
+.delivery-address-row { display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; border: 1px solid #e5e1eb; border-radius: 8px; }
+.checkout-fields .delivery-address-row input { width: 100%; min-width: 0; border: 0; border-radius: 0; }
+.checkout-fields .delivery-address-row input + input { border-left: 1px solid #e5e1eb; }
+.checkout-fields .delivery-address-row input:focus { outline: 2px solid #8664c0; outline-offset: -2px; }
+.postal-input-row { display: flex; gap: 8px; min-width: 0; }
+.postal-input-row input { flex: 1; min-width: 0; }
+.postal-search-button { flex: none; padding: 0 16px; border: 1px solid #d7c9e8; border-radius: 8px; background: #f7f3fb; color: #613c93; font-size: 13px; font-weight: 700; cursor: pointer; }
+.postal-search-button:hover { background: #eee6f8; }
+.postal-search-button:focus-visible { outline: 2px solid #8664c0; outline-offset: 2px; }
+.postal-modal-backdrop { position: fixed; inset: 0; z-index: 11000; display: grid; place-items: center; padding: 20px; background: rgba(28,20,34,.5); }
+.postal-modal { width: min(100%, 560px); max-height: min(80vh, 700px); overflow-y: auto; padding: 24px; border-radius: 16px; background: #fff; box-shadow: 0 18px 60px #24133338; }
+.postal-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.postal-modal-header h2 { margin: 0; color: #302339; font-size: 20px; }
+.postal-modal-close { border: 0; background: none; color: #756a7b; font-size: 28px; cursor: pointer; }
+.postal-search label { display: grid; gap: 8px; color: #4c4655; font-weight: 600; }
+.postal-search input { width: 100%; height: 44px; padding: 0 12px; border: 1px solid #ddd3e8; border-radius: 8px; font: inherit; }
+.postal-search > button { margin-top: 12px; padding: 9px 16px; border-radius: 7px; background: #6841b4; color: white; }
+.postal-search > button:disabled { opacity: .5; }
+.postal-search ul { list-style: none; margin: 16px 0 0; padding: 0; }
+.postal-search li { border-top: 1px solid #eee8f2; }
+.postal-search li button { width: 100%; padding: 14px 4px; text-align: left; color: #503b66; line-height: 1.5; }
+.postal-search li button:hover { background: #f8f5fb; }
+.cart-added-backdrop { position: fixed; inset: 0; z-index: 10000; display: grid; place-items: center; padding: 20px; background: rgba(28, 20, 34, .48); }
+.cart-added-dialog { position: relative; width: min(100%, 460px); padding: 38px 32px 30px; border-radius: 18px; background: #fff; box-shadow: 0 18px 60px #24133338; text-align: center; }
+.cart-added-close { position: absolute; top: 12px; right: 16px; border: 0; background: transparent; color: #756a7b; font-size: 28px; line-height: 1; cursor: pointer; }
+.cart-added-icon { display: inline-grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: #f0e8f8; color: #643b98; font-size: 25px; font-weight: 700; }
+.cart-success-icon { width: 54px; height: 54px; background: #f1eafa; }
+.cart-success-icon svg { width: 29px; height: 29px; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.cart-deleted-icon { background: #f8eded; color: #ad5c5c; font-size: 29px; font-weight: 500; }
+.cart-added-dialog h2 { margin: 18px 0 10px; color: #302339; font-size: 23px; line-height: 1.4; }
+.cart-added-dialog p { margin: 0; color: #716779; font-size: 15px; line-height: 1.7; overflow-wrap: anywhere; }
+.cart-added-dialog p strong { color: #47324f; }
+.cart-added-actions { display: flex; gap: 10px; margin-top: 26px; }
+.cart-added-actions button { flex: 1; min-height: 48px; padding: 10px; border: 1px solid #dcd1e5; border-radius: 9px; font-size: 15px; font-weight: 700; cursor: pointer; }
+.cart-added-continue { background: #fff; color: #5a4666; }
+.cart-added-actions .cart-added-go { border-color: #613c93; background: #613c93; color: #fff; }
+.cart-bulk-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+@media (max-width: 420px) { .cart-added-dialog { padding: 34px 20px 24px; } .cart-added-actions { flex-direction: column-reverse; } }
+.product-description .product-intro-subtitle { margin: 0 0 18px; color: #49345d; font-size: 18px; font-weight: 700; line-height: 1.65; }
+.product-intro-body .product-reading-text { margin: 0 0 18px; line-height: 1.95; }
+.product-publisher-review { margin: 26px 0 8px; padding: 22px 24px; border: 1px solid #eee8f3; border-radius: 12px; background: #faf8fc; }
+.product-publisher-review h3 { margin: 0 0 12px; color: #503a65; font-size: 16px; }
+.product-publisher-review .product-reading-text { margin: 0; line-height: 1.9; }
+.product-description .product-empty-text { color: #817971; }
+
+/* 교보문고 주간 순위를 보여주는 독립 화면 */
+#bestseller-view { max-width: 1120px; margin: 0 auto; padding: 32px 0 72px; }
+.bestseller-header { padding: 20px 0 28px; border-bottom: 1px solid #e8e2ec; }
+.bestseller-kicker { color: #765998; font-size: 12px; font-weight: 800; letter-spacing: .12em; }
+.bestseller-header h1 { margin: 8px 0; color: #292130; font-size: clamp(28px, 4vw, 38px); }
+.bestseller-header p { margin: 0; color: #6f6675; font-size: 16px; line-height: 1.7; }
+.bestseller-header .bestseller-source { margin-top: 16px; font-size: 13px; }
+.bestseller-source a { margin-left: 6px; color: #62408a; text-decoration: underline; }
+.bestseller-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; padding-top: 24px; }
+.bestseller-item { display: grid; grid-template-columns: 32px 86px minmax(0, 1fr); gap: 16px; align-items: start; min-width: 0; padding: 18px; border: 1px solid #ebe5ed; border-radius: 14px; background: #fff; }
+.bestseller-rank { color: #674390; font-size: 22px; font-weight: 800; line-height: 1; }
+.bestseller-cover { display: grid; place-items: center; width: 86px; height: 120px; overflow: hidden; border-radius: 5px; background: #f2eef5; }
+.bestseller-cover img { width: 100%; height: 100%; object-fit: contain; }
+.bestseller-cover > span { color: #a092aa; font-size: 11px; font-weight: 800; letter-spacing: .1em; line-height: 1.5; text-align: center; }
+.bestseller-copy { min-width: 0; }
+.bestseller-copy h2 { margin: 0 0 8px; color: #302737; font-size: 17px; line-height: 1.45; overflow-wrap: anywhere; }
+.bestseller-copy p { margin: 0 0 12px; color: #746a78; font-size: 13px; line-height: 1.6; }
+.bestseller-available, .bestseller-unavailable { color: #735596; font-size: 12px; }
+.bestseller-unavailable { color: #8b818d; }
+.bestseller-actions { grid-column: 3; align-self: end; }
+.bestseller-actions button, .bestseller-actions a { display: inline-block; padding: 0; border: 0; background: none; color: #604080; font: inherit; font-size: 13px; font-weight: 700; text-align: left; }
+@media (max-width: 700px) {
+  #bestseller-view { padding: 20px 0 48px; }
+  .bestseller-list { grid-template-columns: 1fr; gap: 12px; }
+  .bestseller-item { grid-template-columns: 28px 70px minmax(0, 1fr); gap: 12px; padding: 15px; }
+  .bestseller-cover { width: 70px; height: 100px; }
+}
+/* 베스트셀러 화면의 크기와 가독성 */
+#bestseller-view { max-width: 1240px; }
+.bestseller-header { padding: 12px 0 34px; }
+.bestseller-kicker { font-size: 15px; }
+.bestseller-header h1 { font-size: clamp(34px, 4vw, 44px); }
+.bestseller-header p { font-size: 18px; }
+.bestseller-header .bestseller-source { font-size: 15px; }
+.bestseller-list { gap: 20px; padding-top: 28px; }
+.bestseller-item { grid-template-columns: 40px 110px minmax(0, 1fr); gap: 20px; padding: 24px; }
+.bestseller-rank { font-size: 28px; }
+.bestseller-cover { width: 110px; height: 154px; }
+.bestseller-cover > span { font-size: 14px; }
+.bestseller-copy h2 { font-size: 20px; }
+.bestseller-copy p { font-size: 16px; }
+.bestseller-available, .bestseller-unavailable { font-size: 14px; }
+.bestseller-actions button, .bestseller-actions a { font-size: 16px; line-height: 1.5; }
+@media (max-width: 700px) {
+  .bestseller-header h1 { font-size: 32px; }
+  .bestseller-header p { font-size: 16px; }
+  .bestseller-header .bestseller-source { font-size: 14px; }
+  .bestseller-list { gap: 14px; }
+  .bestseller-item { grid-template-columns: 32px 82px minmax(0, 1fr); gap: 14px; padding: 17px; }
+  .bestseller-rank { font-size: 23px; }
+  .bestseller-cover { width: 82px; height: 115px; }
+  .bestseller-copy h2 { font-size: 17px; }
+  .bestseller-copy p, .bestseller-actions button, .bestseller-actions a { font-size: 14px; }
+}
+@media (max-width: 700px) {
+  .product-description .product-intro-subtitle { font-size: 16px; }
+  .product-publisher-review { padding: 18px; }
+}
+
+/* 추천도서 화면의 텍스트 가독성 */
+#curation-view .curation-welcome .eyebrow { font-size: 14px; }
+#curation-view .curation-welcome h1 { font-size: 34px; line-height: 1.3; }
+#curation-view .curation-welcome p { font-size: 16px; line-height: 1.7; }
+#curation-view .curation-guides article > span { font-size: 13px; }
+#curation-view .curation-guides b { font-size: 15px; line-height: 1.5; }
+#curation-view .curation-guides small { font-size: 14px; line-height: 1.5; }
+#curation-view .curation-section-head h2 { font-size: 23px; }
+#curation-view .curation-section-head p,
+#curation-view .curation-section-head .catalog-count { font-size: 15px; }
+#curation-view .curation-cover > span { font-size: 13px; }
+#curation-view .curation-copy .category { font-size: 13px; }
+#curation-view .curation-copy h3 { font-size: 17px; }
+#curation-view .curation-copy .author,
+#curation-view .curation-reason,
+#curation-view .curation-more { font-size: 14px; line-height: 1.6; }
+
+#curation-view .curation-grid { gap: 28px 18px; }
+#curation-view .curation-book { display: flex; flex-direction: column; height: 100%; }
+#curation-view .curation-cover { flex: none; overflow: hidden; }
+#curation-view .curation-copy { display: flex; flex: 1; flex-direction: column; min-width: 0; }
+#curation-view .curation-copy h3,
+#curation-view .curation-copy .author { overflow-wrap: anywhere; }
+#curation-view .curation-reason { margin: 10px 0 12px; }
+#curation-view .curation-more { margin-top: auto; }
+
+/* 국내도서 카드 안쪽 정렬 */
+#domestic-view .domestic-shelf .book-card { display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+#domestic-view .domestic-shelf .book-art { flex: none; }
+
+/* 도서 카드 공통 글자와 버튼 */
+html body .book-card .book-meta .category { color: #8c8581; font-size: 12px; }
+html body .book-card .book-meta h3 { color: #30283a; font-size: 15px; font-weight: 700; line-height: 1.45; }
+html body .book-card .book-meta .author { color: #817987; font-size: 13px; }
+html body .book-card .price-line .discount { color: #bd655c; font-size: 12px; }
+html body .book-card .price-line .price { color: #403a3a; font-size: 16px; font-weight: 700; }
+html body .book-card .rating { color: #ab7d46; font-size: 12px; }
+html body .book-card .rating span { color: #8c8581; }
+html body .book-card .buy-row { display: flex; flex-wrap: wrap; gap: 6px; }
+html body .book-card .buy-row button { min-height: 38px; padding: 0 12px; border: 0; border-radius: 3px; background: #6841b4; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; }
+html body .book-card .buy-row button + button { background: #55463f; }
+html body .book-card .buy-row button:hover { filter: brightness(.9); }
+html body .book-card .buy-row button:focus-visible { outline: 2px solid #8064b8; outline-offset: 2px; }
+@media (max-width: 600px) {
+  html body .book-card .book-meta h3 { font-size: 14px; }
+  html body .book-card .price-line .price { font-size: 15px; }
+  html body .book-card .buy-row button { min-height: 36px; padding-inline: 10px; }
+}
+#domestic-view .domestic-shelf .book-meta { display: flex; flex: 1; flex-direction: column; gap: 6px; min-width: 0; padding: 14px 14px 16px; }
+#domestic-view .domestic-shelf .book-meta h3 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; min-height: 2.8em; margin: 0; overflow: hidden; overflow-wrap: anywhere; white-space: normal; }
+#domestic-view .domestic-shelf .book-meta .author { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height: 1.5; }
+#domestic-view .domestic-shelf .price-line { margin-top: auto; padding-top: 4px; }
+#domestic-view .domestic-shelf .buy-row { gap: 6px; margin-top: 4px; }
+html body #domestic-view .domestic-shelf .book-card { padding: 0; }
+html body #domestic-view .domestic-shelf .book-meta { padding: 14px 16px 16px; }
+html body #domestic-view .domestic-shelf .book-meta h3 { color: #30283a; font-size: 15px; }
+html body #domestic-view .domestic-shelf .book-meta .author { color: #817987; font-size: 13px; }
+html body #domestic-view .domestic-shelf .buy-row button { min-height: 38px; padding: 0 12px; border: 0; border-radius: 3px; background: #6841b4; color: #fff; font-size: 13px; font-weight: 700; }
+html body #domestic-view .domestic-shelf .buy-row button + button { background: #55463f; }
+
+/* 홈과 국내도서에서 카드 제목, 저자, 가격을 구분합니다. */
+html body #shop-view :is(#books, .home-new-section) .book-meta .category,
+html body #domestic-view .domestic-shelf .book-meta .category { color: #614e75; }
+html body #shop-view :is(#books, .home-new-section) .book-meta .author,
+html body #domestic-view .domestic-shelf .book-meta .author { color: #665c6e; }
+html body #shop-view :is(#books, .home-new-section) .price-line,
+html body #domestic-view .domestic-shelf .price-line { padding-top: 8px; }
+html body #shop-view :is(#books, .home-new-section) .buy-row button,
+html body #domestic-view .domestic-shelf .buy-row button { border-radius: 7px; }
+
+@media (max-width: 700px) {
+  #curation-view .curation-welcome h1 { font-size: 28px; }
+  #curation-view .curation-welcome p { font-size: 15px; }
+  #curation-view .curation-copy h3 { font-size: 16px; }
+  #curation-view .curation-grid { gap: 24px 14px; }
+  #domestic-view .domestic-shelf .book-meta { padding: 12px 10px 14px; }
+  html body #domestic-view .domestic-shelf .book-meta { padding: 12px 10px 14px; }
+  html body #domestic-view .domestic-shelf .book-meta h3 { font-size: 14px; }
+  html body #domestic-view .domestic-shelf .buy-row button { min-height: 36px; padding-inline: 10px; }
+}
+.product-reviews { padding:24px 0 36px; }
+.product-review-form { display:grid; gap:10px; padding:18px; margin:16px 0 24px; border:1px solid #e6ded7; border-radius:10px; background:#faf8fb; }
+.product-review-form fieldset { padding:0; margin:0; border:0; }
+.product-review-form textarea { width:100%; padding:12px; border:1px solid #d9cde6; border-radius:6px; font:inherit; resize:vertical; }
+.product-review-form button, .product-reviews nav button { padding:8px 16px; border-radius:6px; background:#59388b; color:#fff; }
+.product-review-form button { justify-self:end; }
+.product-stars { display:flex; gap:8px; }
+.product-stars label { position:relative; cursor:pointer; font-size:27px; color:#77717e; }
+.product-stars label.selected { color:#663da2; }
+.product-stars input { position:absolute; opacity:0; }
+.product-stars label:focus-within { outline:2px solid #663da2; outline-offset:3px; }
+.product-review-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr)); gap:14px; }
+.product-review-list article { min-width:0; padding:16px; border:1px solid #e6ded7; border-radius:10px; }
+.product-review-list header { display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; }
+.product-review-list time { color:#625951; font-size:13px; }
+.product-review-rating { margin-top:10px; color:#663da2; font-weight:700; }
+.product-editorial {
+  min-width: 0;
+  padding: clamp(18px, 4vw, 36px);
+  border: 1px solid #eee8f2;
+  border-radius: 16px;
+  background: #fff;
+}
+.product-editorial .product-reading-text { max-width: 70ch; }
+.product-editorial .product-contents,
+.product-editorial .product-contents-list {
+  margin: 0;
+  padding: 16px 20px;
+  border-left: 3px solid #cbb7e4;
+  border-radius: 0 8px 8px 0;
+  background: #faf7fc;
+  line-height: 1.95;
+}
+.product-editorial .product-contents-list { padding-inline-start: 38px; }
+.product-contents-entries {
+  margin: 16px 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid #eee8f2;
+  border-radius: 10px;
+  background: #faf7fc;
+}
+.product-contents-entries li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px clamp(12px, 3vw, 20px);
+  line-height: 1.6;
+}
+.product-contents-entries li + li { border-top: 1px solid #eee8f2; }
+.product-contents-entries li span + span { flex: none; color: #694d86; font-variant-numeric: tabular-nums; }
+.product-contents-source { display: inline-block; margin-top: 4px; color: #59388b; text-decoration: underline; text-underline-offset: 3px; }
+.product-section-nav { gap: clamp(4px, 3vw, 24px); }
+.product-section-nav button { padding-inline: clamp(8px, 2vw, 18px); cursor: pointer; }
+.product-review-overview {
+  display: grid;
+  grid-template-columns: minmax(135px, .65fr) minmax(0, 1.35fr);
+  gap: clamp(16px, 4vw, 36px);
+  align-items: center;
+  padding: clamp(16px, 4vw, 28px);
+  border: 1px solid #e9dff3;
+  border-radius: 16px;
+  background: #f8f4fc;
+}
+.product-average-rating { display: grid; gap: 4px; color: #5e5168; }
+.product-average-rating strong { color: #4c2f73; font-size: clamp(32px, 6vw, 48px); line-height: 1.1; }
+.product-average-rating small { font-size: 16px; }
+.product-rating-breakdown { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.product-rating-breakdown li { display: grid; grid-template-columns: 2.2em minmax(0, 1fr) 5em; gap: 8px; align-items: center; color: #5e5168; font-size: 13px; }
+.product-rating-breakdown li > :last-child { text-align: right; }
+.product-rating-breakdown meter { width: 100%; height: 12px; }
+.product-rating-breakdown meter::-webkit-meter-bar { border: 0; background: #e9dff2; }
+.product-rating-breakdown meter::-webkit-meter-optimum-value { background: #7954aa; }
+.product-rating-breakdown meter::-moz-meter-bar { background: #7954aa; }
+.product-review-form { padding: clamp(16px, 4vw, 24px); border-color: #eee8f2; background: #fff; }
+.product-review-form h3 { margin: 0 0 4px; }
+.product-review-submit, .product-review-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.product-review-submit { justify-content: space-between; }
+.product-review-controls { justify-content: flex-end; margin-bottom: 16px; }
+.product-review-controls label { display: flex; align-items: center; gap: 8px; color: #584d62; font-size: 14px; }
+.product-review-controls select { min-height: 36px; padding: 4px 8px; border: 1px solid #ded4e8; border-radius: 8px; background: #fff; color: inherit; font: inherit; }
+.product-review-form button:disabled, .product-reviews nav button:disabled { opacity: .55; cursor: default; }
+.product-review-list { grid-template-columns: minmax(0, 1fr); }
+.product-review-list article { padding: clamp(16px, 4vw, 24px); border-color: #eee8f2; background: #fff; }
+.product-review-list h3 { margin: 12px 0 0; }
+.product-review-list p { margin: 8px 0 0; color: #51485a; }
+.product-review-rating { display: flex; align-items: center; gap: 8px; }
+.product-empty-stars { color: #cfc0dc; }
+.product-review-empty { padding: 22px; border-radius: 10px; background: #faf7fc; color: #5e5168; text-align: center; }
+@media (max-width: 560px) {
+  .product-review-overview { grid-template-columns: minmax(0, 1fr); }
+  .product-review-controls { justify-content: flex-start; }
+}
+
+#domestic-view .domestic-pagination { flex-wrap:wrap; gap:6px; }
+#domestic-view .domestic-pagination button { min-width:40px; min-height:40px; padding:6px 10px; border:1px solid #e4d7f1; border-radius:8px; background:#fff; color:#512d83; cursor:pointer; }
+#domestic-view .domestic-pagination button[aria-current="page"] { background:#512d83; border-color:#512d83; color:#fff; font-weight:700; }
+#domestic-view .domestic-pagination button:disabled { opacity:.45; cursor:default; }
+#domestic-view .domestic-pagination button:focus-visible { outline:2px solid #8664c0; outline-offset:2px; }
+
+/* 메인과 국내도서 목록은 넓은 화면에서 한 줄에 세 권씩 표시합니다. */
+html body #shop-view .section#books .book-grid,
+html body #shop-view .section.home-new-section .book-grid,
+html body #domestic-view .domestic-shelf .catalog-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+html body #shop-view .section#books .book-art,
+html body #shop-view .section.home-new-section .book-art,
+html body #domestic-view .domestic-shelf .book-art { height:clamp(214px, 24vw, 320px); }
+@media (max-width:600px) {
+  html body #shop-view .section#books .book-grid,
+  html body #shop-view .section.home-new-section .book-grid,
+  html body #domestic-view .domestic-shelf .catalog-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  html body #shop-view .section#books .book-art,
+  html body #shop-view .section.home-new-section .book-art,
+  html body #domestic-view .domestic-shelf .book-art { height:170px; }
+}
+
+/* 분야 탐색과 도서 목록 */
+#domestic-view .domestic-catalog-layout { display:grid; grid-template-columns:190px minmax(0,1fr); gap:32px; align-items:start; }
+#domestic-view .domestic-category-nav { padding:34px 16px 24px 0; border-right:1px solid #eae5ed; }
+#domestic-view .domestic-category-nav h2 { margin:0 0 18px; color:#241a31; font-size:24px; }
+#domestic-view .domestic-category-nav p { margin:0 0 12px; color:#776b80; font-size:14px; font-weight:700; }
+#domestic-view .domestic-category-nav button { display:block; width:100%; padding:10px 12px; border:0; border-radius:8px; background:transparent; color:#51485a; font:inherit; font-size:15px; text-align:left; cursor:pointer; }
+#domestic-view .domestic-category-nav button:hover, #domestic-view .domestic-category-nav button[aria-current="page"] { background:#f1e9fa; color:#512d83; font-weight:700; }
+#domestic-view .domestic-shelf { min-width:0; }
+html body #shop-view .section#books .book-grid, html body #shop-view .section.home-new-section .book-grid, html body #domestic-view .domestic-shelf .catalog-grid, html body #curation-view .curation-grid, html body #bestseller-view .bestseller-list { grid-template-columns:repeat(5,minmax(0,1fr)); }
+html body #shop-view .section#books .book-art, html body #shop-view .section.home-new-section .book-art, html body #domestic-view .domestic-shelf .book-art { height:220px; }
+html body .book-card .book-meta .category { font-size:14px; }
+html body .book-card .book-meta h3, html body #domestic-view .domestic-shelf .book-meta h3 { font-size:17px; }
+html body .book-card .book-meta .author, html body #domestic-view .domestic-shelf .book-meta .author { font-size:14px; }
+html body .book-card .price-line .discount, html body .book-card .rating { font-size:14px; }
+html body .book-card .price-line .price { font-size:18px; }
+html body .book-card .buy-row button, html body #domestic-view .domestic-shelf .buy-row button { min-height:42px; padding:0 15px; font-size:15px; }
+#bestseller-view .bestseller-item { display:flex; flex-direction:column; gap:12px; padding:14px; }
+#bestseller-view .bestseller-cover { width:100%; height:220px; }
+#bestseller-view .bestseller-copy h2 { font-size:17px; }
+#bestseller-view .bestseller-copy p { font-size:14px; }
+#bestseller-view .bestseller-actions { margin-top:auto; align-self:stretch; }
+#bestseller-view .bestseller-actions button, #bestseller-view .bestseller-actions a { display:inline-block; padding:10px 12px; border-radius:7px; background:#6841b4; color:#fff; font-size:14px; }
+@media (max-width:1100px) { html body #domestic-view .domestic-shelf .catalog-grid, html body #bestseller-view .bestseller-list { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+@media (max-width:900px) {
+  html body #shop-view .section#books .book-grid, html body #shop-view .section.home-new-section .book-grid, html body #curation-view .curation-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  #domestic-view .domestic-catalog-layout { grid-template-columns:150px minmax(0,1fr); gap:20px; }
+}
+@media (max-width:600px) {
+  #domestic-view .domestic-catalog-layout { display:block; }
+  #domestic-view .domestic-category-nav { display:flex; gap:6px; overflow-x:auto; padding:20px 0 8px; border-right:0; }
+  #domestic-view .domestic-category-nav h2, #domestic-view .domestic-category-nav p { display:none; }
+  #domestic-view .domestic-category-nav button { width:auto; flex:none; white-space:nowrap; }
+  html body #shop-view .section#books .book-grid, html body #shop-view .section.home-new-section .book-grid, html body #domestic-view .domestic-shelf .catalog-grid, html body #curation-view .curation-grid, html body #bestseller-view .bestseller-list { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  html body #shop-view .section#books .book-art, html body #shop-view .section.home-new-section .book-art, html body #domestic-view .domestic-shelf .book-art { height:180px; }
+}
+
+/* 도서 목록과 분야 메뉴 가독성 */
+html body #shop-view .section#books .book-grid,
+html body #shop-view .section.home-new-section .book-grid,
+html body #domestic-view .domestic-shelf .catalog-grid,
+html body #curation-view .curation-grid,
+html body #bestseller-view .bestseller-list { grid-template-columns:repeat(3,minmax(0,1fr)); }
+#domestic-view .domestic-category-nav h2 { font-size:26px; line-height:1.3; }
+#domestic-view .domestic-category-nav p { margin-bottom:14px; color:#5f5369; font-size:15px; }
+#domestic-view .domestic-category-nav button { min-height:46px; margin:2px 0; padding:10px 14px; color:#403648; font-size:16px; line-height:1.5; }
+#domestic-view .domestic-category-nav button:focus-visible { outline:2px solid #7652a8; outline-offset:2px; }
+@media (max-width:600px) {
+  html body #shop-view .section#books .book-grid,
+  html body #shop-view .section.home-new-section .book-grid,
+  html body #domestic-view .domestic-shelf .catalog-grid,
+  html body #curation-view .curation-grid,
+  html body #bestseller-view .bestseller-list { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+
+/* 베스트셀러 분야 메뉴 */
+#bestseller-view .bestseller-layout { display:grid; grid-template-columns:190px minmax(0,1fr); gap:32px; align-items:start; }
+#bestseller-view .bestseller-category-nav { padding:12px 16px 24px 0; border-right:1px solid #eae5ed; }
+#bestseller-view .bestseller-category-nav h2 { margin:0 0 24px; color:#241a31; font-size:26px; line-height:1.3; }
+#bestseller-view .bestseller-category-group { padding:0 0 18px; border-bottom:1px solid #eae5ed; }
+#bestseller-view .bestseller-category-group h3 { margin:0 0 8px; color:#403648; font-size:16px; }
+#bestseller-view .bestseller-category-group a { display:block; padding:10px 14px; border-radius:8px; background:#f1e9fa; color:#512d83; font-size:16px; font-weight:700; text-decoration:none; }
+#bestseller-view .bestseller-category-group a:focus-visible { outline:2px solid #7652a8; outline-offset:2px; }
+#bestseller-view .bestseller-content { min-width:0; }
+@media (max-width:900px) { #bestseller-view .bestseller-layout { grid-template-columns:150px minmax(0,1fr); gap:20px; } }
+@media (max-width:600px) {
+  #bestseller-view .bestseller-layout { display:block; }
+  #bestseller-view .bestseller-category-nav { padding:0 0 14px; border-right:0; }
+  #bestseller-view .bestseller-category-nav h2 { margin-bottom:12px; }
+  #bestseller-view .bestseller-category-group { display:flex; align-items:center; gap:12px; padding:0 0 14px; }
+  #bestseller-view .bestseller-category-group h3 { margin:0; }
+}
+
+.db-dashboard .admin-tabs, .db-dashboard .admin-toolbar, .db-dashboard .admin-actions { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:20px 0; }
+.db-dashboard .admin-tabs button, .db-dashboard .admin-toolbar button, .db-dashboard .admin-actions button, .db-dashboard table button { min-height:40px; padding:8px 15px; border:1px solid #ded3ea; border-radius:8px; background:#fff; color:#51316e; font:inherit; cursor:pointer; }
+.db-dashboard .admin-tabs button[aria-pressed="true"] { background:#65419a; border-color:#65419a; color:white; font-weight:700; }
+.db-dashboard .admin-toolbar h2 { margin:0 auto 0 0; }
+.db-dashboard .admin-toolbar form { display:flex; gap:8px; }
+.db-dashboard input { min-height:42px; padding:8px 11px; border:1px solid #d9d0e0; border-radius:7px; font:inherit; }
+.db-dashboard .admin-auth, .db-dashboard .admin-editor { padding:24px; margin:20px 0; }
+.db-dashboard .admin-auth { max-width:460px; margin:30px auto; }
+.db-dashboard .admin-auth label, .db-dashboard .admin-fields label { display:grid; gap:6px; font-weight:700; }
+.db-dashboard .admin-auth label { margin:16px 0; }
+.db-dashboard .admin-fields { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; }
+.db-dashboard .admin-error { padding:12px; color:#a82c2c; background:#fff1f1; border-radius:8px; }
+.db-dashboard .analytics-grid { grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); }
+.db-dashboard .admin-chart { padding:24px; }
+.db-dashboard .admin-bars { display:grid; gap:14px; margin-top:22px; }
+.db-dashboard .admin-bar-row { display:grid; grid-template-columns:minmax(65px,auto) minmax(40px,1fr) auto; gap:10px; align-items:center; font-size:14px; }
+.db-dashboard .admin-bar-row b { white-space:nowrap; }
+.db-dashboard .admin-bar-track { height:14px; overflow:hidden; border-radius:10px; background:#eee8f2; }
+.db-dashboard .admin-bar-track span { display:block; height:100%; border-radius:inherit; background:#8064c9; }
+.db-dashboard .admin-empty { color:#756b80; }
+.db-dashboard .table-wrap { overflow-x:auto; }
+
+/* 국내도서와 베스트셀러의 본문 폭과 카드 간격을 맞춥니다. */
+html body #bestseller-view { max-width:1440px; margin:0 auto; padding:0 28px 70px; }
+#bestseller-view .bestseller-category-nav { padding-top:34px; }
+#bestseller-view .bestseller-header { padding:clamp(24px,4vw,36px) 0 18px; }
+#bestseller-view .bestseller-header h1 { margin:0 0 8px; font-size:clamp(20px,2vw,25px); line-height:1.3; }
+#bestseller-view .bestseller-header p { font-size:15px; line-height:1.5; }
+#bestseller-view .bestseller-header .bestseller-source { margin-top:8px; font-size:13px; }
+#bestseller-view .bestseller-list { gap:20px 18px; padding-top:18px; align-items:stretch; }
+#bestseller-view .bestseller-item { min-width:0; padding:0; gap:0; overflow:hidden; border:1px solid #eee9e2; border-radius:16px; background:#fff; }
+#bestseller-view .bestseller-rank { padding:14px 16px 10px; font-size:22px; }
+#bestseller-view .bestseller-cover { display:flex; flex:none; align-items:center; justify-content:center; width:100%; height:220px; overflow:hidden; border-radius:0; background:#f4f2ef; }
+#bestseller-view .bestseller-cover img { display:block; width:auto; height:auto; max-width:70%; max-height:82%; object-fit:contain; box-shadow:5px 7px 12px #28231e20; }
+#bestseller-view .bestseller-copy { display:flex; flex:1; flex-direction:column; gap:7px; padding:14px 16px 0; }
+#bestseller-view .bestseller-copy h2 { margin:0; font-size:17px; line-height:1.45; }
+#bestseller-view .bestseller-copy p { margin:0; font-size:14px; }
+#bestseller-view .bestseller-available, #bestseller-view .bestseller-unavailable { font-size:13px; }
+#bestseller-view .bestseller-actions { padding:12px 16px 16px; }
+#bestseller-view .bestseller-actions button, #bestseller-view .bestseller-actions a { min-height:42px; font-size:15px; line-height:22px; }
+@media (max-width:700px) { html body #bestseller-view { padding:0 14px 48px; } }
+@media (max-width:600px) {
+  #bestseller-view .bestseller-category-nav { padding:20px 0 14px; }
+  #bestseller-view .bestseller-header { padding:8px 0 16px; }
+  #bestseller-view .bestseller-cover { height:180px; }
+  #bestseller-view .bestseller-copy { padding:12px 10px 0; }
+  #bestseller-view .bestseller-actions { padding:12px 10px 14px; }
+}
+
+/* 비회원 주문조회 */
+.guest-order-page { max-width:1100px; margin:0 auto; padding:48px 24px 80px; }
+.guest-order-heading { margin-bottom:28px; }
+.guest-order-heading > p:first-child { color:#7651a4; font-size:12px; font-weight:800; letter-spacing:.1em; }
+.guest-order-heading h1 { margin:8px 0; color:#2d2337; font-size:clamp(28px,4vw,38px); }
+.guest-order-heading p, .guest-order-help, .guest-order-notice { color:#6d6373; line-height:1.6; }
+.guest-order-layout { display:grid; grid-template-columns:minmax(260px,360px) minmax(0,1fr); gap:20px; align-items:start; }
+.guest-order-panel { padding:26px; border:1px solid #e9e2ed; border-radius:16px; background:#fff; }
+.guest-order-panel h2 { margin:0 0 20px; font-size:20px; }
+.guest-order-form label { display:block; margin:18px 0 8px; color:#3b3043; font-size:15px; font-weight:700; }
+.guest-order-form input { width:100%; min-height:48px; padding:10px 12px; border:1px solid #dcd2e2; border-radius:8px; font:inherit; }
+.guest-order-form button { width:100%; min-height:48px; margin-top:20px; border:0; border-radius:8px; background:#6841b4; color:white; font:inherit; font-weight:700; cursor:pointer; }
+.guest-order-form button:disabled { opacity:.6; cursor:wait; }
+.guest-order-form a { color:#62408a; font-weight:700; }
+.guest-order-error { padding:12px; border-radius:8px; background:#fff1f1; color:#a82c2c; }
+.guest-order-help, .guest-order-notice { font-size:14px; }
+.guest-order-empty { padding:60px 0; color:#62566b; text-align:center; line-height:1.6; }
+.guest-order-result-head { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; border-bottom:1px solid #eee8f1; }
+.guest-order-result-head span, .guest-order-result-head time { color:#706675; font-size:14px; }
+.guest-order-result-head h2 { margin:8px 0 18px; }
+.guest-order-result h3 { margin:22px 0 12px; font-size:16px; }
+.guest-order-item { display:flex; align-items:center; gap:14px; padding:12px 0; border-bottom:1px solid #eee8f1; }
+.guest-order-item img { width:48px; height:64px; object-fit:contain; }
+.guest-order-item div { flex:1; min-width:0; }
+.guest-order-item div span { display:block; color:#706675; font-size:14px; margin-top:5px; }
+.guest-order-item strong { white-space:nowrap; }
+.guest-order-details { margin:18px 0 0; }
+.guest-order-details div { display:flex; justify-content:space-between; gap:12px; padding:7px 0; }
+.guest-order-details dt { color:#706675; }
+.guest-order-details dd { margin:0; text-align:right; }
+@media(max-width:700px) { .guest-order-page { padding:28px 14px 50px; } .guest-order-layout { grid-template-columns:1fr; } .guest-order-panel { padding:20px; } }
+.admin-page-actions { display:flex; flex-wrap:wrap; gap:8px; }
+
+/* 대시보드 요약과 운영 현황 */
+html body .db-dashboard .metric-grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
+.db-dashboard .admin-operations { margin-top:18px; padding:22px 24px; border:1px solid #e3e9e9; border-radius:12px; background:#fff; }
+.db-dashboard .admin-operations-heading { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; }
+.db-dashboard .admin-operations-heading h2 { margin:0; color:#243943; font-size:18px; }
+.db-dashboard .admin-operations-heading p { margin:5px 0 0; color:#71818a; font-size:13px; }
+.db-dashboard .admin-operations-heading button { padding:8px 12px; border:1px solid #ddd3ea; border-radius:8px; background:#fff; color:#65419a; font:inherit; font-size:13px; font-weight:700; cursor:pointer; }
+.db-dashboard .admin-operations-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:18px; }
+.db-dashboard .admin-operations-grid article { display:flex; flex-direction:column; gap:6px; padding:15px; border-radius:9px; background:#f6f4fa; }
+.db-dashboard .admin-operations-grid span { color:#60536b; font-size:14px; }
+.db-dashboard .admin-operations-grid strong { color:#30233e; font-size:22px; }
+.db-dashboard .admin-operations-grid small { color:#756c7c; line-height:1.4; }
+@media (max-width:900px) { html body .db-dashboard .metric-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:600px) { .db-dashboard .admin-operations-grid { grid-template-columns:1fr; } .db-dashboard .admin-operations { padding:18px; } }
+
+.delivery-address-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px 14px; }
+@media (max-width: 700px) { .delivery-address-fields { grid-template-columns: 1fr; } }
+
+#bestseller-view .store-popular { margin-top: 48px; border-top: 1px solid #eae5ed; padding-top: 28px; }
+#bestseller-view .store-popular header h2 { margin: 0 0 8px; font-size: 23px; color: #241a31; }
+#bestseller-view .store-popular header p { margin: 0; color: #776b80; line-height: 1.5; }
+#bestseller-view .store-popular-more { display: block; margin: 24px auto 0; padding: 11px 24px; border: 1px solid #d9cbe8; border-radius: 8px; background: #fff; color: #59388b; font: inherit; cursor: pointer; }
+
+#bestseller-view .bestseller-category-group button { display:block; width:100%; padding:10px 14px; border:0; border-radius:8px; background:transparent; color:#403648; font:inherit; font-size:16px; text-align:left; cursor:pointer; }
+#bestseller-view .bestseller-category-group button:hover, #bestseller-view .bestseller-category-group button[aria-current="page"] { background:#f1e9fa; color:#512d83; font-weight:700; }
+#bestseller-view .bestseller-category-group button:focus-visible { outline:2px solid #7652a8; outline-offset:2px; }
+#bestseller-view .bestseller-subjects { padding-top:18px; }
+@media (max-width:600px) { #bestseller-view .bestseller-subjects { display:flex; overflow-x:auto; } #bestseller-view .bestseller-category-group button { width:auto; flex:none; white-space:nowrap; } #bestseller-view .bestseller-subjects h3 { white-space:nowrap; } }

@@ -1,7 +1,2 @@
-fastapi[standard]
-sqlalchemy>=2.0,<3.0
-psycopg2-binary
-pwdlib[argon2]
-itsdangerous
-python-dotenv
-jwt>=1.4,<2.0
+# 루트 main.py가 실행하는 통합 백엔드 의존성
+-r team_backend/requirements.txt
