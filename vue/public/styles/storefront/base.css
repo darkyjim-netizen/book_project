@@ -1017,7 +1017,7 @@ td.muted {
     margin-left: auto;
   }
 
-  .head-actions .icon-btn:nth-child(2) {
+  .head-actions .mypage-icon-button {
     display: none;
   }
 

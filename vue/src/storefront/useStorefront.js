@@ -2,6 +2,8 @@ import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storefrontApi } from './api.js';
 import { publishedContentsByIsbn } from './bookContents.js';
+import { useAuthStore } from '../stores/authStore.js';
+import http from '../api/http.js';
 
 const seedBooks = [
   { id: 11, title: 'Vue 3 풀스택 실전 웹 프로젝트', author: '김기태, 김대철', cat: '컴퓨터·IT', price: 1000, discount: 10, rate: '', color: '#356b6d', bg: '#dcebea', stock: 12, publisher: '남가람북스', featured: true },
@@ -126,6 +128,7 @@ export function bookCoverUrl(book) {
 export function useStorefront() {
   const route = useRoute();
   const router = useRouter();
+  const auth = useAuthStore();
   const postalOpen = ref(false), postalKeyword = ref(''), postalResults = ref([]), postalPage = ref(1), postalSubmitted = ref(''), postalLoading = ref(false), postalMessage = ref('');
   async function searchPostal(nextPage) {
     const query = nextPage ? postalSubmitted.value : postalKeyword.value.trim();
@@ -358,6 +361,9 @@ export function useStorefront() {
   const checkoutMessage = ref('');
   const checkoutLoading = ref(false);
   const checkoutSubmitting = ref(false);
+  const checkoutCoupons = ref([]), selectedCouponId = ref(''), couponLoading = ref(false), couponError = ref('');
+  const selectedCoupon = computed(() => checkoutCoupons.value.find(coupon => String(coupon.member_coupon_id) === String(selectedCouponId.value)) || null);
+  const couponDiscount = computed(() => Number(selectedCoupon.value?.discount_amount || 0));
   const paymentMethod = ref('CARD');
   const checkoutPaymentMode = ref('toss');
   const productByTitle = computed(() => new Map(backendProducts.value.map(product => [product.title, product])));
@@ -594,6 +600,7 @@ export function useStorefront() {
     return router.push({ name: 'productInfo', params: { title: product.title } });
   }
   function backToBooks() {
+    if (route.query.from === 'mypage') return router.push({ name: 'mypage', hash: '#member-recommendations' });
     return router.push(productSourcePath.value);
   }
   function openBookInfo(book) {
@@ -683,6 +690,7 @@ export function useStorefront() {
     checkoutLoading.value = true;
     checkoutReady.value = false;
     checkoutMessage.value = '';
+    checkoutCoupons.value = []; selectedCouponId.value = ''; couponError.value = '';
     try {
       const result = await storefrontApi.listProducts();
       backendProducts.value = result.items || [];
@@ -690,6 +698,13 @@ export function useStorefront() {
       if (missing.length) {
         checkoutMessage.value = `판매 상품 정보가 없는 책이 있어요: ${missing.map(book => book.title).join(', ')}`;
         return;
+      }
+      if (!auth.initialized) await auth.fetchMe();
+      if (auth.isAuthenticated) {
+        couponLoading.value = true;
+        try { checkoutCoupons.value = (await http.get('/api/v1/members/me/coupons/available', { params: { amount: checkoutTotal.value } })).data; }
+        catch (error) { couponError.value = error.userMessage || '쿠폰을 불러오지 못했습니다.'; }
+        finally { couponLoading.value = false; }
       }
       checkoutMessage.value = '현재 결제 연결을 점검 중입니다. 주문은 아직 접수되지 않았습니다.';
     } catch (error) {
@@ -864,7 +879,7 @@ export function useStorefront() {
 
   return {
     view, searchQuery, showBookSearchResults, categoryGroups, selectedMajor, selectedSub, selectedGroup, availableSubcategories, homeCategories, selectedHomeCategory, homeSort, domesticSortOptions, domesticSortByCategory, categorySort, headerCategoryMenu, closeHeaderCategoryMenu, closeHeaderCategoryMenuOnBlur, selectHeaderCategory, postalOpen, postalKeyword, postalResults, postalPage, postalLoading, postalMessage, searchPostal, selectPostal,
-    activeBanner, banners, wishlist, cart, cartBooks, selectedCart, selectedCartBooks, cartSubtotal, cartDiscount, cartTotal, checkoutTotal, checkoutReady, checkoutMessage, checkoutLoading, checkoutSubmitting, delivery, paymentMethod, checkoutPaymentMode, effectivePrice, allBooks, homeBooks, newBooks, themeShelves, domesticCategories, activeDomesticCategory, domesticSort, domesticBooks, categoryBooks, curatedBooks, bestSellerBooks, lastOrder, orderHistory, myProfile, profileDraft, isEditingProfile, catalogLoading,
+    activeBanner, banners, wishlist, cart, cartBooks, selectedCart, selectedCartBooks, cartSubtotal, cartDiscount, cartTotal, checkoutTotal, checkoutReady, checkoutMessage, checkoutLoading, checkoutSubmitting, checkoutCoupons, selectedCouponId, selectedCoupon, couponDiscount, couponLoading, couponError, checkoutAuthenticated: computed(() => auth.isAuthenticated), delivery, paymentMethod, checkoutPaymentMode, effectivePrice, allBooks, homeBooks, newBooks, themeShelves, domesticCategories, activeDomesticCategory, domesticSort, domesticBooks, categoryBooks, curatedBooks, bestSellerBooks, lastOrder, orderHistory, myProfile, profileDraft, isEditingProfile, catalogLoading,
     curationNotes, productBook, productPanel, productDetail, productDetailStatus, publishedContents, productIntroduction, productReviews, reviewStats, ratingCount, reviewCount, reviewSort, reviewRating, reviewPage, reviewsStatus, reviewDraft, reviewMessage, reviewSubmitting, loadProductReviews, submitProductReview, toastMessage, addedCartTitle, cartDialog, closeCartDialog, trapCartDialogFocus, cartDeleteTargets, cartDeleteMode, cartDeleteComplete, closeCartDelete, confirmCartDelete, closeCartDeleteComplete, showBookForm, editingBookId, bookForm, formSubcategories,
     adminQuery, adminCategory, adminStock, adminBooks,
     adminUserId, adminPassword, rememberAdminId, showAdminPassword, adminLoginError, signupConsent, signupError, signupForm,

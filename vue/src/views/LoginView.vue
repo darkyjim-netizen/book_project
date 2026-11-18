@@ -39,7 +39,7 @@ async function submit() {
   error.value = ''
   try {
     await auth.login(form)
-    const redirect = typeof route.query.redirect === 'string' && route.query.redirect.startsWith('/') && !route.query.redirect.startsWith('//') ? route.query.redirect : (auth.isAdmin ? '/store-admin/dashboard' : '/dashboard')
+    const redirect = typeof route.query.redirect === 'string' && route.query.redirect.startsWith('/') && !route.query.redirect.startsWith('//') ? route.query.redirect : (auth.isAdmin ? '/store-admin/dashboard' : '/main')
     await router.push(redirect)
   } catch (e) { error.value = apiError(e) }
 }

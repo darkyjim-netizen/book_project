@@ -31,6 +31,8 @@ const storefrontRoutes = [
   { path: 'order-complete', name: 'orderComplete', component: () => import('../storefront/pages/OrderCompleteView.vue') },
   { path: 'mypage', name: 'mypage', component: () => import('../storefront/pages/MyPageView.vue'), requiresAuth: true },
   { path: 'support', name: 'support', component: () => import('../storefront/pages/SupportView.vue') },
+  { path: 'terms', name: 'terms', component: () => import('../storefront/pages/PolicyView.vue') },
+  { path: 'privacy', name: 'privacy', component: () => import('../storefront/pages/PolicyView.vue') },
   { path: 'store-admin', name: 'admin', redirect: { name: 'adminDashboard' } },
   { path: 'store-login', name: 'adminLogin', redirect: { name: 'adminDashboard' } },
   { path: 'store-signup', name: 'adminSignup', redirect: { name: 'adminDashboard' } },
@@ -46,8 +48,8 @@ const routes = [
   { path: '/index.html', alias: '/shop.html', redirect: redirectStorefrontEntry },
   { path: '/login', name: 'login', component: () => import('../views/LoginView.vue'), meta: { guestOnly: true } },
   { path: '/register', name: 'register', component: () => import('../views/RegisterView.vue'), meta: { guestOnly: true } },
-  { path: '/dashboard', name: 'dashboard', component: () => import('../views/DashboardView.vue'), meta: { requiresAuth: true } },
-  { path: '/profile', name: 'profile', component: () => import('../views/ProfileView.vue'), meta: { requiresAuth: true } },
+  { path: '/dashboard', name: 'dashboard', redirect: { name: 'mypage' } },
+  { path: '/profile', name: 'profile', redirect: { name: 'mypage' } },
   { path: '/admin/members', name: 'admin-members', component: () => import('../views/AdminMembersView.vue'), meta: { requiresAuth: true, requiresAdmin: true } },
   { path: '/admin/members/:id', name: 'admin-member-detail', component: () => import('../views/AdminMemberDetailView.vue'), props: true, meta: { requiresAuth: true, requiresAdmin: true } },
   { path: '/:pathMatch(.*)*', redirect: { name: 'home' } }
@@ -58,6 +60,7 @@ const router = createRouter({
   routes,
   scrollBehavior(to, _from, savedPosition) {
     if (to.hash === '#home-books-title') return { el: to.hash, top: window.innerWidth <= 700 ? 210 : 156 }
+    if (to.hash === '#member-recommendations') return { el: to.hash, top: window.innerWidth <= 700 ? 210 : 156 }
     return savedPosition ?? { top: 0 }
   }
 })
@@ -71,6 +74,9 @@ router.beforeEach(async to => {
 
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
     return { name: 'login', query: { redirect: to.fullPath } }
+  }
+  if (to.name === 'mypage' && auth.isAdmin) {
+    return { name: 'adminDashboard' }
   }
   if (to.meta.requiresAdmin && !auth.isAdmin) {
     return { name: 'dashboard' }

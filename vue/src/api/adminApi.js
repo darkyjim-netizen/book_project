@@ -5,15 +5,15 @@ import http from './http'
 export const adminApi = {
   // 응답: { success, items: [...], meta: { page, size, total, total_pages } }
   list(params = {}) {
-    return http.get('/admin/members', { params }).then(r => r.data)
+    return http.get('/api/v1/admin/members', { params }).then(r => r.data)
   },
   // 응답: { member, order_stats, segment, churn }  (segment/churn 은 AI 분석 결과이며 없을 수 있음)
   detail(id) {
-    return http.get(`/admin/members/${id}`).then(r => r.data)
+    return http.get(`/api/v1/admin/members/${id}`).then(r => r.data)
   },
   // PATCH /admin/members/{id} → PUT /admin/members/{id}/status
   // 상태 값: ACTIVE | DORMANT | SUSPENDED (최고 관리자 ADMIN 만 변경 가능)
   updateStatus(id, status) {
-    return http.put(`/admin/members/${id}/status`, { status }).then(r => r.data)
+    return http.put(`/api/v1/admin/members/${id}/status`, { status }).then(r => r.data)
   }
 }

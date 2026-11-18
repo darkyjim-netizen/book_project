@@ -65,7 +65,7 @@ const recAlgorithm = ref('')
 const recLoading = ref(true)
 const recError = ref('')
 // SASREC: 구매 흐름 기반 추천, POPULAR: 인기 도서(구매 이력이 없는 신규 회원)
-const recTitle = computed(() => recAlgorithm.value === 'SASREC' ? '회원님의 구매 흐름을 분석한 맞춤 추천' : '지금 많이 찾는 인기 도서')
+const recTitle = computed(() => recAlgorithm.value && recAlgorithm.value !== 'POPULAR' ? '회원님의 구매 흐름을 분석한 맞춤 추천' : '지금 많이 찾는 인기 도서')
 const price = v => (v == null ? '' : `${Number(v).toLocaleString('ko-KR')}원`)
 
 onMounted(async () => {

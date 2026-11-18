@@ -2919,6 +2919,24 @@ html body #shop-view .theme-shelf { display:flex; flex-direction:column; gap:15p
 html body #shop-view .theme-shelf-books { grid-template-columns:1fr; gap:12px; }
 html body #shop-view .theme-shelf-books button { grid-template-columns:52px minmax(0,1fr); padding:8px; border:1px solid #f0ece6; border-radius:12px; background:#fff; }
 html body #shop-view .theme-shelf-books img { width:52px; height:68px; border-radius:5px; }
+html body #shop-view .home-theme-section { padding:30px; border:1px solid #e8dff0; border-radius:20px; background:#faf7fd; }
+html body #shop-view .home-theme-section .section-head { gap:16px; margin-bottom:22px; }
+html body #shop-view .home-theme-section .section-head p { margin:7px 0 0; color:#75677f; font-size:15px; }
+html body #shop-view .theme-shelf-list { gap:18px; }
+html body #shop-view .theme-shelf { min-width:0; gap:18px; padding:24px; border:1px solid #e8dff0; border-radius:16px; background:#fff; box-shadow:0 8px 24px rgba(74,46,102,.06); }
+html body #shop-view .theme-shelf-heading .theme-number { display:inline-flex; align-items:center; justify-content:center; min-width:38px; height:30px; padding:0 8px; border-radius:8px; background:#f0e8fa; color:#65419a; font-size:13px; font-weight:800; }
+html body #shop-view .theme-shelf-heading h3 { margin:12px 0 0; color:#352544; font-size:21px; }
+html body #shop-view .theme-shelf-heading p { margin:6px 0 0; color:#75697f; font-size:14px; }
+html body #shop-view .theme-shelf-books { gap:10px; }
+html body #shop-view .theme-shelf-books button { grid-template-columns:64px minmax(0,1fr); gap:14px; min-height:100px; padding:10px; border:1px solid #eee8f3; border-radius:12px; background:#fcfafe; cursor:pointer; }
+html body #shop-view .theme-shelf-books button:hover { border-color:#bba4d5; background:#f5effb; }
+html body #shop-view .theme-shelf-books button:focus-visible { outline:2px solid #7953aa; outline-offset:2px; }
+html body #shop-view .theme-shelf-books img { width:64px; height:88px; object-fit:contain; border-radius:5px; }
+html body #shop-view .theme-shelf-books button>span { gap:5px; }
+html body #shop-view .theme-shelf-books b { color:#352544; font-size:15px; line-height:1.4; }
+html body #shop-view .theme-shelf-books small { color:#75697f; font-size:13px; }
+html body #shop-view .theme-shelf-books i { color:#7049a4; font-size:12px; font-style:normal; font-weight:700; }
+@media(max-width:700px) { html body #shop-view .home-theme-section { padding:20px; } html body #shop-view .theme-shelf { padding:18px; } }
 @media(max-width:900px) { html body #shop-view .home-new-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } html body #shop-view .theme-shelf-list { grid-template-columns:1fr; } }
 @media(max-width:600px) { html body #shop-view .home-new-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } html body #shop-view .home-new-grid .book-art { height:170px; } }
 /* 국내도서 분야별 책장 */
@@ -3721,6 +3739,8 @@ html body #bestseller-view .bestseller-list { grid-template-columns:repeat(3,min
 .db-dashboard .admin-auth label, .db-dashboard .admin-fields label { display:grid; gap:6px; font-weight:700; }
 .db-dashboard .admin-auth label { margin:16px 0; }
 .db-dashboard .admin-fields { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; }
+.db-dashboard .admin-fields label { min-width:0; }
+.db-dashboard .admin-fields input { box-sizing:border-box; width:100%; min-width:0; }
 .db-dashboard .admin-error { padding:12px; color:#a82c2c; background:#fff1f1; border-radius:8px; }
 .db-dashboard .analytics-grid { grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); }
 .db-dashboard .admin-chart { padding:24px; }
@@ -3730,6 +3750,20 @@ html body #bestseller-view .bestseller-list { grid-template-columns:repeat(3,min
 .db-dashboard .admin-bar-track { height:14px; overflow:hidden; border-radius:10px; background:#eee8f2; }
 .db-dashboard .admin-bar-track span { display:block; height:100%; border-radius:inherit; background:#8064c9; }
 .db-dashboard .admin-empty { color:#756b80; }
+.db-dashboard .analytics-grid { align-items:stretch;gap:18px;margin-top:20px; }
+.db-dashboard .admin-chart { min-width:0;border:1px solid #e5ddeb;border-radius:14px;box-shadow:0 6px 20px rgba(74,46,102,.05); }
+.db-dashboard .admin-chart .card-heading h2 { margin:0;color:#342644;font-size:18px; }
+.db-dashboard .admin-chart .card-heading p { margin:7px 0 0;color:#756b80;font-size:13px;line-height:1.5; }
+.db-dashboard .admin-donut { display:grid;place-items:center;width:180px;aspect-ratio:1;border-radius:50%;margin:24px auto; }
+.db-dashboard .admin-donut>div { display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:66%;height:66%;border-radius:50%;background:#fff;color:#352544; }
+.db-dashboard .admin-donut small { color:#756b80;font-size:13px; }
+.db-dashboard .admin-donut strong { font-size:21px; }
+.db-dashboard .admin-chart-legend { display:grid;gap:10px;margin:0;padding:0;list-style:none; }
+.db-dashboard .admin-chart-legend li { display:flex;justify-content:space-between;align-items:baseline;gap:10px;color:#554a60;font-size:13px; }
+.db-dashboard .legend-label { display:flex;align-items:center;gap:8px;min-width:0;overflow-wrap:anywhere; }
+.db-dashboard .legend-label i { flex:none;width:10px;height:10px;border-radius:50%; }
+.db-dashboard .admin-chart-legend b { flex:none;color:#392d46;white-space:nowrap; }
+.db-dashboard .admin-chart-legend b small { color:#81748c;font-weight:400; }
 .db-dashboard .table-wrap { overflow-x:auto; }
 
 /* 국내도서와 베스트셀러의 본문 폭과 카드 간격을 맞춥니다. */
