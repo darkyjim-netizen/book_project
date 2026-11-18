@@ -165,6 +165,8 @@ class ReviewSentiment(Base):
     score: Mapped[float] = mapped_column(Numeric(6, 4), nullable=False)  # 모델이 계산한 대표 점수
     positive_prob: Mapped[float] = mapped_column(Numeric(6, 4), default=0)  # 긍정일 확률
     negative_prob: Mapped[float] = mapped_column(Numeric(6, 4), default=0)  # 부정일 확률
+    # 중립일 확률. NULL 은 3클래스 모델로 아직 분석하지 않았다는 뜻이다.
+    neutral_prob: Mapped[Optional[float]] = mapped_column(Numeric(6, 4))
     keywords: Mapped[Optional[dict]] = mapped_column(JSONB)  # 분석에서 뽑은 주요 단어 등
     model_version: Mapped[str] = mapped_column(
         String(40),

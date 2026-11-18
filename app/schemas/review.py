@@ -42,6 +42,7 @@ class SentimentResponse(BaseModel):
     label: str  # 분석 결과 분류. 예: 긍정, 중립, 부정
     score: float  # 대표 감성 점수
     positive_prob: float  # 긍정으로 판단한 확률
+    neutral_prob: Optional[float] = None  # 중립으로 판단한 확률 (없으면 None)
     negative_prob: float  # 부정으로 판단한 확률
     keywords: Optional[Dict] = None  # 분석에 영향을 준 단어 정보
     model_version: str  # 분석에 사용한 AI 모델 버전

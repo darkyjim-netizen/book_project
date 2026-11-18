@@ -68,6 +68,11 @@ class ReviewService:
                 score=float(review.sentiment.score),
                 positive_prob=float(review.sentiment.positive_prob),
                 negative_prob=float(review.sentiment.negative_prob),
+                neutral_prob=(
+                    None
+                    if review.sentiment.neutral_prob is None
+                    else float(review.sentiment.neutral_prob)
+                ),
                 keywords=review.sentiment.keywords,
                 model_version=review.sentiment.model_version,
             )
@@ -249,6 +254,7 @@ class ReviewService:
                 score=result["score"],
                 positive_prob=result["positive_prob"],
                 negative_prob=result["negative_prob"],
+                neutral_prob=result.get("neutral_prob"),
                 keywords={
                     "positive": result["positive_keywords"],
                     "negative": result["negative_keywords"],

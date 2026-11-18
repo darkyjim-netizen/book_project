@@ -488,9 +488,13 @@ CREATE TABLE ai.review_sentiments (
     score           NUMERIC(6,4) NOT NULL,
     positive_prob   NUMERIC(6,4) NOT NULL DEFAULT 0,
     negative_prob   NUMERIC(6,4) NOT NULL DEFAULT 0,
+    neutral_prob    NUMERIC(6,4),                      -- 중립 확률 (NULL = 3클래스 모델로 아직 분석 안 함)
     keywords        JSONB,
     model_version   VARCHAR(40) NOT NULL DEFAULT 'kosa-lr-v1',
-    analyzed_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+    analyzed_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CONSTRAINT ck_review_sentiments_prob CHECK (
+        positive_prob BETWEEN 0 AND 1 AND negative_prob BETWEEN 0 AND 1
+        AND (neutral_prob IS NULL OR neutral_prob BETWEEN 0 AND 1))
 );
 CREATE INDEX idx_sentiments_book  ON ai.review_sentiments(book_id, label);
 

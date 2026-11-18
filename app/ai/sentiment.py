@@ -22,6 +22,8 @@ logger = logging.getLogger(__name__)
 
 # 설정 파일에 지정된 모델 버전을 사용한다.
 MODEL_VERSION = settings.SENTIMENT_MODEL_VERSION
+# Hugging Face 3클래스(부정·중립·긍정) 모델로 분석한 결과에 붙이는 이름.
+HF_MODEL_VERSION = "hf-bert-3class-v1"
 
 # 학습한 머신러닝 모델을 저장할 파일 이름
 ARTIFACT_NAME = "sentiment_lr.pkl"
@@ -424,9 +426,26 @@ class HuggingFaceSentimentModel:
         )
         self.model.to(self.device)
         self.model.eval()
+
+        # 모델 설정(id2label)에서 부정·중립·긍정이 몇 번째 출력인지 찾는다.
+        # 설정에 이름이 없으면 학습 때 쓴 순서(0 부정, 1 중립, 2 긍정)로 본다.
+        id2label = {
+            int(k): str(v).lower()
+            for k, v in (self.model.config.id2label or {}).items()
+        }
+        name_to_idx = {v: k for k, v in id2label.items()}
+        self.label_index = {
+            "negative": name_to_idx.get("negative", 0),
+            "neutral": name_to_idx.get("neutral", 1),
+            "positive": name_to_idx.get("positive", 2),
+        }
         self.available = True
 
-    def predict_proba(self, text: str) -> Optional[float]:
+    def predict_probs(self, text: str) -> Optional[Dict[str, float]]:
+        """부정·중립·긍정 확률을 {"negative":.., "neutral":.., "positive":..} 로 반환한다.
+
+        세 값의 합은 1이다. 모델을 쓸 수 없으면 None 을 반환한다.
+        """
         if not self.available:
             return None
 
@@ -443,8 +462,16 @@ class HuggingFaceSentimentModel:
             logits = self.model(**inputs).logits
             probabilities = torch.softmax(logits, dim=-1)[0]
 
-        # 모델 레이블에서 1은 긍정으로 정의되어 있음
-        return float(probabilities[1].item())
+        return {
+            name: float(probabilities[idx].item())
+            for name, idx in self.label_index.items()
+        }
+
+    def predict_proba(self, text: str) -> Optional[float]:
+        """긍정 확률만 필요할 때 쓰는 기존 함수 (predict_probs 의 긍정 값)."""
+        probs = self.predict_probs(text)
+        return None if probs is None else probs["positive"]
+
 
 # -----------------------------------------------------------------------------
 # 사전 분석과 머신러닝 결과를 합치는 분석기
@@ -470,60 +497,83 @@ class SentimentAnalyzer:
         self.hf_model = HuggingFaceSentimentModel()
         
     def analyze(self, text: str) -> Dict:
-        """문장을 분석해 감성 라벨, 점수, 키워드를 반환한다."""
+        """문장을 분석해 감성 라벨, 점수, 확률, 키워드를 반환한다.
+
+        - Hugging Face 3클래스 모델이 있으면: 부정·중립·긍정 확률을 모두 구하고,
+          라벨은 세 확률 중 가장 높은 것, 점수는 (긍정 - 부정) 확률로 정한다.
+        - 모델이 없으면: 기존 방식(사전 점수 + 2클래스 모델)을 쓰고 neutral_prob 는 None 이다.
+        """
 
         # 어휘 사전으로 분석한 점수와 긍정·부정 단어를 가져온다.
         lex_score, pos_kw, neg_kw = self.lexicon.score(text)
 
-        # 학습된 모델이 있으면 긍정 확률을 계산한다.
-        model_proba = self.hf_model.predict_proba(text)
-        if model_proba is None:
-            model_proba = self.model.predict_proba(text)
+        hf_probs = self.hf_model.predict_probs(text)
 
-        if model_proba is not None:
-            # 긍정 확률 0~1을 감성 점수 -1~1로 변환한다.
-            model_score = (model_proba - 0.5) * 2
+        if hf_probs is not None:
+            positive_prob = hf_probs["positive"]
+            neutral_prob = hf_probs["neutral"]
+            negative_prob = hf_probs["negative"]
 
-            # 사전 점수와 머신러닝 점수의 가중 평균을 구한다.
-            score = (
-                self.LEXICON_WEIGHT * lex_score
-                + self.MODEL_WEIGHT * model_score
-            )
-            positive_prob = model_proba
+            # 세 확률 중 가장 높은 것이 최종 라벨이다.
+            label = max(hf_probs, key=hf_probs.get).upper()
+
+            # 점수 -1~1: 긍정이 확실하면 +1, 부정이 확실하면 -1, 중립이면 0 근처.
+            score = positive_prob - negative_prob
+            used_ml = True
+            model_version = HF_MODEL_VERSION
 
         else:
-            # 모델이 없으면 사전 분석 결과만 사용한다.
-            score = lex_score
+            # 모델이 없으면 기존 2클래스 모델 또는 사전 분석 결과를 쓴다.
+            model_proba = self.model.predict_proba(text)
 
-            # 사전 점수 -1~1을 확률처럼 표시할 수 있도록 0~1로 바꾼다.
-            positive_prob = (lex_score + 1) / 2
+            if model_proba is not None:
+                # 긍정 확률 0~1을 감성 점수 -1~1로 변환한다.
+                model_score = (model_proba - 0.5) * 2
+
+                # 사전 점수와 머신러닝 점수의 가중 평균을 구한다.
+                score = (
+                    self.LEXICON_WEIGHT * lex_score
+                    + self.MODEL_WEIGHT * model_score
+                )
+                positive_prob = model_proba
+            else:
+                # 사전 점수 -1~1을 확률처럼 표시할 수 있도록 0~1로 바꾼다.
+                score = lex_score
+                positive_prob = (lex_score + 1) / 2
+
+            negative_prob = 1 - positive_prob
+            neutral_prob = None  # 2클래스 방식에서는 중립 확률을 알 수 없다.
+
+            # 점수 구간에 따라 긍정·중립·부정 라벨을 정한다.
+            score = max(-1.0, min(1.0, score))
+            if score >= self.POSITIVE_THRESHOLD:
+                label = "POSITIVE"
+            elif score <= self.NEGATIVE_THRESHOLD:
+                label = "NEGATIVE"
+            else:
+                label = "NEUTRAL"
+
+            used_ml = model_proba is not None
+            model_version = (
+                MODEL_VERSION
+                if self.model.available
+                else f"{MODEL_VERSION}-lexicon"
+            )
 
         # 최종 점수가 -1보다 작거나 1보다 커지지 않게 제한한다.
         score = max(-1.0, min(1.0, score))
-
-        # 점수 구간에 따라 긍정·중립·부정 라벨을 정한다.
-        if score >= self.POSITIVE_THRESHOLD:
-            label = "POSITIVE"
-        elif score <= self.NEGATIVE_THRESHOLD:
-            label = "NEGATIVE"
-        else:
-            label = "NEUTRAL"
 
         return {
             "label": label,
             "score": round(score, 4),
             "positive_prob": round(positive_prob, 4),
-            "negative_prob": round(1 - positive_prob, 4),
+            "neutral_prob": None if neutral_prob is None else round(neutral_prob, 4),
+            "negative_prob": round(negative_prob, 4),
             "positive_keywords": pos_kw,
             "negative_keywords": neg_kw,
-            # 모델이 실제 사용됐는지에 따라 버전 이름을 구분한다.
-            "model_version": (
-                MODEL_VERSION
-                # if self.model.available
-                if self.hf_model.available or self.model.available
-                else f"{MODEL_VERSION}-lexicon"
-            ),
-            "used_ml_model": model_proba is not None,
+            # 어떤 모델로 분석했는지 구분하는 이름.
+            "model_version": model_version,
+            "used_ml_model": used_ml,
         }
 
     def analyze_batch(
@@ -604,6 +654,7 @@ class SentimentAnalyzer:
                     "score": result["score"],
                     "pp": result["positive_prob"],
                     "np": result["negative_prob"],
+                    "nu": result["neutral_prob"],
                     # 키워드는 JSON 문자열로 바꿔 DB JSONB 칼럼에 넣는다.
                     "kw": __import__("json").dumps(
                         {
@@ -630,6 +681,7 @@ class SentimentAnalyzer:
                         score,
                         positive_prob,
                         negative_prob,
+                        neutral_prob,
                         keywords,
                         model_version
                     )
@@ -640,6 +692,7 @@ class SentimentAnalyzer:
                         :score,
                         :pp,
                         :np,
+                        :nu,
                         CAST(:kw AS jsonb),
                         :ver
                     )
@@ -649,6 +702,7 @@ class SentimentAnalyzer:
                         score = EXCLUDED.score,
                         positive_prob = EXCLUDED.positive_prob,
                         negative_prob = EXCLUDED.negative_prob,
+                        neutral_prob = EXCLUDED.neutral_prob,
                         keywords = EXCLUDED.keywords,
                         model_version = EXCLUDED.model_version,
                         analyzed_at = now()
