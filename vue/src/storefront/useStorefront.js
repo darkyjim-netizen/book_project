@@ -123,6 +123,23 @@ export function bookCoverUrl(book) {
   return addedBookCovers[book.id] ? `/assets/covers/${addedBookCovers[book.id]}` : '';
 }
 
+let tossScriptPromise;
+function loadTossPayments() {
+  if (window.TossPayments) return Promise.resolve();
+  if (tossScriptPromise) return tossScriptPromise;
+  tossScriptPromise = new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://js.tosspayments.com/v2/standard';
+    script.async = true;
+    const timeout = setTimeout(() => fail(), 15000);
+    function fail() { clearTimeout(timeout); script.remove(); reject(new Error('토스 결제창을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.')); }
+    script.onerror = fail;
+    script.onload = () => { if (!window.TossPayments) return fail(); clearTimeout(timeout); resolve(); };
+    document.head.appendChild(script);
+  }).catch(error => { tossScriptPromise = null; throw error; });
+  return tossScriptPromise;
+}
+
 
 
 export function useStorefront() {
@@ -148,7 +165,34 @@ export function useStorefront() {
   const selectedMajor = ref('');
   const selectedSub = ref('');
   const activeBanner = ref(0);
-  const wishlist = ref(new Set(JSON.parse(localStorage.getItem('bookjjeok-wishlist') || '[]')));
+  const wishlist = ref(new Set());
+  const wishPending = new Set();
+  let wishGeneration = 0;
+  let wishesReady = false;
+  const guestWishKey = 'bookjjeok-guest-wishlist';
+  const canWish = computed(() => auth.initialized && !auth.isAdmin);
+  watch(() => [auth.initialized, auth.user?.id, auth.isAdmin], async ([initialized, memberId, isAdmin]) => {
+    const generation = ++wishGeneration;
+    wishesReady = false;
+    wishlist.value = new Set();
+    if (!initialized) return;
+    if (isAdmin) return;
+    if (!memberId) {
+      try { wishlist.value = new Set(JSON.parse(localStorage.getItem(guestWishKey) || '[]')); }
+      catch { wishlist.value = new Set(); }
+      wishesReady = true;
+      return;
+    }
+    try {
+      const first = await storefrontApi.wishlist();
+      const rest = await Promise.all(Array.from({ length: Math.max(0, (first.meta?.total_pages || 1) - 1) }, (_, i) => storefrontApi.wishlist(i + 2)));
+      if (generation !== wishGeneration) return;
+      wishlist.value = new Set([first, ...rest].flatMap(page => page.items.map(book => String(book.book_id))));
+      wishesReady = true;
+    } catch {
+      if (generation === wishGeneration) showToast('찜 목록을 불러오지 못했어요. 새로고침해 주세요.');
+    }
+  }, { immediate: true });
   const cart = ref(JSON.parse(localStorage.getItem('bookjjeok-cart') || '[]'));
   const selectedCart = ref(new Set(cart.value.map((_, index) => index)));
   const lastOrder = ref(null);
@@ -329,7 +373,7 @@ export function useStorefront() {
   const adminDonutStyle = { background: 'conic-gradient(#52b9a1 0 12%, #8064c9 12% 40%, #4882ba 40% 71%, #dc874c 71% 90%, #8bbba7 90% 100%)' };
   let toastTimer;
   let refreshTimer;
-  const refreshBooks = () => { if (!document.hidden) loadDatabaseBooks(); };
+  const refreshBooks = () => { if (!document.hidden && !['adminDashboard', 'adminOrderDetail'].includes(route.name)) loadDatabaseBooks(); };
 
   const allBooks = computed(() => {
     if (databaseBooks.value !== null) return databaseBooks.value;
@@ -606,12 +650,31 @@ export function useStorefront() {
   function openBookInfo(book) {
     openProduct(book);
   }
-  function toggleWish(book) {
+  async function toggleWish(book) {
+    if (!canWish.value) return;
+    if (!wishesReady) { showToast('찜 목록을 확인 중이거나 불러오지 못했어요.'); return; }
+    const id = String(book.id);
+    if (wishPending.has(id)) return;
+    const generation = wishGeneration;
     const next = new Set(wishlist.value);
-    if (next.has(book.title)) next.delete(book.title); else next.add(book.title);
+    if (auth.isAuthenticated) {
+      if (!book.isDatabaseBook) { showToast('이 도서는 찜할 수 없어요.'); return; }
+      wishPending.add(id);
+      try {
+        const result = await storefrontApi.toggleWishlist(id);
+        if (generation !== wishGeneration) return;
+        const updated = new Set(wishlist.value);
+        if (result.wished) updated.add(id); else updated.delete(id);
+        wishlist.value = updated;
+        showToast(result.wished ? '찜 목록에 담았어요' : '찜 목록에서 삭제했어요');
+      } catch { if (generation === wishGeneration) showToast('찜 상태를 저장하지 못했어요.'); }
+      finally { wishPending.delete(id); }
+      return;
+    }
+    if (next.has(id)) next.delete(id); else next.add(id);
     wishlist.value = next;
-    localStorage.setItem('bookjjeok-wishlist', JSON.stringify([...next]));
-    showToast(next.has(book.title) ? '찜 목록에 담았어요' : '찜 목록에서 삭제했어요');
+    localStorage.setItem(guestWishKey, JSON.stringify([...next]));
+    showToast(next.has(id) ? '찜 목록에 담았어요' : '찜 목록에서 삭제했어요');
   }
   function addCart(book) {
     const title = typeof book === 'string' ? book : book.title;
@@ -756,7 +819,7 @@ export function useStorefront() {
         navigate('orderComplete');
         return;
       }
-      if (!window.TossPayments) throw new Error('토스 결제창을 불러오지 못했어요. 페이지를 새로고침해 주세요.');
+      await loadTossPayments();
       const order = await storefrontApi.createOrder({
         receiver_name: delivery.value.name.trim(),
         receiver_phone: delivery.value.phone.trim(),
@@ -818,7 +881,7 @@ export function useStorefront() {
     showToast('내 정보를 저장했어요');
   }
   function removeOrder(orderId) { orderHistory.value = orderHistory.value.filter(order => order.id !== orderId); localStorage.setItem('bookjjeok-orders', JSON.stringify(orderHistory.value)); showToast('주문 내역을 삭제했어요'); }
-  function likedBooks() { return allBooks.value.filter(book => wishlist.value.has(book.title)); }
+  function likedBooks() { return allBooks.value.filter(book => wishlist.value.has(String(book.id))); }
   function moveBanner(step) {
     if (!banners.value.length) return;
     activeBanner.value = (activeBanner.value + step + banners.value.length) % banners.value.length;
@@ -879,7 +942,7 @@ export function useStorefront() {
 
   return {
     view, searchQuery, showBookSearchResults, categoryGroups, selectedMajor, selectedSub, selectedGroup, availableSubcategories, homeCategories, selectedHomeCategory, homeSort, domesticSortOptions, domesticSortByCategory, categorySort, headerCategoryMenu, closeHeaderCategoryMenu, closeHeaderCategoryMenuOnBlur, selectHeaderCategory, postalOpen, postalKeyword, postalResults, postalPage, postalLoading, postalMessage, searchPostal, selectPostal,
-    activeBanner, banners, wishlist, cart, cartBooks, selectedCart, selectedCartBooks, cartSubtotal, cartDiscount, cartTotal, checkoutTotal, checkoutReady, checkoutMessage, checkoutLoading, checkoutSubmitting, checkoutCoupons, selectedCouponId, selectedCoupon, couponDiscount, couponLoading, couponError, checkoutAuthenticated: computed(() => auth.isAuthenticated), delivery, paymentMethod, checkoutPaymentMode, effectivePrice, allBooks, homeBooks, newBooks, themeShelves, domesticCategories, activeDomesticCategory, domesticSort, domesticBooks, categoryBooks, curatedBooks, bestSellerBooks, lastOrder, orderHistory, myProfile, profileDraft, isEditingProfile, catalogLoading,
+    activeBanner, banners, wishlist, canWish, cart, cartBooks, selectedCart, selectedCartBooks, cartSubtotal, cartDiscount, cartTotal, checkoutTotal, checkoutReady, checkoutMessage, checkoutLoading, checkoutSubmitting, checkoutCoupons, selectedCouponId, selectedCoupon, couponDiscount, couponLoading, couponError, checkoutAuthenticated: computed(() => auth.isAuthenticated), delivery, paymentMethod, checkoutPaymentMode, effectivePrice, allBooks, homeBooks, newBooks, themeShelves, domesticCategories, activeDomesticCategory, domesticSort, domesticBooks, categoryBooks, curatedBooks, bestSellerBooks, lastOrder, orderHistory, myProfile, profileDraft, isEditingProfile, catalogLoading,
     curationNotes, productBook, productPanel, productDetail, productDetailStatus, publishedContents, productIntroduction, productReviews, reviewStats, ratingCount, reviewCount, reviewSort, reviewRating, reviewPage, reviewsStatus, reviewDraft, reviewMessage, reviewSubmitting, loadProductReviews, submitProductReview, toastMessage, addedCartTitle, cartDialog, closeCartDialog, trapCartDialogFocus, cartDeleteTargets, cartDeleteMode, cartDeleteComplete, closeCartDelete, confirmCartDelete, closeCartDeleteComplete, showBookForm, editingBookId, bookForm, formSubcategories,
     adminQuery, adminCategory, adminStock, adminBooks,
     adminUserId, adminPassword, rememberAdminId, showAdminPassword, adminLoginError, signupConsent, signupError, signupForm,

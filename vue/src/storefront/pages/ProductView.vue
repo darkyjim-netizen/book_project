@@ -9,7 +9,7 @@
           <p class="product-author">{{ productBook.author }} 지음 <span>·</span> {{ productBook.publisher }}</p>
           <div class="product-rating" v-if="productBook.rate">★ {{ productBook.rate }} <span>독자 평점</span></div>
           <div class="product-price-block"><del v-if="productBook.discount">{{ won(productBook.price) }}</del><strong>{{ won(productBook.price*(1-productBook.discount/100)) }}</strong><span v-if="productBook.discount">{{ productBook.discount }}% 할인</span></div>
-          <div class="product-actions"><button @click="addCart(productBook.title)">장바구니 담기</button><button class="product-wish" @click="toggleWish(productBook)">{{ wishlist.has(productBook.title) ? '♥ 찜한 책' : '♡ 찜하기' }}</button></div>
+          <div class="product-actions"><button @click="addCart(productBook.title)">장바구니 담기</button><button v-if="canWish" class="product-wish" @click="toggleWish(productBook)">{{ wishlist.has(String(productBook.id)) ? '♥ 찜한 책' : '♡ 찜하기' }}</button></div>
           <p class="product-shipping">재고 {{ productBook.stock > 0 ? '있음' : '문의 필요' }} <span>·</span> 주문 후 배송 안내</p>
         </div>
       </div>

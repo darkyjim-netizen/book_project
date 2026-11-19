@@ -43,6 +43,8 @@ async function listBooks(sort = 'sales') {
 
 export const storefrontApi = Object.freeze({
   baseUrl,
+  wishlist: (page = 1) => request(`/api/v1/wishlist?${new URLSearchParams({ page, size: 100 })}`),
+  toggleWishlist: id => request(`/api/v1/wishlist/${encodeURIComponent(id)}`, { method: 'POST' }),
   adminOverview: () => request('/api/v1/admin/dashboard/overview'),
   adminLogin: (email, password) => request('/api/v1/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
   adminLogout: () => request('/api/v1/auth/logout', { method: 'POST' }),

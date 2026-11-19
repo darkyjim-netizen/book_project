@@ -37,7 +37,8 @@ const storefrontRoutes = [
   { path: 'store-login', name: 'adminLogin', redirect: { name: 'adminDashboard' } },
   { path: 'store-signup', name: 'adminSignup', redirect: { name: 'adminDashboard' } },
   { path: 'store-admin/dashboard', name: 'adminDashboard', component: () => import('../storefront/pages/StoreDashboardView.vue') },
-].map(route => ({ ...route, meta: { storefrontView: route.name, requiresAuth: !!route.requiresAuth } }))
+  { path: 'store-admin/orders/:id', name: 'adminOrderDetail', component: () => import('../storefront/pages/AdminOrderDetail.vue'), requiresAuth: true, requiresAdmin: true },
+].map(route => ({ ...route, meta: { storefrontView: route.name, requiresAuth: !!route.requiresAuth, requiresAdmin: !!route.requiresAdmin } }))
 
 const routes = [
   {

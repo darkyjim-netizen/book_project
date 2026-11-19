@@ -3,9 +3,9 @@ from unittest.mock import patch
 
 import pytest
 
-from team_backend.app.core.exceptions import PaymentError
-from team_backend.app.models.enums import PaymentMethod
-from team_backend.app.services.payment_gateway import TossPgGateway
+from app.core.exceptions import PaymentError
+from app.models.enums import PaymentMethod
+from app.services.payment_gateway import TossPgGateway
 
 
 def test_toss_approval_requires_matching_payment_details():

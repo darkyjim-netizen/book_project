@@ -5,7 +5,7 @@
     <a class="brand" href="/main" aria-label="북적북적 홈" @click.prevent="navigate('home')"><img class="brand-logo" src="/assets/bookjjeok-logo-new.png" alt="" /></a>
     <StorefrontSearch />
     <div class="head-actions">
-      <button type="button" class="icon-btn" :aria-label="'장바구니 ' + cart.length + '종'" @click="navigate('cart')"><span aria-hidden="true">🛒<span v-if="cart.length" class="badge">{{ cart.length }}</span></span><small>장바구니</small></button>
+      <button v-if="auth.initialized && !auth.isAdmin" type="button" class="icon-btn" :aria-label="'장바구니 ' + cart.length + '종'" @click="navigate('cart')"><span aria-hidden="true">🛒<span v-if="cart.length" class="badge">{{ cart.length }}</span></span><small>장바구니</small></button>
       <button v-if="auth.initialized && !auth.isAdmin" type="button" class="icon-btn mypage-icon-button" aria-label="마이페이지" @click="navigate('mypage')"><span aria-hidden="true">👤</span><small>마이페이지</small></button>
       <button v-if="auth.initialized && auth.isAuthenticated" type="button" class="icon-btn logout-icon-button" aria-label="로그아웃" @click="openLogout"><span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4H6.5A2.5 2.5 0 0 0 4 6.5v11A2.5 2.5 0 0 0 6.5 20H10"/><path d="M10 12h10m-3.5-3.5L20 12l-3.5 3.5"/></svg></span><small>로그아웃</small></button>
       <a v-if="auth.initialized && auth.isAdmin" class="icon-btn" href="/store-admin/dashboard" aria-label="관리자 대시보드"><span aria-hidden="true">🧑</span><small>관리자</small></a>

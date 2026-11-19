@@ -20,7 +20,7 @@
           </div>
         </header>
         <div v-if="domesticBooks.length" class="book-grid catalog-grid">
-          <book-card v-for="book in pagedBooks" :key="book.id" :book="book" :wished="wishlist.has(book.title)" @wish="toggleWish" @buy="addCart" @detail="openProduct"></book-card>
+          <book-card v-for="book in pagedBooks" :key="book.id" :book="book" :wished="wishlist.has(String(book.id))" @wish="toggleWish" @buy="addCart" @detail="openProduct"></book-card>
         </div>
         <p v-else class="empty-catalog">해당 분야의 검색 결과가 없습니다.</p>
         <nav v-if="totalPages > 1" class="domestic-pagination" aria-label="국내도서 페이지">

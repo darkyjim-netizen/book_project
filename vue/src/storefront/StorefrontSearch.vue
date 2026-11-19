@@ -8,7 +8,7 @@
       <button v-if="searchQuery" class="store-search-clear" type="button" aria-label="검색어 지우기" @click="clearQuery">×</button>
       <button class="store-search-submit" type="submit" aria-label="도서 검색"><span aria-hidden="true"></span></button>
     </form>
-    <section v-show="open" id="store-search-panel" class="store-search-panel" aria-label="검색 안내">
+    <section v-if="open" id="store-search-panel" class="store-search-panel" aria-label="검색 안내">
       <div class="store-search-columns">
         <section>
           <header>

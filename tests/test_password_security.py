@@ -2,7 +2,7 @@ import bcrypt
 import pytest
 from fastapi import HTTPException
 
-from team_backend.app.core.security import hash_password, validate_password_policy, verify_password
+from app.core.security import hash_password, validate_password_policy, verify_password
 
 
 def test_bcrypt_hash_round_trip_and_existing_hash():

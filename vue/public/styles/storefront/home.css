@@ -3825,6 +3825,40 @@ html body #bestseller-view { max-width:1440px; margin:0 auto; padding:0 28px 70p
 .guest-order-details dd { margin:0; text-align:right; }
 @media(max-width:700px) { .guest-order-page { padding:28px 14px 50px; } .guest-order-layout { grid-template-columns:1fr; } .guest-order-panel { padding:20px; } }
 .admin-page-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.db-dashboard .dashboard-content{width:min(1320px,calc(100% - 56px));padding:58px 0 80px}
+.db-dashboard .admin-workspace{display:grid;grid-template-columns:230px minmax(0,1fr);gap:42px;align-items:start}
+.db-dashboard .admin-side{position:static}
+.db-dashboard .admin-side-kicker{margin:0 0 8px;color:#785c94;font-size:12px;font-weight:700;letter-spacing:.1em}
+.db-dashboard .admin-side h1{margin:0 0 35px;color:#292132;font-size:29px;font-weight:800;letter-spacing:-.05em}
+.db-dashboard .admin-side-label{margin:0 0 12px;color:#776a81;font-size:14px;font-weight:800}
+.db-dashboard .admin-side nav{display:flex;flex-direction:column;gap:5px}
+.db-dashboard .admin-side nav button{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;min-height:50px;padding:12px 15px;border:0;border-radius:9px;background:transparent;color:#514858;font:inherit;font-size:16px;font-weight:650;line-height:1.35;text-align:left;cursor:pointer}
+.db-dashboard .admin-side nav button:hover,.db-dashboard .admin-side nav button[aria-current]{background:#f4eff9;color:#65419a}
+.db-dashboard .admin-side nav button[aria-current]{font-weight:800}
+.db-dashboard .admin-side nav button:focus-visible{outline:3px solid #9c7ac0;outline-offset:2px}
+.db-dashboard .admin-side-note{margin:38px 0 0;padding-top:21px;border-top:1px solid #eee9f0;color:#aaa2ae;font-size:12px;line-height:1.7}
+.db-dashboard .admin-side{max-height:none;overflow:visible}
+.db-dashboard .admin-side-group{margin-top:24px}
+.db-dashboard .admin-workspace-main{min-width:0}
+.db-dashboard .admin-welcome{display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:150px;padding:30px 36px;border:1px solid #e8e1ec;border-radius:12px;background:#fff;box-shadow:0 8px 32px rgba(62,43,75,.035)}
+.db-dashboard .admin-welcome-person{display:flex;align-items:center;gap:20px;min-width:0}
+.db-dashboard .admin-welcome-icon{display:grid;place-items:center;flex:0 0 68px;height:68px;border-radius:50%;background:#f2ebf9;color:#7952a2;font-size:30px}
+.db-dashboard .admin-welcome-person span,.db-dashboard .admin-section-heading span{color:#9c88ad;font-size:10px;font-weight:700;letter-spacing:.12em}
+.db-dashboard .admin-welcome h2{margin:7px 0;color:#292132;font-size:21px;letter-spacing:-.04em}
+.db-dashboard .admin-welcome p{margin:0;color:#918a96;font-size:13px}
+.db-dashboard .admin-refresh{flex-shrink:0;padding:10px 14px;border:1px solid #e2d8e9;border-radius:7px;background:white;color:#65419a;font:inherit;font-size:13px;cursor:pointer}
+.db-dashboard .admin-refresh:disabled{opacity:.5;cursor:wait}
+.db-dashboard .admin-section-heading{margin:42px 0 20px}
+.db-dashboard .admin-section-heading h2{margin:6px 0;color:#292132;font-size:20px}
+.db-dashboard .admin-section-heading p{margin:0;color:#8f8795;font-size:13px}
+.db-dashboard .metric-grid{gap:12px}
+.db-dashboard .metric-card{border:0;border-radius:9px;background:#f7f4fa;box-shadow:none}
+.db-dashboard .metric-top{color:#82778b;font-size:13px}.db-dashboard .metric-value{color:#5c3b83;font-size:24px}.db-dashboard .metric-bottom{color:#998fa1}
+.db-dashboard .admin-operations{margin-top:28px;border-color:#eae4ed}.db-dashboard .admin-operations-grid article{background:#f8f6fa}
+.db-dashboard .dashboard-lower{margin-top:24px}
+@media(max-width:900px){.db-dashboard .admin-workspace{grid-template-columns:205px minmax(0,1fr);gap:25px}.db-dashboard .metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.db-dashboard .dashboard-content{width:calc(100% - 36px);padding:30px 0 60px}.db-dashboard .admin-workspace{display:block}.db-dashboard .admin-side{position:static}.db-dashboard .admin-side h1{margin-bottom:18px;font-size:24px}.db-dashboard .admin-side-label,.db-dashboard .admin-side-note{display:none}.db-dashboard .admin-side nav{flex-direction:row;overflow-x:auto;margin:0 -18px 24px;padding:0 18px 8px}.db-dashboard .admin-side nav button{width:auto;flex-shrink:0;padding:9px 12px}.db-dashboard .admin-side nav button span{display:none}.db-dashboard .admin-welcome{padding:22px 18px;gap:12px}.db-dashboard .admin-welcome-person{gap:12px}.db-dashboard .admin-welcome-icon{flex-basis:50px;height:50px;font-size:24px}.db-dashboard .admin-welcome h2{font-size:17px}.db-dashboard .admin-welcome p{font-size:12px}.db-dashboard .admin-refresh{padding:9px;font-size:12px}.db-dashboard .admin-section-heading{margin-top:32px}}
+@media(max-width:600px){.db-dashboard .admin-side{max-height:none;overflow:visible}.db-dashboard .admin-side-label{display:block;margin:0 0 8px}.db-dashboard .admin-side-group{margin-top:4px}.db-dashboard .admin-side nav{flex-direction:row;flex-wrap:wrap;overflow:visible;gap:7px;margin:0 0 18px;padding:0}.db-dashboard .admin-side nav button{width:auto;min-height:44px;padding:10px 12px;background:#f5f1f8;font-size:15px}}
 
 /* 대시보드 요약과 운영 현황 */
 html body .db-dashboard .metric-grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
@@ -3840,6 +3874,24 @@ html body .db-dashboard .metric-grid { grid-template-columns:repeat(4,minmax(0,1
 .db-dashboard .admin-operations-grid small { color:#756c7c; line-height:1.4; }
 @media (max-width:900px) { html body .db-dashboard .metric-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media (max-width:600px) { .db-dashboard .admin-operations-grid { grid-template-columns:1fr; } .db-dashboard .admin-operations { padding:18px; } }
+
+/* 관리자 화면의 수치와 관리 항목은 메뉴와 비슷한 크기로 읽기 쉽게 표시한다. */
+.db-dashboard .admin-workspace-main{font-size:16px;line-height:1.55}
+.db-dashboard .admin-welcome h2{font-size:24px}
+.db-dashboard .admin-welcome p,.db-dashboard .admin-section-heading p,.db-dashboard .admin-refresh{font-size:16px;color:#655a6c}
+.db-dashboard .admin-section-heading span{font-size:14px;letter-spacing:.04em}
+.db-dashboard .admin-section-heading h2{font-size:24px}
+.db-dashboard .metric-top,.db-dashboard .metric-bottom{font-size:16px;color:#675a70}
+.db-dashboard .metric-value{font-size:clamp(22px,2vw,28px);overflow-wrap:anywhere}
+.db-dashboard .admin-operations-heading h2,.db-dashboard .admin-chart .card-heading h2,.db-dashboard .admin-toolbar h2{font-size:21px}
+.db-dashboard .admin-operations-heading p,.db-dashboard .admin-operations-heading button,.db-dashboard .admin-chart .card-heading p,.db-dashboard .admin-chart-legend li,.db-dashboard .admin-donut small,.db-dashboard .data-note,.db-dashboard .admin-operations-grid span,.db-dashboard .admin-operations-grid small{font-size:16px;line-height:1.5}
+.db-dashboard .admin-operations-grid strong,.db-dashboard .admin-donut strong{font-size:24px}
+.db-dashboard .table-wrap table{font-size:16px;line-height:1.5}
+.db-dashboard .table-wrap th,.db-dashboard .table-wrap td{font-size:16px;line-height:1.5}
+.db-dashboard .table-wrap th{font-weight:700}
+.db-dashboard .admin-toolbar button,.db-dashboard .admin-actions button,.db-dashboard table button,.db-dashboard input,.db-dashboard select,.db-dashboard textarea,.db-dashboard .admin-editor,.db-dashboard .admin-auth{font-size:16px}
+.db-dashboard .admin-editor h3,.db-dashboard .admin-auth h1{font-size:21px}
+@media(max-width:600px){.db-dashboard .admin-welcome h2{font-size:20px}.db-dashboard .admin-welcome p,.db-dashboard .admin-section-heading p{font-size:15px}.db-dashboard .metric-value{font-size:22px}.db-dashboard .admin-chart-legend li{flex-wrap:wrap}}
 
 .delivery-address-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px 14px; }
 @media (max-width: 700px) { .delivery-address-fields { grid-template-columns: 1fr; } }

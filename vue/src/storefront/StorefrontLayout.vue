@@ -4,7 +4,7 @@
       <link v-for="sheet in stylesheets" :key="sheet" rel="stylesheet" :href="'/styles/storefront/' + sheet + '.css'" />
     </Teleport>
     <StorefrontHeader />
-    <main class="content" :class="{ 'content-dashboard': $route.name === 'adminDashboard' }"><RouterView /></main>
+    <main class="content" :class="{ 'content-dashboard': ['adminDashboard', 'adminOrderDetail'].includes($route.name) }"><RouterView /></main>
     <footer class="footer storefront-footer">
       <span>© 2026 북적북적 · 책을 좋아하는 사람들을 위한 서점</span>
       <nav class="footer-support" aria-label="고객지원 바로가기">
