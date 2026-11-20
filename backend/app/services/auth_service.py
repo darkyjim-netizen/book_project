@@ -39,8 +39,8 @@ class AuthService:
 
         if not self.check_email_available(payload.email):
             raise BusinessError("이미 사용 중인 이메일입니다.", code="EMAIL_DUPLICATED")
-        if not self.check_name_available(payload.name):
-            raise BusinessError("이미 사용 중인 이름입니다.", code="NAME_DUPLICATED")
+        if payload.nickname is not None and not self.check_nickname_available(payload.nickname):
+            raise BusinessError("이미 사용 중인 닉네임입니다.", code="NICKNAME_DUPLICATED")
 
         # 비밀번호가 프로젝트에서 정한 보안 규칙에 맞는지 검사한다.
         validate_password_policy(payload.password)
@@ -50,7 +50,7 @@ class AuthService:
             email=str(payload.email).strip().lower(),
             password_hash=hash_password(payload.password),  # 원문 대신 해시 저장
             name=payload.name.strip(),
-            nickname=payload.nickname or payload.name,  # 별명이 없으면 이름을 사용
+            nickname=payload.nickname.strip() if payload.nickname is not None else payload.name,
             phone=payload.phone,
             birth_date=payload.birth_date,
             gender=payload.gender,
@@ -123,15 +123,12 @@ class AuthService:
             select(Member).where(func.lower(func.trim(Member.email)) == str(email).strip().lower())
         ) is None
 
-    def check_name_available(self, name: str) -> bool:
-        name = name.strip()
-        if not name:
-            raise BusinessError("이름을 입력해 주세요.")
+    def check_nickname_available(self, nickname: str) -> bool:
+        nickname = nickname.strip()
+        if not nickname:
+            raise BusinessError("닉네임을 입력해 주세요.", code="NICKNAME_REQUIRED")
         return self.db.scalar(
-            select(Member).where(
-                func.lower(func.trim(Member.name)) == name.lower(),
-                Member.status != MemberStatus.WITHDRAWN,
-            )
+            select(Member.member_id).where(func.lower(func.trim(Member.nickname)) == nickname.lower())
         ) is None
 
     # ------------------------------------------------------------------ 로그인

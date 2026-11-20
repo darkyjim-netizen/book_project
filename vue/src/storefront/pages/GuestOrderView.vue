@@ -1,6 +1,6 @@
 <template>
   <section class="guest-order-page" aria-labelledby="guest-order-title">
-    <div class="guest-order-heading"><p>ORDER LOOKUP</p><h1 id="guest-order-title">비회원 주문조회</h1><p>주문할 때 입력한 주문번호와 이메일을 입력해 주세요.</p></div>
+    <div class="guest-order-heading"><h1 id="guest-order-title">비회원 주문조회</h1><p>주문번호와 주문 시 사용한 이메일로 상품과 배송 상태를 확인하세요.</p></div>
     <div class="guest-order-layout">
       <form class="guest-order-panel guest-order-form" @submit.prevent="lookup">
         <h2>주문 정보 확인</h2>
@@ -26,7 +26,6 @@
         <div v-else class="guest-order-empty"><b>주문 내역을 확인해 보세요</b><p>주문 정보가 일치하면 이곳에서 상품과 배송 상태를 볼 수 있습니다.</p></div>
       </section>
     </div>
-    <p class="guest-order-notice">비회원은 쿠폰을 등록하거나 사용할 수 없습니다.</p>
   </section>
 </template>
 <script setup>
@@ -45,3 +44,12 @@ async function lookup() {
   finally { loading.value = false; }
 }
 </script>
+
+<style scoped>
+.guest-order-page{box-sizing:border-box;padding-top:20px;min-width:0}
+.guest-order-heading{margin-bottom:26px}.guest-order-heading h1{margin:0 0 12px;font-size:32px;font-weight:700;letter-spacing:-.035em;line-height:1.35}.guest-order-heading p{margin:0;font-size:16px;line-height:1.7;color:#766580}
+.guest-order-layout{gap:24px}.guest-order-panel{padding:28px;border-color:#e7ddef;box-shadow:0 4px 20px #44265e04}.guest-order-panel h2{font-size:22px;font-weight:600}
+.guest-order-form input{font-size:16px;min-height:50px;border-radius:10px}.guest-order-form label{font-size:15px}.guest-order-form button{min-height:50px;font-size:16px;border-radius:10px}.guest-order-help{margin:18px 0 10px;font-size:14px;line-height:1.8}.guest-order-form>a{display:inline-flex;align-items:center;min-height:36px;font-size:14px}.guest-order-notice{margin-top:16px;font-size:13px;color:#8a7a94}
+.guest-order-empty{padding:54px 16px}.guest-order-empty b{display:block;margin-bottom:10px;font-size:19px;font-weight:600;color:#5c4270}.guest-order-empty p{max-width:34em;margin:0 auto;font-size:15px;line-height:1.8;color:#8a7994}
+@media(max-width:700px){.guest-order-page{padding-top:12px}.guest-order-heading h1{font-size:28px}.guest-order-panel{padding:22px 20px}.guest-order-empty{padding:30px 8px}}
+</style>

@@ -300,6 +300,7 @@ export function useStorefront() {
   }
   const productSourcePath = ref('/domestic');
   const toastMessage = ref('');
+  const toastWishLink = ref(false);
   const addedCartTitle = ref('');
   const cartAlreadyAdded = ref(false);
   const cartDialog = ref(null);
@@ -472,10 +473,11 @@ export function useStorefront() {
     return bookCoverUrl(book);
   }
   function won(value) { return `${Number(value || 0).toLocaleString('ko-KR')}원`; }
-  function showToast(message) {
+  function showToast(message, wishLink = false) {
+    toastWishLink.value = wishLink;
     toastMessage.value = message;
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => { toastMessage.value = ''; }, 3500);
+    toastTimer = setTimeout(() => { toastMessage.value = ''; toastWishLink.value = false; }, wishLink ? 8000 : 3500);
   }
   function mapDatabaseBook(book, index) {
     const [major, subcategory] = databaseCategoryMap[book.category_name] || [book.category_name || '도서', ''];
@@ -665,7 +667,7 @@ export function useStorefront() {
         const updated = new Set(wishlist.value);
         if (result.wished) updated.add(id); else updated.delete(id);
         wishlist.value = updated;
-        showToast(result.wished ? '찜 목록에 담았어요' : '찜 목록에서 삭제했어요');
+        showToast(result.wished ? '찜 목록에 담았어요' : '찜 목록에서 삭제했어요', true);
       } catch { if (generation === wishGeneration) showToast('찜 상태를 저장하지 못했어요.'); }
       finally { wishPending.delete(id); }
       return;
@@ -673,7 +675,7 @@ export function useStorefront() {
     if (next.has(id)) next.delete(id); else next.add(id);
     wishlist.value = next;
     localStorage.setItem(guestWishKey, JSON.stringify([...next]));
-    showToast(next.has(id) ? '찜 목록에 담았어요' : '찜 목록에서 삭제했어요');
+    showToast(next.has(id) ? '찜 목록에 담았어요' : '찜 목록에서 삭제했어요', true);
   }
   function addCart(book) {
     const title = typeof book === 'string' ? book : book.title;
@@ -953,6 +955,6 @@ export function useStorefront() {
     adminUserId, adminPassword, rememberAdminId, showAdminPassword, adminLoginError, signupConsent, signupError, signupForm,
     adminTodayLabel, adminMetrics, adminProfile, workload, workloadMix, adminDonutStyle,
     findBook, majorFor, detailsFor, coverUrl, won, navigate, openBestSellers, openProduct, backToBooks, openBookInfo,
-    toggleWish, addCart, removeCart, openPayment, toggleCartItem, removeAllCart, updateCartQuantity, submitTossPayment, startProfileEdit, cancelProfileEdit, saveMyProfile, removeOrder, likedBooks, moveBanner, showToast, openBookForm, openEditBookForm, createBook, removeBook, adminLogin, logoutAdmin, adminSignup
+    toastWishLink, toggleWish, addCart, removeCart, openPayment, toggleCartItem, removeAllCart, updateCartQuantity, submitTossPayment, startProfileEdit, cancelProfileEdit, saveMyProfile, removeOrder, likedBooks, moveBanner, showToast, openBookForm, openEditBookForm, createBook, removeBook, adminLogin, logoutAdmin, adminSignup
   };
 }

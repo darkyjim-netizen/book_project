@@ -598,6 +598,24 @@ def admin_cancel_order(
 
     service = OrderService(db)
 
+    from datetime import datetime, timezone
+    from app.core.exceptions import BusinessError
+    from app.models.enums import PaymentStatus
+    from app.models.order import Refund
+    from app.services.payment_service import PaymentService
+    order = service.get_order(order_id)
+    if not order.is_cancelable:
+        raise BusinessError('현재 주문 상태에서는 취소할 수 없습니다.')
+    payment = order.main_payment
+    if payment and payment.status in (PaymentStatus.PAID, PaymentStatus.PARTIAL_CANCELLED):
+        remaining = float(payment.amount) - float(payment.cancelled_amount or 0)
+        if remaining > 0:
+            PaymentService(db).cancel_payment(order_id, remaining, reason_text or '관리자 주문 취소')
+            db.add(Refund(order_id=order_id, payment_id=payment.payment_id,
+                          refund_amount=remaining, point_restore=order.point_used,
+                          reason_code='ADMIN_CANCEL', reason_text=reason_text,
+                          completed_at=datetime.now(timezone.utc)))
+
     # 회원이 직접 취소하는 것이 아니므로 member에는 None을 전달한다.
     order = service.cancel_order(
         order_id,
@@ -617,7 +635,7 @@ def admin_cancel_order(
 def refund_order(
     order_id: int,
     # 값이 없으면 결제 서비스가 남은 금액 전체를 취소하도록 처리한다.
-    amount: Optional[float] = Body(None, embed=True),
+    amount: Optional[float] = Body(None, embed=True, gt=0),
     reason: str = Body("관리자 환불", embed=True),
     _admin: Member = Depends(require_admin),
     db: Session = Depends(get_db),

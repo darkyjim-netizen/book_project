@@ -15,6 +15,10 @@
 .member-mypage .mypage-dashboard { padding-top: 28px; }
 .member-mypage .mypage-order-status { margin-bottom: 24px; }
 .member-mypage .member-recommendations { margin-bottom: 0; padding-bottom: 24px; }
+.member-mypage .member-recommendations.member-wishlist { box-sizing: border-box; margin-bottom: 24px; padding: 26px; border: 1px solid #e5ddeb; border-radius: 12px; background: #fff; }
+@media (max-width: 700px) {
+  .member-mypage .member-recommendations.member-wishlist { padding: 20px; }
+}
 .member-mypage .member-recommendation strong { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; line-height: 1.5; }
 .member-mypage .member-recommendation > span:last-child { margin-top: auto; font-weight: 700; }
 .member-mypage .as-grid { margin-top: 24px; }

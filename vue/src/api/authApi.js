@@ -1,11 +1,11 @@
 import http from './http'
 
 export const authApi = {
+  checkNickname(nickname) {
+    return http.get('/api/v1/auth/check-nickname', { params: { nickname } }).then(r => r.data)
+  },
   checkEmail(email) {
     return http.get('/api/v1/auth/check-email', { params: { email } }).then(r => r.data)
-  },
-  checkName(name) {
-    return http.get('/api/v1/auth/check-name', { params: { name } }).then(r => r.data)
   },
   register(payload) {
     return http.post('/api/v1/auth/signup', payload).then(r => r.data)

@@ -26,9 +26,9 @@
       </details>
       <a href="/domestic" :class="{active:view==='domestic'||view==='category'}" @click.prevent="navigate('domestic')">국내도서</a>
       <a href="/curation" :class="{active:view==='curation'}" @click.prevent="navigate('curation')">추천도서</a>
-      <a v-if="auth.initialized && !auth.isAuthenticated" href="/guest-order" :class="{active:view==='guestOrder'}" @click.prevent="navigate('guestOrder')">비회원 주문조회</a>
       <a href="/bestsellers" :class="{active:view==='bestsellers'}" @click.prevent="openBestSellers">베스트셀러</a>
       <a class="nav-service-start" href="/support" :class="{active:view==='support'}" @click.prevent="navigate('support')">고객지원</a>
+      <a v-if="auth.initialized && !auth.isAuthenticated" href="/guest-order" :class="{active:view==='guestOrder'}" @click.prevent="navigate('guestOrder')">비회원 주문조회</a>
       <RouterLink v-if="auth.isAuthenticated && !auth.isAdmin" :to="{ name: 'mypage', query: { tab: 'orders' } }">주문·배송 조회</RouterLink>
     </nav>
   </header>

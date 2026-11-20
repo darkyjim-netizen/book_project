@@ -3,11 +3,12 @@
       <div class="domestic-catalog-layout">
       <aside class="domestic-category-nav" aria-label="국내도서 분야">
         <h2>국내도서</h2>
-        <button type="button" class="domestic-bestsellers" @click="openBestSellers">베스트셀러</button>
-        <p>분야별 도서</p>
+        <div class="domestic-category-group"><button type="button" class="domestic-bestsellers" @click="openBestSellers">베스트셀러</button></div>
+        <div class="domestic-category-group domestic-subjects"><h3>분야별 도서</h3>
         <button v-for="category in domesticCategories" :key="category.name" type="button"
           :aria-current="activeDomesticCategory === category.name ? 'page' : undefined"
           @click="selectHeaderCategory(category.name)">{{ category.name }}</button>
+        </div>
       </aside>
       <section class="domestic-shelf" aria-labelledby="domestic-results-title">
         <header class="domestic-shelf-head">

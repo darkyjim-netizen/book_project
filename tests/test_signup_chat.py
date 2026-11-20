@@ -14,7 +14,7 @@ def payload(**changes):
     return SignupRequest(**{**dict(email="user@example.com", name="테스트", password="Booktest1234", password_confirm="Booktest1234"), **changes})
 
 
-@pytest.mark.parametrize("existing,code", [([object()], "EMAIL_DUPLICATED"), ([None, object()], "NAME_DUPLICATED")])
+@pytest.mark.parametrize("existing,code", [([object()], "EMAIL_DUPLICATED")])
 def test_signup_blocks_duplicates_before_writes(existing, code):
     db = Mock()
     db.scalar.side_effect = existing
@@ -55,3 +55,15 @@ def test_delete_missing_room():
     with pytest.raises(NotFoundError):
         ChatService(db).delete_room(10, SimpleNamespace(member_id=1, is_admin=False))
     db.delete.assert_not_called()
+
+
+def test_signup_allows_existing_name(monkeypatch):
+    db = Mock()
+    db.scalar.return_value = None  # Only email availability is queried.
+    service = AuthService(db)
+    monkeypatch.setattr(service, "_grant_welcome_benefits", Mock())
+    monkeypatch.setattr("app.services.auth_service.hash_password", lambda password: "hashed")
+    member = service.signup(payload(name="동명이인"))
+    assert member.name == "동명이인"
+    db.scalar.assert_called_once()
+    db.commit.assert_called_once()

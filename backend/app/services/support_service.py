@@ -234,8 +234,8 @@ class QnaService:
                 )
             )
 
-        # 작성자 이름을 응답에 표시하되, 이름을 별표로 가린다.
-        name = q.member.name if q.member else "회원"
+        # 관리자는 전체 이름을 확인하고 일반 조회에는 마스킹을 적용한다.
+        name = (q.member.name if q.member else None) or "회원"
         masked = name[0] + "*" * max(len(name) - 1, 1)
 
         # 답변 응답 스키마를 이 함수에서만 사용하므로 필요한 시점에 가져온다.
@@ -249,7 +249,7 @@ class QnaService:
             content=q.content if can_view else None,
             status=q.status.value,
             is_secret=q.is_secret,
-            member_name=masked,
+            member_name=name if viewer is not None and viewer.is_admin else masked,
             book_id=q.book_id,
             book_title=None,
             view_count=q.view_count,

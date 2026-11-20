@@ -148,6 +148,7 @@ class PaymentResponse(BaseModel):
     method: str  # 결제 수단
     status: str  # 결제 상태
     amount: float  # 결제 금액
+    cancelled_amount: float = 0  # 누적 환불 금액
     pg_tid: Optional[str] = None  # 결제대행사가 발급한 거래 번호
     card_name: Optional[str] = None  # 카드사 이름
     card_no_masked: Optional[str] = None  # 일부를 가린 카드 번호

@@ -18,7 +18,9 @@ http.interceptors.response.use(
     const body = data?.error || {}
     const detail = body.detail ?? data?.detail
     const message = Array.isArray(detail)
-      ? detail.map(v => v.msg || v.message || JSON.stringify(v)).join(', ')
+      ? detail.map(v => v.loc?.at(-1) === 'email'
+        ? '올바른 이메일 형식으로 입력해 주세요. (예: name@example.com)'
+        : v.msg || v.message || JSON.stringify(v)).join(', ')
       : typeof detail === 'string' && detail
         ? detail
         : body.message || data?.message || (status ? '요청에 실패했습니다.' : error.message) || '요청에 실패했습니다.'

@@ -1,5 +1,5 @@
 <template>
-<p v-if="toastMessage" class="toast show" role="status">{{ toastMessage }}</p>
+<p v-if="toastMessage" class="toast show" role="status"><span>{{ toastMessage }}</span><RouterLink v-if="toastWishLink" class="toast-wish-link" :to="{ name: 'mypage', query: { tab: 'overview' }, hash: '#member-wishlist-title' }" @click="toastMessage = ''">찜 목록 바로가기 →</RouterLink></p>
 <div v-if="cartDeleteComplete" class="cart-added-backdrop" @click.self="closeCartDeleteComplete()" @keydown.esc.stop="closeCartDeleteComplete()" @keydown.tab="trapCartDialogFocus">
     <section ref="cartDialog" class="cart-added-dialog" role="dialog" aria-modal="true" aria-labelledby="cart-deleted-title" aria-describedby="cart-deleted-description">
       <span class="cart-added-icon cart-deleted-icon" aria-hidden="true">×</span>

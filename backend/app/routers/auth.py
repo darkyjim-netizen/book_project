@@ -55,9 +55,9 @@ def check_email(email: EmailStr, db: Session = Depends(get_db)):
     return {"email": email, "available": available}
 
 
-@router.get("/check-name", response_model=dict, summary="이름 중복 확인")
-def check_name(name: str = Query(..., min_length=1, max_length=60), db: Session = Depends(get_db)):
-    return {"name": name.strip(), "available": AuthService(db).check_name_available(name)}
+@router.get("/check-nickname", response_model=dict, summary="닉네임 중복 확인")
+def check_nickname(nickname: str = Query(..., min_length=1, max_length=60), db: Session = Depends(get_db)):
+    return {"nickname": nickname.strip(), "available": AuthService(db).check_nickname_available(nickname)}
 
 
 @router.post(

@@ -14,8 +14,12 @@ from app.core.config import settings
 # 추가
 from pathlib import Path
 
-import torch
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
+try:
+    import torch
+    from transformers import AutoModelForSequenceClassification, AutoTokenizer
+except ImportError:
+    torch = None
+    AutoModelForSequenceClassification = AutoTokenizer = None
 #여기까지
 
 logger = logging.getLogger(__name__)
@@ -412,11 +416,22 @@ class HuggingFaceSentimentModel:
         self.tokenizer = None
         self.model = None
 
+        if torch is None or AutoTokenizer is None:
+            logger.warning("BERT 의존성 미설치: 기존 감성 분석 방식으로 대체합니다.")
+            return
         model_path = Path(settings.MODEL_PATH)
+        if not model_path.is_absolute() and not model_path.exists():
+            model_path = Path(__file__).resolve().parents[2] / model_path
         if not model_path.exists():
             logger.warning("Hugging Face 모델 폴더를 찾을 수 없습니다: %s", model_path)
             return
 
+        weights = model_path / 'model.safetensors'
+        if weights.exists():
+            with weights.open('rb') as handle:
+                if handle.read(42).startswith(b'version https://git-lfs.github.com/spec/v1'):
+                    logger.warning("BERT 가중치는 Git LFS 포인터입니다. 감성 사전 방식으로 대체합니다.")
+                    return
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.tokenizer = AutoTokenizer.from_pretrained(
             str(model_path), local_files_only=True

@@ -4,11 +4,11 @@ from typing import Literal
 
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel, Field, model_validator
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.core.exceptions import NotFoundError
+from app.core.exceptions import BusinessError, NotFoundError
 from app.core.security import require_admin
 from app.models.member import Member
 from app.models.promotion import Coupon
@@ -50,11 +50,44 @@ def coupon_data(c):
             'issued_count': c.issued_count, 'valid_to': c.valid_to, 'is_active': c.is_active}
 
 
+@router.post('/analysis/review-sentiment/run')
+def run_review_sentiment(admin: Member = Depends(require_admin), db: Session = Depends(get_db)):
+    # A transaction-scoped lock prevents concurrent full analysis jobs.
+    if not db.scalar(text("SELECT pg_try_advisory_xact_lock(726401)")):
+        raise BusinessError('이미 리뷰 분석이 진행 중입니다. 잠시 후 새로고침해 주세요.', status_code=409)
+    from app.ai.sentiment import get_analyzer
+    try:
+        count = get_analyzer().reanalyze_all(db)
+        return {'analyzed_reviews': count, 'message': '리뷰 감성분석이 완료되었습니다.'}
+    except Exception:
+        db.rollback()
+        raise
+
+
+@router.get('/analysis/review-sentiment/reviews')
+def sentiment_review_results(
+    label: Literal['POSITIVE', 'NEUTRAL', 'NEGATIVE'] | None = None,
+    page: int = Query(1, ge=1), size: int = Query(20, ge=1, le=100),
+    admin: Member = Depends(require_admin), db: Session = Depends(get_db),
+):
+    from app.models.book import Book
+    conditions = [Review.is_blinded.is_(False)]
+    if label:
+        conditions.append(ReviewSentiment.label == label)
+    query = select(ReviewSentiment, Review, Book.title).join(Review, Review.review_id == ReviewSentiment.review_id).join(Book, Book.book_id == Review.book_id).where(*conditions)
+    total = db.scalar(select(func.count()).select_from(query.subquery())) or 0
+    rows = db.execute(query.order_by(ReviewSentiment.analyzed_at.desc(), Review.review_id.desc()).offset((page-1)*size).limit(size)).all()
+    return {'items': [{'review_id': review.review_id, 'book_title': title, 'content': review.content,
+                      'label': result.label.value, 'score': float(result.score),
+                      'model_version': result.model_version} for result, review, title in rows],
+            'meta': {'page': page, 'total_pages': (total+size-1)//size, 'total': total}}
+
+
 @router.get('/analysis/review-sentiment')
 def review_sentiment_summary(admin: Member = Depends(require_admin), db: Session = Depends(get_db)):
     """저장된 분석 결과만 집계하며 분석이나 학습을 실행하지 않는다."""
-    total_reviews = db.scalar(select(func.count()).select_from(Review)) or 0
-    rows = db.execute(select(ReviewSentiment.label, func.count()).group_by(ReviewSentiment.label)).all()
+    total_reviews = db.scalar(select(func.count()).select_from(Review).where(Review.is_blinded.is_(False))) or 0
+    rows = db.execute(select(ReviewSentiment.label, func.count()).join(Review, Review.review_id == ReviewSentiment.review_id).where(Review.is_blinded.is_(False)).group_by(ReviewSentiment.label)).all()
     counts = {'POSITIVE': 0, 'NEUTRAL': 0, 'NEGATIVE': 0}
     for label, count in rows:
         counts[label.value] = count
@@ -62,6 +95,26 @@ def review_sentiment_summary(admin: Member = Depends(require_admin), db: Session
     versions = db.scalars(select(ReviewSentiment.model_version).distinct().order_by(ReviewSentiment.model_version)).all()
     return {'total_reviews': total_reviews, 'analyzed_reviews': sum(counts.values()),
             'counts': counts, 'last_analyzed_at': latest, 'model_versions': versions}
+
+
+class ReviewManagementUpdate(BaseModel):
+    is_blinded: bool
+    reply_content: str = Field(default='', max_length=2000)
+
+
+@router.patch('/reviews/{review_id}')
+def update_review_management(review_id: int, payload: ReviewManagementUpdate,
+                             admin: Member = Depends(require_admin), db: Session = Depends(get_db)):
+    review = db.get(Review, review_id)
+    if review is None:
+        raise NotFoundError('리뷰를 찾을 수 없습니다.')
+    reply = payload.reply_content.strip() or None
+    if review.reply_content != reply:
+        review.reply_content = reply
+        review.replied_at = datetime.now(timezone.utc) if reply else None
+    review.is_blinded = payload.is_blinded
+    db.commit()
+    return {'message': '변경사항을 저장했습니다.'}
 
 
 @router.get('/reviews')

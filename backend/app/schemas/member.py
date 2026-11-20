@@ -33,6 +33,15 @@ class SignupRequest(BaseModel):
     sms_agree: bool = False  # 문자 수신 동의 여부
     email_agree: bool = False  # 이메일 수신 동의 여부
 
+    @field_validator("nickname")
+    @classmethod
+    def _nickname(cls, value):
+        if value is not None:
+            value = value.strip()
+            if not value:
+                raise ValueError("닉네임을 입력해 주세요.")
+        return value
+
     @field_validator("name", mode="before")
     @classmethod
     def _trim_name(cls, value):

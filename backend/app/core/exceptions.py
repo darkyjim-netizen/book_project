@@ -62,6 +62,25 @@ def _envelope(code: str, message: str, detail=None) -> dict:
     return {"success": False, "error": error}
 
 
+def _validation_message(error: dict) -> str:
+    field = error.get("loc", [""])[-1]
+    label = {"email": "이메일", "nickname": "닉네임", "name": "이름", "password": "비밀번호", "password_confirm": "비밀번호 확인", "phone": "휴대전화", "birth_date": "생년월일"}.get(field, "입력값")
+    if field == "email":
+        return "올바른 이메일 형식으로 입력해 주세요. (예: name@example.com)"
+    kind = error.get("type", "")
+    context = error.get("ctx", {})
+    if kind == "missing":
+        return f"{label} 항목을 입력해 주세요."
+    if kind == "string_too_short":
+        return f"{label} 항목은 {context.get('min_length', 1)}자 이상 입력해 주세요."
+    if kind == "string_too_long":
+        return f"{label} 항목은 {context.get('max_length')}자 이하로 입력해 주세요."
+    message = error.get("msg", "")
+    if any("가" <= char <= "힣" for char in message):
+        return message.removeprefix("Value error, ")
+    return f"{label} 항목을 올바르게 입력해 주세요."
+
+
 def register_exception_handlers(app: FastAPI) -> None:
     """main.py가 호출하면 FastAPI 앱에 공통 예외 처리기를 등록한다."""
 
@@ -81,7 +100,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         # 검증 오류의 위치, 메시지, 유형만 응답에 담는다.
         # 원본 입력과 JSON으로 변환하기 어려운 내부 정보는 제외한다.
         errors = [
-            {"loc": error["loc"], "msg": error["msg"], "type": error["type"]}
+            {"loc": error["loc"], "msg": _validation_message(error), "type": error["type"]}
             for error in exc.errors()
         ]
         return JSONResponse(
