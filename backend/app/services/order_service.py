@@ -603,10 +603,16 @@ class OrderService:
         size: int = 20,
         status: Optional[str] = None,
         keyword: Optional[str] = None,
+        claims_only: bool = False,
     ) -> Tuple[List[Order], int]:
         """관리자가 전체 주문을 조회한다."""
 
         conditions = []
+        if claims_only:
+            conditions.append(Order.status.in_([
+                OrderStatus.CANCELLED, OrderStatus.RETURN_REQ, OrderStatus.RETURNED,
+                OrderStatus.EXCHANGE_REQ, OrderStatus.EXCHANGED,
+            ]))
 
         # 상태가 지정되면 해당 상태의 주문만 조회한다.
         if status:

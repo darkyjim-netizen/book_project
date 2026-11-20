@@ -62,6 +62,7 @@ const router = createRouter({
   scrollBehavior(to, _from, savedPosition) {
     if (to.hash === '#home-books-title') return { el: to.hash, top: window.innerWidth <= 700 ? 210 : 156 }
     if (to.hash === '#member-recommendations') return { el: to.hash, top: window.innerWidth <= 700 ? 210 : 156 }
+    if (to.hash === '#member-wishlist-title') return { el: to.hash, top: window.innerWidth <= 700 ? 210 : 156 }
     return savedPosition ?? { top: 0 }
   }
 })

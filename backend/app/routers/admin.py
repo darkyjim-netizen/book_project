@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.security import require_admin, require_superadmin
 from app.models.member import Member
+from app.models.enums import OrderStatus
 from app.schemas.ai import DashboardKpi, DashboardResponse
 from app.schemas.book import (
     BookCreateRequest,
@@ -512,6 +513,30 @@ def admin_list_orders(
             service.to_response(order)
             for order in rows
         ],
+        meta=PageMeta.build(page, size, total),
+    )
+
+
+@router.get(
+    "/orders/claims",
+    response_model=PageResponse[OrderResponse],
+    summary="취소·반품·교환 목록(관리자)",
+)
+def admin_list_claims(
+    page: int = Query(1, ge=1),
+    size: int = Query(20, ge=1, le=100),
+    status_filter: Optional[OrderStatus] = Query(None, alias="status"),
+    keyword: Optional[str] = None,
+    _admin: Member = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    service = OrderService(db)
+    rows, total = service.list_all_orders(
+        page, size, status_filter.value if status_filter else None, keyword,
+        claims_only=True,
+    )
+    return PageResponse[OrderResponse](
+        items=[service.to_response(order) for order in rows],
         meta=PageMeta.build(page, size, total),
     )
 

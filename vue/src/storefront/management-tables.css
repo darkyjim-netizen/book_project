@@ -1,0 +1,50 @@
+/* 관리 목록의 열 너비를 고정해 긴 내용이 다른 열을 밀지 않도록 합니다. */
+.db-dashboard .admin-workspace-main { min-width:0; }
+.db-dashboard .management-table { width:100%; min-width:680px; table-layout:fixed; }
+.db-dashboard .management-table th, .db-dashboard .management-table td { box-sizing:border-box; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:7px 10px; }
+.db-dashboard .management-table th:last-child, .db-dashboard .management-table td:last-child { overflow:visible; text-overflow:clip; }
+.db-dashboard .management-table td:last-child button, .db-dashboard .management-table td:last-child .admin-detail-link { padding:7px 10px; font-size:16px; }
+.db-dashboard .management-table--books col:nth-child(1) { width:36%; }
+.db-dashboard .management-table--books col:nth-child(2) { width:22%; }
+.db-dashboard .management-table--books col:nth-child(3) { width:15%; }
+.db-dashboard .management-table--books col:nth-child(4) { width:10%; }
+.db-dashboard .management-table--books col:nth-child(5) { width:17%; }
+.db-dashboard .management-table--members col:nth-child(1) { width:16%; }
+.db-dashboard .management-table--members col:nth-child(2) { width:39%; }
+.db-dashboard .management-table--members col:nth-child(3), .db-dashboard .management-table--members col:nth-child(4) { width:15%; }
+.db-dashboard .management-table--members col:nth-child(5) { width:15%; }
+.db-dashboard .management-table--reviews col:nth-child(1) { width:29%; }
+.db-dashboard .management-table--reviews col:nth-child(2) { width:16%; }
+.db-dashboard .management-table--reviews col:nth-child(3) { width:28%; }
+.db-dashboard .management-table--reviews col:nth-child(4) { width:13%; }
+.db-dashboard .management-table--reviews col:nth-child(5) { width:14%; }
+.db-dashboard .management-table--orders col:nth-child(1), .db-dashboard .management-table--refunds col:nth-child(1) { width:29%; }
+.db-dashboard .management-table--orders col:nth-child(2), .db-dashboard .management-table--refunds col:nth-child(2) { width:17%; }
+.db-dashboard .management-table--orders col:nth-child(3), .db-dashboard .management-table--refunds col:nth-child(3) { width:20%; }
+.db-dashboard .management-table--orders col:nth-child(4), .db-dashboard .management-table--refunds col:nth-child(4) { width:17%; }
+.db-dashboard .management-table--orders col:nth-child(5), .db-dashboard .management-table--refunds col:nth-child(5) { width:17%; }
+.db-dashboard .management-table--qna col:first-child, .db-dashboard .management-table--notices col:first-child { width:43%; }
+.db-dashboard .management-table--qna col:not(:first-child), .db-dashboard .management-table--notices col:not(:first-child) { width:19%; }
+.db-dashboard .management-table--coupons col:first-child { width:26%; }
+.db-dashboard .management-table--coupons col:nth-child(2), .db-dashboard .management-table--coupons col:nth-child(3), .db-dashboard .management-table--coupons col:nth-child(4) { width:16%; }
+.db-dashboard .management-table--coupons col:nth-child(5) { width:11%; }
+.db-dashboard .management-table--coupons col:nth-child(6) { width:15%; }
+
+.db-dashboard .management-table th, .db-dashboard .management-table td { text-align:center; vertical-align:middle; }
+
+
+.db-dashboard .management-table th, .db-dashboard .management-table td { vertical-align:middle; line-height:1.5; }
+.db-dashboard .management-table td:last-child button + button { margin-left:4px; }
+.db-dashboard .admin-editor h3 { margin:0 0 18px; line-height:1.4; }
+.db-dashboard .admin-editor > p { margin:10px 0; line-height:1.6; }
+
+/* Keep management headings compact and readable across dashboard tabs. */
+.db-dashboard .admin-section-heading.admin-section-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:24px 0 18px}
+.db-dashboard .admin-section-heading .management-refresh{flex:none;margin:0}
+.db-dashboard .admin-section-heading.overview-heading{padding-top:0}
+.db-dashboard .admin-work-panel,.db-dashboard .management-table{font-size:18px;line-height:1.6}
+.db-dashboard .admin-toolbar h2{font-size:23px}
+.db-dashboard .admin-section-heading h2{font-size:27px}
+.db-dashboard .admin-section-heading p,.db-dashboard .admin-section-heading span{font-size:17px}
+.db-dashboard .admin-toolbar input,.db-dashboard .admin-toolbar select,.db-dashboard .admin-toolbar button,.db-dashboard .management-refresh button,.db-dashboard .management-table button,.db-dashboard .admin-detail-link{font-size:18px}
+@media(max-width:600px){.db-dashboard .admin-section-heading{gap:10px;margin-top:18px}.db-dashboard .admin-section-heading h2{font-size:23px}.db-dashboard .admin-work-panel,.db-dashboard .management-table{font-size:16px}}

@@ -93,6 +93,15 @@ class ConnectionManager:
             len(self._rooms[room_id]),
         )
 
+    async def close_room_connections(self, room_id: int) -> None:
+        async with self._lock:
+            connections = list(self._rooms.pop(room_id, set()))
+        for websocket in connections:
+            try:
+                await websocket.close(code=1000)
+            except Exception:
+                logger.debug("이미 종료된 상담 연결: room_id=%s", room_id)
+
     async def connect_agent(self, websocket: WebSocket) -> None:
         """상담원을 신규 문의 알림용 WebSocket에 연결한다."""
 
@@ -331,6 +340,11 @@ class ChatService:
             )
 
         return room
+
+    def delete_room(self, room_id: int, member: Member) -> None:
+        room = self.get_room(room_id, member)
+        self.db.delete(room)
+        self.db.commit()
 
     def list_my_rooms(self, member: Member) -> List[ChatRoom]:
         """회원 본인의 채팅방 목록을 최신순으로 조회한다."""

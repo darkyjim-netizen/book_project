@@ -21,9 +21,9 @@ http.interceptors.response.use(
       ? detail.map(v => v.msg || v.message || JSON.stringify(v)).join(', ')
       : typeof detail === 'string' && detail
         ? detail
-        : body.message || data?.message || error.message || '요청에 실패했습니다.'
+        : body.message || data?.message || (status ? '요청에 실패했습니다.' : error.message) || '요청에 실패했습니다.'
     error.userMessage = status
-      ? `${status}: ${message}`
+      ? message
       : `API 서버에 연결할 수 없습니다. (${message})`
     return Promise.reject(error)
   }

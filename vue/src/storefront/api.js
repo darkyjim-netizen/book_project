@@ -17,7 +17,7 @@ async function request(path, options = {}) {
     const message = typeof detail === 'string'
       ? detail
       : detail?.message || payload?.error?.message || payload?.message || responseText;
-    const error = new Error(message || `API 요청 실패 (${response.status})`);
+    const error = new Error(message || 'API 요청에 실패했습니다.');
     error.status = response.status;
     throw error;
   }

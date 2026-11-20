@@ -4,13 +4,13 @@
       <div class="product-main">
         <div class="product-cover-panel" :style="{background:productBook.bg}"><img :src="coverUrl(productBook)" :alt="productBook.title + ' 표지'" /></div>
         <div class="product-summary">
-          <p class="product-category">{{ majorFor(productBook) }} <span>도서</span></p>
+          <nav class="product-category" aria-label="현재 위치"><RouterLink to="/main">홈</RouterLink><span>›</span><RouterLink to="/domestic">국내도서</RouterLink><span>›</span><button type="button" @click="selectHeaderCategory(majorFor(productBook))">{{ majorFor(productBook) }}</button></nav>
           <h1>{{ productBook.title }}</h1>
-          <p class="product-author">{{ productBook.author }} 지음 <span>·</span> {{ productBook.publisher }}</p>
+          <p class="product-author">{{ authorCredit(productBook.author) }} <span>·</span> {{ productBook.publisher }}</p>
           <div class="product-rating" v-if="productBook.rate">★ {{ productBook.rate }} <span>독자 평점</span></div>
           <div class="product-price-block"><del v-if="productBook.discount">{{ won(productBook.price) }}</del><strong>{{ won(productBook.price*(1-productBook.discount/100)) }}</strong><span v-if="productBook.discount">{{ productBook.discount }}% 할인</span></div>
-          <div class="product-actions"><button @click="addCart(productBook.title)">장바구니 담기</button><button v-if="canWish" class="product-wish" @click="toggleWish(productBook)">{{ wishlist.has(String(productBook.id)) ? '♥ 찜한 책' : '♡ 찜하기' }}</button></div>
-          <p class="product-shipping">재고 {{ productBook.stock > 0 ? '있음' : '문의 필요' }} <span>·</span> 주문 후 배송 안내</p>
+          <div class="product-actions"><button class="product-cart-primary" :disabled="productBook.stock <= 0" @click="addCart(productBook.title)">장바구니 담기</button><button class="product-buy-now" :disabled="productBook.stock <= 0" @click="buyNow">바로 구매</button><button v-if="canWish" class="product-wish" @click="toggleWish(productBook)">{{ wishlist.has(String(productBook.id)) ? '♥ 찜한 책' : '♡ 찜하기' }}</button></div>
+          <p class="product-shipping"><i :class="{available:productBook.stock > 0}" aria-hidden="true"></i>재고 {{ productBook.stock > 0 ? '있음' : '문의 필요' }} <span>·</span> 주문 후 배송 안내</p>
         </div>
       </div>
       <nav class="product-section-nav" aria-label="도서 상세 메뉴">
@@ -146,7 +146,32 @@
 </template>
 
 <script>
+import { onMounted, onUnmounted } from 'vue';
 import { useStorefrontContext } from '../context.js';
 
-export default { setup: useStorefrontContext };
+export default {
+  setup() {
+    const context=useStorefrontContext();
+    let headerObserver;
+    const updateHeaderOffset=()=>{
+      const header=document.querySelector('.site-top');
+      const position=header?getComputedStyle(header).position:'';
+      const height=header && ['sticky','fixed'].includes(position)?header.getBoundingClientRect().height:0;
+      document.documentElement.style.setProperty('--product-header-offset',`${height}px`);
+    };
+    onMounted(()=>{updateHeaderOffset();const header=document.querySelector('.site-top');if(header){headerObserver=new ResizeObserver(updateHeaderOffset);headerObserver.observe(header);}});
+    onUnmounted(()=>{headerObserver?.disconnect();document.documentElement.style.removeProperty('--product-header-offset');});
+    function authorCredit(value){const text=(value||'').trim();return /(?:지음|옮김|엮음|글|그림|저|편저|저자)\s*$/.test(text)?text:`${text} 지음`;}
+    function buyNow(){
+      const title=context.productBook.value.title;
+      context.addCart(title);
+      context.closeCartDialog();
+      const index=context.cart.value.findIndex(item=>(typeof item==='string'?item:item.title)===title);
+      if(index<0)return;
+      context.selectedCart.value=new Set([index]);
+      context.openPayment();
+    }
+    return {...context,authorCredit,buyNow};
+  }
+};
 </script>

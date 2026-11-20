@@ -20,7 +20,8 @@
     <section ref="cartDialog" class="cart-added-dialog" role="dialog" aria-modal="true" aria-labelledby="cart-added-title">
       <button class="cart-added-close" type="button" aria-label="닫기" @click="closeCartDialog()">×</button>
       <span class="cart-added-icon cart-success-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5h2l1.5 9h9.8l1.7-6.5H7"/><path d="M9 18.5h.01M16 18.5h.01"/><path d="m10 10.5 1.5 1.5 3-3"/></svg></span>
-      <h2 id="cart-added-title">장바구니에 담겼습니다</h2>
+      <h2 id="cart-added-title">{{ cartAlreadyAdded ? '이미 장바구니에 담겨 있는 책입니다' : '장바구니에 담겼습니다' }}</h2>
+      <p v-if="cartAlreadyAdded">{{ addedCartTitle }}<br>장바구니에서 확인해 주세요.</p>
       <div class="cart-added-actions"><button type="button" class="cart-added-continue" @click="closeCartDialog()">쇼핑 계속하기</button><button type="button" class="cart-added-go" @click="closeCartDialog(true)">장바구니로 이동</button></div>
     </section>
   </div>

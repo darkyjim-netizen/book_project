@@ -15,8 +15,11 @@
         <input id="login-password" v-model="form.password" type="password" autocomplete="current-password" required placeholder="비밀번호" />
         <button class="login-button" type="submit" :disabled="auth.loading">{{ auth.loading ? '로그인 중...' : '로그인' }}</button>
       </form>
-      <div class="account-links"><RouterLink to="/register">회원가입</RouterLink><span aria-hidden="true"></span><small>계정 문제가 있으면 관리자에게 문의해 주세요.</small></div>
-      <a class="shop-entry-link" href="/guest-order">비회원 주문조회 →</a>
+      <div class="login-alternatives" aria-label="비회원 주문 조회">
+        <div class="login-divider"><span>또는</span></div>
+        <RouterLink class="alternative-button guest-button" :to="{ name: 'guestOrder' }">비회원 주문조회</RouterLink>
+      </div>
+      <div class="account-links"><RouterLink to="/register">회원가입</RouterLink></div>
       <a class="shop-entry-link" href="/main">메인 쇼핑몰 보기 <span aria-hidden="true">→</span></a>
     </div>
   </section>
@@ -44,3 +47,7 @@ async function submit() {
   } catch (e) { error.value = apiError(e) }
 }
 </script>
+
+<style scoped>
+.login-alternatives{display:flex;flex-direction:column;gap:10px;width:100%;margin-top:20px}.login-divider{display:flex;align-items:center;gap:12px;color:#8b8090;font-size:13px}.login-divider::before,.login-divider::after{content:'';height:1px;flex:1;background:#e8e1ec}.alternative-button{box-sizing:border-box;display:flex;align-items:center;justify-content:center;width:100%;min-height:48px;border:0;border-radius:14px;font:inherit;font-weight:700;text-decoration:none}.login-button{border-radius:14px}.login-button,.guest-button{background:#65419a;color:#fff}.login-button:hover,.guest-button:hover{background:#51316e}.login-button:disabled{background:#a99ab9}.account-links a{color:#65419a}
+</style>

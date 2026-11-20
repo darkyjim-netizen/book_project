@@ -1,6 +1,7 @@
 """회원가입, 로그인 등 인증 관련 API 경로."""
-from fastapi import APIRouter, Depends, Request, Response, status
+from fastapi import APIRouter, Depends, Query, Request, Response, status
 from sqlalchemy.orm import Session
+from pydantic import EmailStr
 
 from app.core.config import settings  # 쿠키 만료 시간과 운영 환경 여부
 from app.core.database import get_db  # 요청 중 사용할 DB 세션 제공
@@ -45,13 +46,18 @@ def signup(payload: SignupRequest, db: Session = Depends(get_db)):
     response_model=dict,
     summary="이메일 중복 확인",
 )
-def check_email(email: str, db: Session = Depends(get_db)):
+def check_email(email: EmailStr, db: Session = Depends(get_db)):
     """이메일을 사용할 수 있는지 확인한다."""
 
     available = AuthService(db).check_email_available(email)
 
     # 사용자가 확인한 이메일과 사용 가능 여부를 반환한다.
     return {"email": email, "available": available}
+
+
+@router.get("/check-name", response_model=dict, summary="이름 중복 확인")
+def check_name(name: str = Query(..., min_length=1, max_length=60), db: Session = Depends(get_db)):
+    return {"name": name.strip(), "available": AuthService(db).check_name_available(name)}
 
 
 @router.post(

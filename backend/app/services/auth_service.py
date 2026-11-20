@@ -3,7 +3,7 @@ import logging
 from datetime import datetime, timezone
 from typing import Optional
 
-from sqlalchemy import select  # ORM 조회문을 만드는 도구
+from sqlalchemy import func, select  # ORM 조회문을 만드는 도구
 from sqlalchemy.orm import Session  # DB 세션 타입
 
 from app.core.config import settings  # 로그인 제한, 토큰 만료 시간 등 설정
@@ -37,24 +37,19 @@ class AuthService:
     def signup(self, payload: SignupRequest) -> Member:
         """회원 정보를 저장하고 가입 혜택을 지급한다."""
 
-        # 같은 이메일로 가입한 회원이 있는지 확인한다.
-        exists = self.db.scalar(
-            select(Member).where(Member.email == payload.email)
-        )
-        if exists:
-            raise BusinessError(
-                "이미 사용 중인 이메일입니다.",
-                code="EMAIL_DUPLICATED",
-            )
+        if not self.check_email_available(payload.email):
+            raise BusinessError("이미 사용 중인 이메일입니다.", code="EMAIL_DUPLICATED")
+        if not self.check_name_available(payload.name):
+            raise BusinessError("이미 사용 중인 이름입니다.", code="NAME_DUPLICATED")
 
         # 비밀번호가 프로젝트에서 정한 보안 규칙에 맞는지 검사한다.
         validate_password_policy(payload.password)
 
         # 요청으로 받은 정보를 새 회원 객체에 담는다.
         member = Member(
-            email=payload.email,
+            email=str(payload.email).strip().lower(),
             password_hash=hash_password(payload.password),  # 원문 대신 해시 저장
-            name=payload.name,
+            name=payload.name.strip(),
             nickname=payload.nickname or payload.name,  # 별명이 없으면 이름을 사용
             phone=payload.phone,
             birth_date=payload.birth_date,
@@ -125,7 +120,18 @@ class AuthService:
         """해당 이메일을 가입에 사용할 수 있으면 True를 반환한다."""
 
         return self.db.scalar(
-            select(Member).where(Member.email == email)
+            select(Member).where(func.lower(func.trim(Member.email)) == str(email).strip().lower())
+        ) is None
+
+    def check_name_available(self, name: str) -> bool:
+        name = name.strip()
+        if not name:
+            raise BusinessError("이름을 입력해 주세요.")
+        return self.db.scalar(
+            select(Member).where(
+                func.lower(func.trim(Member.name)) == name.lower(),
+                Member.status != MemberStatus.WITHDRAWN,
+            )
         ) is None
 
     # ------------------------------------------------------------------ 로그인

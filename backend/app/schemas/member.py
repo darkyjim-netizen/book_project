@@ -33,6 +33,11 @@ class SignupRequest(BaseModel):
     sms_agree: bool = False  # 문자 수신 동의 여부
     email_agree: bool = False  # 이메일 수신 동의 여부
 
+    @field_validator("name", mode="before")
+    @classmethod
+    def _trim_name(cls, value):
+        return value.strip() if isinstance(value, str) else value
+
     @field_validator("password_confirm")
     @classmethod
     def _match(cls, v: str, info):

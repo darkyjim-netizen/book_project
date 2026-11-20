@@ -1,26 +1,11 @@
+import { kyoboBestsellerSnapshot } from './bestsellerSnapshot.js';
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storefrontApi } from './api.js';
 import { publishedContentsByIsbn } from './bookContents.js';
 import { useAuthStore } from '../stores/authStore.js';
 import http from '../api/http.js';
-
-const seedBooks = [
-  { id: 11, title: 'Vue 3 풀스택 실전 웹 프로젝트', author: '김기태, 김대철', cat: '컴퓨터·IT', price: 1000, discount: 10, rate: '', color: '#356b6d', bg: '#dcebea', stock: 12, publisher: '남가람북스', featured: true },
-  { id: 12, title: '인공지능을 위한 파이썬 첫 걸음', author: '김기태, 이초연', cat: '컴퓨터·IT', price: 5000, discount: 0, rate: '', color: '#5b6d9b', bg: '#e3e8f3', stock: 12, publisher: '부크크(Bookk)', featured: true },
-  { id: 13, title: 'Spring Boot 3 첫 걸음', author: '김기태, 김경희, 김재우', cat: '컴퓨터·IT', price: 7000, discount: 0, rate: '', color: '#52754d', bg: '#e4ebdf', stock: 12, publisher: '부크크(Bookk)', featured: true },
-  { id: 14, title: '인공지능을 위한 PostgreSQL', author: '김기태, 장원, 박령점', cat: '컴퓨터·IT', price: 10000, discount: 0, rate: '', color: '#454d69', bg: '#e4e6ef', stock: 12, publisher: '부크크(Bookk)', featured: true },
-  { id: 1, title: '불편한 편의점', author: '김호연', cat: '소설', price: 14000, discount: 10, rate: '9.7', color: '#344e45', bg: '#e3e9df', stock: 32, publisher: '나무옆의자' },
-  { id: 2, title: '작별하지 않는다', author: '한강', cat: '소설', price: 15000, discount: 10, rate: '9.8', color: '#4b5260', bg: '#e7e6e3', stock: 4, publisher: '문학동네' },
-  { id: 3, title: '모순', author: '양귀자', cat: '소설', price: 13000, discount: 10, rate: '9.5', color: '#b7855d', bg: '#efe7dd', stock: 27, publisher: '쓰다' },
-  { id: 4, title: '아주 작은 습관의 힘', author: '제임스 클리어', cat: '자기계발', price: 16000, discount: 10, rate: '9.4', color: '#df9b4e', bg: '#f2e9d9', stock: 51, publisher: '비즈니스북스' },
-  { id: 5, title: '나는 나로 살기로 했다', author: '김수현', cat: '에세이', price: 14800, discount: 10, rate: '9.3', color: '#637563', bg: '#e6e9e0', stock: 18, publisher: '클레이하우스' },
-  { id: 6, title: '역행자', author: '자청', cat: '경제경영', price: 19500, discount: 10, rate: '9.1', color: '#313b53', bg: '#e1e5ee', stock: 9, publisher: '웅진지식하우스' },
-  { id: 7, title: '물고기는 존재하지 않는다', author: '룰루 밀러', cat: '인문', price: 17000, discount: 10, rate: '9.6', color: '#66798a', bg: '#e4eaec', stock: 23, publisher: '곰출판' },
-  { id: 8, title: '세이노의 가르침', author: '세이노', cat: '자기계발', price: 7200, discount: 0, rate: '9.5', color: '#363a32', bg: '#e8e8e1', stock: 2, publisher: '데이원' },
-  { id: 9, title: '달러구트 꿈 백화점', author: '이미예', cat: '소설', price: 13800, discount: 10, rate: '9.2', color: '#89759b', bg: '#eae5ed', stock: 40, publisher: '팩토리나인' },
-  { id: 10, title: '나는 메트로폴리탄 미술관의 경비원입니다', author: '패트릭 브링리', cat: '에세이', price: 17500, discount: 10, rate: '9.7', color: '#638277', bg: '#e2e9e5', stock: 16, publisher: '웅진지식하우스' }
-];
+import { getCartStorage } from './cartStorage.js';
 
 const categoryGroups = [
   { name: '소설', subcategories: ['한국소설', '번역소설', '추리', 'SF', '로맨스', '역사소설'] },
@@ -61,7 +46,6 @@ const databaseCategoryMap = {
   '건강/취미': ['건강·취미·실용', ''], '요리/살림': ['건강·취미·실용', '요리'],
   '여행': ['시·에세이', '여행']
 };
-seedBooks.forEach(book => { [book.major, book.subcategory] = bookCategories[book.title] || [book.cat, '']; });
 
 const bookDetails = {
   '불편한 편의점': { intro: '서울의 한 동네, 사람들이 오가며 하루를 이어가는 작은 편의점에 낯선 손님이 찾아옵니다. 기억을 잃은 채 편의점 앞을 지키던 그는 어느 날 야간 아르바이트를 맡게 되고, 계산대와 진열대 사이에서 다양한 이웃들과 마주합니다.\n\n각자의 사정으로 지쳐 있던 사람들은 서툴지만 진심 어린 대화와 예상 밖의 도움을 주고받으며 조금씩 달라집니다. 거창한 해결책 대신 따뜻한 도시락 한 끼, 누군가의 이야기를 들어주는 시간처럼 작고 구체적인 친절이 사람의 하루를 바꿀 수 있음을 보여줍니다.\n\n웃음이 번지는 장면 사이로 일과 가족, 생계에 대한 고민도 함께 흐릅니다. 평범한 동네의 여러 삶을 따라가며 서로를 이해하는 일이 얼마나 큰 위로가 되는지 그려내는 작품입니다. 바쁜 하루 끝에 마음을 잠시 쉬게 하고 싶은 독자에게 편안한 온기를 건넵니다.', contents: ['산해진미 도시락', '제이에스 오브 제이에스', '삼각김밥의 용도'], formats: ['종이책', 'eBook', '오디오북'] },
@@ -81,20 +65,6 @@ const bookDetails = {
 };
 
 const bannerTones = ['sage', 'mist', 'sun'];
-
-// 교보문고 종합 주간 베스트(2026.10.28~11.03) 공개 순위 스냅샷.
-const kyoboBestsellerSnapshot = [
-  { title: '가호', author: '무라카미 하루키', publisher: '문학동네', isbn: '9791141691370' },
-  { title: '트렌드 코리아 2027', author: '김난도', publisher: '미래의창', isbn: '9791124073483' },
-  { title: '퍼플필', author: '진쏠미', publisher: '클랩북스', isbn: '9791193941836' },
-  { title: '세네카, 오늘을 빼앗기고 있는 당신에게', author: '세네카', publisher: '논픽션', isbn: '9791199489561' },
-  { title: '빨강의 자서전', author: '앤 카슨', publisher: '한겨레출판', isbn: '9791172131784' },
-  { title: '싯다르타', author: '헤르만 헤세', publisher: '민음사', isbn: '9788937460586' },
-  { title: '한국사 이상현상 연구원', author: '최인서', publisher: '다이브', isbn: '9791124137635' },
-  { title: '원피스 115: 세상에서 제일 강한 것', author: '오다 에이치로', publisher: '대원씨아이', isbn: '9791142366369' },
-  { title: '쇼펜하우어 인생수업', author: '쇼펜하우어', publisher: '하이스트', isbn: '9791193282045' },
-  { title: '수족관', author: '유래혁', publisher: '포스터샵', isbn: '9791198547514' }
-];
 
 const defaultHomeCategories = [
   { name: '전체', icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/></svg>' },
@@ -193,12 +163,22 @@ export function useStorefront() {
       if (generation === wishGeneration) showToast('찜 목록을 불러오지 못했어요. 새로고침해 주세요.');
     }
   }, { immediate: true });
-  const cart = ref(JSON.parse(localStorage.getItem('bookjjeok-cart') || '[]'));
-  const selectedCart = ref(new Set(cart.value.map((_, index) => index)));
+  const cartStorage = getCartStorage();
+  const cart = ref([]);
+  const selectedCart = ref(new Set());
+  let cartOwner;
+  function persistCart() { cartStorage.save(cartOwner, cart.value); }
+  watch(() => [auth.initialized, auth.user?.id ?? null], ([initialized, memberId]) => {
+    if (!initialized) return;
+    if (cartOwner !== undefined && cartOwner !== memberId) cartStorage.resetGuest();
+    cartOwner = memberId;
+    cart.value = cartStorage.load(memberId);
+    selectedCart.value = new Set(cart.value.map((_, index) => index));
+  }, { immediate: true, flush: 'sync' });
   const lastOrder = ref(null);
   const orderHistory = ref(JSON.parse(localStorage.getItem('bookjjeok-orders') || '[]'));
   const myProfile = ref({
-    name: '홍길동', phone: '010-1234-5678', postalCode: '', address: '서울시 책읽는구 북적로 12', addressDetail: '',
+    name: '', phone: '', postalCode: '', address: '', addressDetail: '',
     ...JSON.parse(localStorage.getItem('bookjjeok-profile') || '{}')
   });
   if (myProfile.value.addressDetail) {
@@ -213,7 +193,7 @@ export function useStorefront() {
   const adminDeletedIds = ref(JSON.parse(localStorage.getItem('bookjjeok-deleted-books') || '[]'));
   const databaseBooks = ref(null);
   const productBook = ref(null);
-  const catalogLoading = ref(true);
+  const catalogLoading = ref(true), catalogError = ref('');
   const productPanel = ref('intro');
   const productDetail = ref(null);
   const publishedContents = computed(() => publishedContentsByIsbn[productBook.value?.isbn13]);
@@ -321,6 +301,7 @@ export function useStorefront() {
   const productSourcePath = ref('/domestic');
   const toastMessage = ref('');
   const addedCartTitle = ref('');
+  const cartAlreadyAdded = ref(false);
   const cartDialog = ref(null);
   const cartDeleteTargets = ref(null);
   const cartDeleteMode = ref('selected');
@@ -375,13 +356,7 @@ export function useStorefront() {
   let refreshTimer;
   const refreshBooks = () => { if (!document.hidden && !['adminDashboard', 'adminOrderDetail'].includes(route.name)) loadDatabaseBooks(); };
 
-  const allBooks = computed(() => {
-    if (databaseBooks.value !== null) return databaseBooks.value;
-    const source = [...seedBooks, ...adminExtra.value];
-    return source
-      .filter(book => !adminDeletedIds.value.includes(book.id))
-      .map(book => ({ ...book, ...(adminOverrides.value[String(book.id)] || {}) }));
-  });
+  const allBooks = computed(() => databaseBooks.value || []);
   const bestSellerBooks = computed(() => {
     const normalize = value => (value || '').replace(/[\s:：]/g, '').toLowerCase();
     const query = searchQuery.value.trim().toLowerCase();
@@ -500,7 +475,7 @@ export function useStorefront() {
   function showToast(message) {
     toastMessage.value = message;
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => { toastMessage.value = ''; }, 2300);
+    toastTimer = setTimeout(() => { toastMessage.value = ''; }, 3500);
   }
   function mapDatabaseBook(book, index) {
     const [major, subcategory] = databaseCategoryMap[book.category_name] || [book.category_name || '도서', ''];
@@ -532,10 +507,12 @@ export function useStorefront() {
     try {
       const result = await storefrontApi.listBooks();
       databaseBooks.value = (result.items || []).map(mapDatabaseBook);
+      catalogError.value = '';
       if (!databaseBooks.value.length) showToast('DB에 표시할 도서가 없습니다.');
       if (activeBanner.value >= banners.value.length) activeBanner.value = 0;
     } catch (error) {
-      showToast(`도서 목록을 DB에서 불러오지 못했어요: ${error.message}`);
+      catalogError.value = '도서 목록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.';
+      showToast(catalogError.value);
     } finally {
       catalogLoading.value = false;
     }
@@ -598,11 +575,13 @@ export function useStorefront() {
   }
   function selectHeaderCategory(name) {
     closeHeaderCategoryMenu(true);
-    if (view.value === 'domestic' && route.query.category === name) {
+    const target = view.value === 'bestsellers' ? 'bestsellers' : 'domestic';
+    if (view.value === target && route.query.category === name) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
-    return router.push({ name: 'domestic', query: { category: name } });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return router.push({ name: target, query: { category: name } });
   }
   function openBestSellers() {
     navigate('bestsellers');
@@ -628,15 +607,35 @@ export function useStorefront() {
     productBook.value = book;
   }, { immediate: true });
 
+  let deliveryLoadGeneration = 0;
   watch(view, page => {
+    const deliveryLoad = ++deliveryLoadGeneration;
     closeHeaderCategoryMenu();
 
     if (page === 'checkout') {
       delivery.value = { name: '', phone: '', postalCode: '', address: '', addressDetail: '' };
+      loadSavedDelivery(deliveryLoad);
       prepareCheckout();
     }
   }, { immediate: true });
 
+  async function loadSavedDelivery(generation) {
+    if (!auth.initialized) await auth.fetchMe();
+    if (generation !== deliveryLoadGeneration || view.value !== 'checkout' || !auth.isAuthenticated) return;
+    try {
+      const { data } = await http.get('/api/v1/members/me/addresses');
+      if (generation !== deliveryLoadGeneration || view.value !== 'checkout' || !auth.isAuthenticated) return;
+      // Do not overwrite information entered while the saved address was loading.
+      if (Object.values(delivery.value).some(value => String(value || '').trim())) return;
+      const address = data.find(item => item.is_default) || data[0];
+      if (address) delivery.value = {
+        name: address.receiver || '', phone: address.phone || '', postalCode: address.zipcode || '',
+        address: address.address1 || '', addressDetail: address.address2 || '',
+      };
+    } catch (error) {
+      if (generation === deliveryLoadGeneration && view.value === 'checkout') showToast('저장된 배송지를 불러오지 못했습니다. 배송 정보를 직접 입력해 주세요.');
+    }
+  }
   function openProduct(book) {
     const product = typeof book === 'string' ? findBook(book) : book;
     if (!product) return;
@@ -680,18 +679,23 @@ export function useStorefront() {
     const title = typeof book === 'string' ? book : book.title;
     const index = cart.value.findIndex(item => (typeof item === 'string' ? item : item.title) === title);
     if (index >= 0) {
-      showToast('이미 장바구니에 담긴 도서입니다.');
+      openCartDialog(title, true);
       return;
     }
     cart.value = [...cart.value, { title, quantity: 1 }];
     selectedCart.value = new Set(cart.value.map((_, itemIndex) => itemIndex));
-    localStorage.setItem('bookjjeok-cart', JSON.stringify(cart.value));
+    persistCart();
+    openCartDialog(title);
+  }
+  function openCartDialog(title, duplicate = false) {
     cartDialogTrigger = document.activeElement;
+    cartAlreadyAdded.value = duplicate;
     addedCartTitle.value = title;
     nextTick(() => cartDialog.value?.querySelector('button')?.focus());
   }
   function closeCartDialog(goToCart = false) {
     addedCartTitle.value = '';
+    cartAlreadyAdded.value = false;
     if (goToCart) {
       navigate('cart');
     } else nextTick(() => cartDialogTrigger?.focus());
@@ -724,7 +728,7 @@ export function useStorefront() {
     });
     cart.value = remaining;
     selectedCart.value = remainingSelection;
-    localStorage.setItem('bookjjeok-cart', JSON.stringify(remaining));
+    persistCart();
     cartDeleteTargets.value = null;
     cartDeleteComplete.value = true;
     nextTick(() => cartDialog.value?.querySelector('button')?.focus());
@@ -736,7 +740,7 @@ export function useStorefront() {
   function removeCart(index) { requestCartDelete([index], 'single'); }
   function toggleCartItem(index) { const next = new Set(selectedCart.value); next.has(index) ? next.delete(index) : next.add(index); selectedCart.value = next; }
   function removeAllCart() { requestCartDelete(cart.value.map((_, index) => index), 'all'); }
-  function updateCartQuantity(index, quantity) { cart.value = cart.value.map((item, itemIndex) => itemIndex === index ? { title: typeof item === 'string' ? item : item.title, quantity: Math.max(1, Number(quantity)) } : item); localStorage.setItem('bookjjeok-cart', JSON.stringify(cart.value)); }
+  function updateCartQuantity(index, quantity) { cart.value = cart.value.map((item, itemIndex) => itemIndex === index ? { title: typeof item === 'string' ? item : item.title, quantity: Math.max(1, Number(quantity)) } : item); persistCart(); }
   function effectivePrice(book) { return Number(productByTitle.value.get(book.title)?.price ?? book.price); }
   function tossCustomerKey() {
     let key = localStorage.getItem('toss-customer-key');
@@ -782,8 +786,8 @@ export function useStorefront() {
   }
   async function submitTossPayment() {
     if (!checkoutReady.value || checkoutSubmitting.value) return;
-    if (!delivery.value.name.trim() || !delivery.value.phone.trim() || !delivery.value.address.trim() || !delivery.value.addressDetail.trim()) {
-      showToast('받는 분, 연락처, 주소와 상세주소를 입력해 주세요.');
+    if (!delivery.value.name.trim() || !delivery.value.phone.trim() || !delivery.value.address.trim()) {
+      showToast('받는 분, 연락처와 주소를 입력해 주세요.');
       return;
     }
     if (!/^\d{5}$/.test(delivery.value.postalCode.trim())) {
@@ -813,9 +817,10 @@ export function useStorefront() {
         };
         orderHistory.value = [lastOrder.value, ...orderHistory.value];
         localStorage.setItem('bookjjeok-orders', JSON.stringify(orderHistory.value));
-        localStorage.removeItem('bookjjeok-cart');
-        cart.value = [];
-        selectedCart.value = new Set();
+        const purchased = new Set(selectedCartBooks.value.map(book => book.title));
+        cart.value = cart.value.filter(item => !purchased.has(item.title));
+        selectedCart.value = new Set(cart.value.map((_, index) => index));
+        persistCart();
         navigate('orderComplete');
         return;
       }
@@ -942,8 +947,8 @@ export function useStorefront() {
 
   return {
     view, searchQuery, showBookSearchResults, categoryGroups, selectedMajor, selectedSub, selectedGroup, availableSubcategories, homeCategories, selectedHomeCategory, homeSort, domesticSortOptions, domesticSortByCategory, categorySort, headerCategoryMenu, closeHeaderCategoryMenu, closeHeaderCategoryMenuOnBlur, selectHeaderCategory, postalOpen, postalKeyword, postalResults, postalPage, postalLoading, postalMessage, searchPostal, selectPostal,
-    activeBanner, banners, wishlist, canWish, cart, cartBooks, selectedCart, selectedCartBooks, cartSubtotal, cartDiscount, cartTotal, checkoutTotal, checkoutReady, checkoutMessage, checkoutLoading, checkoutSubmitting, checkoutCoupons, selectedCouponId, selectedCoupon, couponDiscount, couponLoading, couponError, checkoutAuthenticated: computed(() => auth.isAuthenticated), delivery, paymentMethod, checkoutPaymentMode, effectivePrice, allBooks, homeBooks, newBooks, themeShelves, domesticCategories, activeDomesticCategory, domesticSort, domesticBooks, categoryBooks, curatedBooks, bestSellerBooks, lastOrder, orderHistory, myProfile, profileDraft, isEditingProfile, catalogLoading,
-    curationNotes, productBook, productPanel, productDetail, productDetailStatus, publishedContents, productIntroduction, productReviews, reviewStats, ratingCount, reviewCount, reviewSort, reviewRating, reviewPage, reviewsStatus, reviewDraft, reviewMessage, reviewSubmitting, loadProductReviews, submitProductReview, toastMessage, addedCartTitle, cartDialog, closeCartDialog, trapCartDialogFocus, cartDeleteTargets, cartDeleteMode, cartDeleteComplete, closeCartDelete, confirmCartDelete, closeCartDeleteComplete, showBookForm, editingBookId, bookForm, formSubcategories,
+    activeBanner, banners, wishlist, canWish, cart, cartBooks, selectedCart, selectedCartBooks, cartSubtotal, cartDiscount, cartTotal, checkoutTotal, checkoutReady, checkoutMessage, checkoutLoading, checkoutSubmitting, checkoutCoupons, selectedCouponId, selectedCoupon, couponDiscount, couponLoading, couponError, checkoutAuthenticated: computed(() => auth.isAuthenticated), delivery, paymentMethod, checkoutPaymentMode, effectivePrice, allBooks, homeBooks, newBooks, themeShelves, domesticCategories, activeDomesticCategory, domesticSort, domesticBooks, categoryBooks, curatedBooks, bestSellerBooks, lastOrder, orderHistory, myProfile, profileDraft, isEditingProfile, catalogLoading, catalogError,
+    curationNotes, productBook, productPanel, productDetail, productDetailStatus, publishedContents, productIntroduction, productReviews, reviewStats, ratingCount, reviewCount, reviewSort, reviewRating, reviewPage, reviewsStatus, reviewDraft, reviewMessage, reviewSubmitting, loadProductReviews, submitProductReview, toastMessage, addedCartTitle, cartAlreadyAdded, cartDialog, closeCartDialog, trapCartDialogFocus, cartDeleteTargets, cartDeleteMode, cartDeleteComplete, closeCartDelete, confirmCartDelete, closeCartDeleteComplete, showBookForm, editingBookId, bookForm, formSubcategories,
     adminQuery, adminCategory, adminStock, adminBooks,
     adminUserId, adminPassword, rememberAdminId, showAdminPassword, adminLoginError, signupConsent, signupError, signupForm,
     adminTodayLabel, adminMetrics, adminProfile, workload, workloadMix, adminDonutStyle,

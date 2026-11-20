@@ -170,6 +170,18 @@ def send_message(
     return ChatMessageResponse.model_validate(message)
 
 
+@router.delete("/rooms/{room_id}", response_model=MessageResponse, summary="상담 삭제")
+async def delete_room(
+    room_id: int,
+    member: Member = Depends(get_current_member),
+    db: Session = Depends(get_db),
+):
+    ChatService(db).delete_room(room_id, member)
+    await manager.broadcast(room_id, {"type": "deleted", "room_id": room_id})
+    await manager.close_room_connections(room_id)
+    return MessageResponse(message="상담이 삭제되었습니다.")
+
+
 @router.post(
     "/rooms/{room_id}/close",
     response_model=MessageResponse,
