@@ -386,6 +386,7 @@ export function useStorefront() {
   const couponDiscount = computed(() => Number(selectedCoupon.value?.discount_amount || 0));
   const paymentMethod = ref('CARD');
   const checkoutPaymentMode = ref('toss');
+  const ordererEmail = ref(''); // 비회원 주문 조회에 쓰는 이메일
   const productByTitle = computed(() => new Map(backendProducts.value.map(product => [product.title, product])));
   const checkoutTotal = computed(() => selectedCartBooks.value.reduce((sum, book) => {
     const product = productByTitle.value.get(book.title);
@@ -775,7 +776,13 @@ export function useStorefront() {
         catch (error) { couponError.value = error.userMessage || '쿠폰을 불러오지 못했습니다.'; }
         finally { couponLoading.value = false; }
       }
-      checkoutMessage.value = '현재 결제 연결을 점검 중입니다. 주문은 아직 접수되지 않았습니다.';
+      // 백엔드 결제 설정(mock/toss)을 확인한 뒤 결제 버튼을 활성화한다.
+      // 결제 설정을 못 불러와도 결제 버튼은 막지 않는다(기본값: 토스 테스트 결제).
+      let mode = null;
+      try { mode = await storefrontApi.getPaymentMode(); } catch { mode = null; }
+      checkoutPaymentMode.value = mode?.mode === 'mock' ? 'mock' : 'toss';
+      checkoutMessage.value = '';
+      checkoutReady.value = true;
     } catch (error) {
       checkoutMessage.value = error.message || '주문 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.';
     } finally {
@@ -786,6 +793,47 @@ export function useStorefront() {
     if (!selectedCartBooks.value.length) return;
     navigate('checkout');
   }
+  // 결제가 끝난 주문을 완료 화면에 보여주고, 산 책을 장바구니에서 뺀다.
+  function completeOrder(pending, statusLabel) {
+    lastOrder.value = { id: pending.orderNo, books: pending.books, total: pending.total, profile: pending.profile, status: statusLabel };
+    orderHistory.value = [lastOrder.value, ...orderHistory.value];
+    localStorage.setItem('bookjjeok-orders', JSON.stringify(orderHistory.value));
+    const purchased = new Set(pending.books.map(book => book.title));
+    cart.value = cart.value.filter(item => !purchased.has(typeof item === 'string' ? item : item.title));
+    selectedCart.value = new Set(cart.value.map((_, index) => index));
+    persistCart();
+    sessionStorage.removeItem('bookjjeok-pending-order');
+    if (view.value !== 'orderComplete') navigate('orderComplete');
+  }
+  // 토스 결제창에서 돌아왔을 때(successUrl / failUrl) 처리한다.
+  let tossHandled = '';
+  async function finishTossPayment() {
+    const q = route.query;
+    const key = `${q.toss}|${q.paymentKey || q.code || ''}`;
+    if (!q.toss || tossHandled === key) return;
+    tossHandled = key;
+    let pending = null;
+    try { pending = JSON.parse(sessionStorage.getItem('bookjjeok-pending-order') || 'null'); } catch { pending = null; }
+    const cleanQuery = () => router.replace({ query: {} });
+    if (q.toss === 'fail') {
+      sessionStorage.removeItem('bookjjeok-pending-order');
+      showToast(q.message ? `결제가 취소되었어요: ${q.message}` : '결제가 취소되었어요.');
+      cleanQuery();
+      return;
+    }
+    if (!pending || !q.paymentKey) { showToast('결제 정보를 확인할 수 없어요. 주문 내역을 확인해 주세요.'); cleanQuery(); return; }
+    try {
+      await storefrontApi.payOrder(pending.orderDbId, {
+        payment_key: String(q.paymentKey), order_no: String(q.orderId), amount: Number(q.amount)
+      }, pending.guestToken);
+      completeOrder(pending, '결제 완료');
+    } catch (error) {
+      showToast(error.message || '결제 승인에 실패했어요. 고객센터로 문의해 주세요.');
+    } finally {
+      cleanQuery();
+    }
+  }
+  watch(() => route.query.toss, value => { if (value) finishTossPayment(); }, { immediate: true });
   async function submitTossPayment() {
     if (!checkoutReady.value || checkoutSubmitting.value) return;
     if (!delivery.value.name.trim() || !delivery.value.phone.trim() || !delivery.value.address.trim()) {
@@ -796,67 +844,60 @@ export function useStorefront() {
       showToast('우편번호 5자리를 입력해 주세요.');
       return;
     }
+    if (!auth.isAuthenticated && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(ordererEmail.value.trim())) {
+      showToast('비회원 주문 조회에 사용할 이메일을 입력해 주세요.');
+      return;
+    }
     checkoutSubmitting.value = true;
     try {
+      const member = auth.isAuthenticated ? auth.user : null;
+      const order = await storefrontApi.createOrder({
+        items: selectedCartBooks.value.map(book => ({
+          book_id: Number(productByTitle.value.get(book.title).id),
+          quantity: book.quantity
+        })),
+        orderer_name: (member?.name || delivery.value.name).trim(),
+        orderer_phone: (member?.phone || delivery.value.phone).trim(),
+        orderer_email: member ? member.email : ordererEmail.value.trim(),
+        receiver: delivery.value.name.trim(),
+        receiver_phone: delivery.value.phone.trim(),
+        zipcode: delivery.value.postalCode.trim(),
+        address1: delivery.value.address.trim(),
+        address2: (delivery.value.addressDetail || '').trim() || null,
+        member_coupon_id: member && selectedCouponId.value ? Number(selectedCouponId.value) : null,
+        payment_method: paymentMethod.value === 'TRANSFER' ? 'TRANSFER' : 'CARD'
+      });
+      const guestToken = order.guest_order_token || null;
+      const pendingOrder = {
+        orderDbId: order.order_id,
+        orderNo: order.order_no,
+        guestToken,
+        books: selectedCartBooks.value.map(book => ({ ...book, price: effectivePrice(book) })),
+        total: Number(order.total_amount),
+        profile: { ...delivery.value }
+      };
+
       if (checkoutPaymentMode.value === 'mock') {
-        const order = await storefrontApi.createOrder({
-          receiver_name: delivery.value.name.trim(),
-          receiver_phone: delivery.value.phone.trim(),
-          postal_code: delivery.value.postalCode.trim(),
-          address: [delivery.value.address.trim(), (delivery.value.addressDetail || '').trim()].filter(Boolean).join(' '),
-          payment_info: { method: 'test' },
-          items: selectedCartBooks.value.map(book => ({
-            product_id: productByTitle.value.get(book.title).id,
-            quantity: book.quantity
-          }))
-        });
-        lastOrder.value = {
-          id: order.order_number || order.id,
-          books: selectedCartBooks.value.map(book => ({ ...book, price: effectivePrice(book) })),
-          total: order.total,
-          profile: { ...delivery.value },
-          status: '데모 결제 완료'
-        };
-        orderHistory.value = [lastOrder.value, ...orderHistory.value];
-        localStorage.setItem('bookjjeok-orders', JSON.stringify(orderHistory.value));
-        const purchased = new Set(selectedCartBooks.value.map(book => book.title));
-        cart.value = cart.value.filter(item => !purchased.has(item.title));
-        selectedCart.value = new Set(cart.value.map((_, index) => index));
-        persistCart();
-        navigate('orderComplete');
+        // 테스트(mock) 모드: 백엔드 가상 결제로 바로 승인한다.
+        await storefrontApi.payOrder(order.order_id, {}, guestToken);
+        completeOrder(pendingOrder, '결제 완료');
         return;
       }
+
+      // 토스 결제창: 인증 후 successUrl로 돌아오면 finishTossPayment()가 승인 API를 호출한다.
       await loadTossPayments();
-      const order = await storefrontApi.createOrder({
-        receiver_name: delivery.value.name.trim(),
-        receiver_phone: delivery.value.phone.trim(),
-        postal_code: delivery.value.postalCode.trim(),
-        address: [delivery.value.address.trim(), (delivery.value.addressDetail || '').trim()].filter(Boolean).join(' '),
-        payment_info: { method: 'toss' },
-        items: selectedCartBooks.value.map(book => ({
-          product_id: productByTitle.value.get(book.title).id,
-          quantity: book.quantity
-        }))
-      });
-      const ready = await storefrontApi.getPaymentReady(order.id);
-      const pendingOrder = {
-        id: order.id,
-        orderNumber: order.order_number,
-        books: selectedCartBooks.value.map(book => ({ ...book, price: effectivePrice(book) })),
-        total: ready.amount,
-        profile: { ...delivery.value },
-        status: '결제 완료'
-      };
+      const ready = await storefrontApi.getPaymentReady(order.order_id, guestToken);
+      pendingOrder.total = ready.amount;
       sessionStorage.setItem('bookjjeok-pending-order', JSON.stringify(pendingOrder));
       const payment = window.TossPayments(ready.client_key).payment({ customerKey: tossCustomerKey() });
       await payment.requestPayment({
-        method: paymentMethod.value,
+        method: paymentMethod.value === 'TRANSFER' ? 'TRANSFER' : 'CARD',
         amount: { value: ready.amount, currency: 'KRW' },
         orderId: ready.order_id,
         orderName: ready.order_name,
         customerName: ready.customer_name,
-        successUrl: ready.success_url,
-        failUrl: ready.fail_url
+        successUrl: `${window.location.origin}/order-complete?toss=success`,
+        failUrl: `${window.location.origin}/checkout?toss=fail`
       });
     } catch (error) {
       sessionStorage.removeItem('bookjjeok-pending-order');
@@ -949,7 +990,7 @@ export function useStorefront() {
 
   return {
     view, searchQuery, showBookSearchResults, categoryGroups, selectedMajor, selectedSub, selectedGroup, availableSubcategories, homeCategories, selectedHomeCategory, homeSort, domesticSortOptions, domesticSortByCategory, categorySort, headerCategoryMenu, closeHeaderCategoryMenu, closeHeaderCategoryMenuOnBlur, selectHeaderCategory, postalOpen, postalKeyword, postalResults, postalPage, postalLoading, postalMessage, searchPostal, selectPostal,
-    activeBanner, banners, wishlist, canWish, cart, cartBooks, selectedCart, selectedCartBooks, cartSubtotal, cartDiscount, cartTotal, checkoutTotal, checkoutReady, checkoutMessage, checkoutLoading, checkoutSubmitting, checkoutCoupons, selectedCouponId, selectedCoupon, couponDiscount, couponLoading, couponError, checkoutAuthenticated: computed(() => auth.isAuthenticated), delivery, paymentMethod, checkoutPaymentMode, effectivePrice, allBooks, homeBooks, newBooks, themeShelves, domesticCategories, activeDomesticCategory, domesticSort, domesticBooks, categoryBooks, curatedBooks, bestSellerBooks, lastOrder, orderHistory, myProfile, profileDraft, isEditingProfile, catalogLoading, catalogError,
+    activeBanner, banners, wishlist, canWish, cart, cartBooks, selectedCart, selectedCartBooks, cartSubtotal, cartDiscount, cartTotal, checkoutTotal, checkoutReady, checkoutMessage, checkoutLoading, ordererEmail, checkoutSubmitting, checkoutCoupons, selectedCouponId, selectedCoupon, couponDiscount, couponLoading, couponError, checkoutAuthenticated: computed(() => auth.isAuthenticated), delivery, paymentMethod, checkoutPaymentMode, effectivePrice, allBooks, homeBooks, newBooks, themeShelves, domesticCategories, activeDomesticCategory, domesticSort, domesticBooks, categoryBooks, curatedBooks, bestSellerBooks, lastOrder, orderHistory, myProfile, profileDraft, isEditingProfile, catalogLoading, catalogError,
     curationNotes, productBook, productPanel, productDetail, productDetailStatus, publishedContents, productIntroduction, productReviews, reviewStats, ratingCount, reviewCount, reviewSort, reviewRating, reviewPage, reviewsStatus, reviewDraft, reviewMessage, reviewSubmitting, loadProductReviews, submitProductReview, toastMessage, addedCartTitle, cartAlreadyAdded, cartDialog, closeCartDialog, trapCartDialogFocus, cartDeleteTargets, cartDeleteMode, cartDeleteComplete, closeCartDelete, confirmCartDelete, closeCartDeleteComplete, showBookForm, editingBookId, bookForm, formSubcategories,
     adminQuery, adminCategory, adminStock, adminBooks,
     adminUserId, adminPassword, rememberAdminId, showAdminPassword, adminLoginError, signupConsent, signupError, signupForm,

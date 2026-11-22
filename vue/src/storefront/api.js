@@ -78,7 +78,13 @@ export const storefrontApi = Object.freeze({
       }))
     };
   },
-  getPaymentMode: () => request('/api/payments/mode'),
+  getPaymentMode: () => request('/api/v1/orders/payment-mode'),
   createOrder: order => request('/api/v1/orders', { method: 'POST', body: JSON.stringify(order) }),
-  getPaymentReady: orderId => request(`/api/payments/toss/${encodeURIComponent(orderId)}/ready`)
+  // 비회원 주문은 주문 생성 응답의 guest_order_token을 X-Guest-Order-Token 헤더로 보내야 한다.
+  getPaymentReady: (orderId, guestToken) => request(`/api/v1/orders/${encodeURIComponent(orderId)}/payment-ready`, {
+    headers: guestToken ? { 'X-Guest-Order-Token': guestToken } : {}
+  }),
+  payOrder: (orderId, body = {}, guestToken) => request(`/api/v1/orders/${encodeURIComponent(orderId)}/pay`, {
+    method: 'POST', body: JSON.stringify(body), headers: guestToken ? { 'X-Guest-Order-Token': guestToken } : {}
+  })
 });

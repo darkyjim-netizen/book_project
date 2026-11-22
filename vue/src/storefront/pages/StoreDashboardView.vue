@@ -1,14 +1,14 @@
 <template>
 <section class="admin-dashboard db-dashboard">
   <div class="dashboard-content">
-    <form v-if="!member && !checking" class="dashboard-card admin-auth" @submit.prevent="login"><h1>관리자 로그인</h1><label>이메일<input v-model.trim="email" type="email" required autocomplete="username" /></label><label>비밀번호<input v-model="password" type="password" required autocomplete="current-password" /></label><button class="primary" type="submit">로그인</button><p v-if="error" role="alert" class="admin-error">{{ error }}</p></form>
+    <form v-if="!member && !checking" class="dashboard-card admin-auth" @submit.prevent="login"><h1>관리자 로그인</h1><label>이메일<input v-model.trim="email" type="email" required autocomplete="username" /></label><label>비밀번호<input v-model="password" type="password" required autocomplete="current-password" /></label><button class="primary" type="submit">로그인</button><p v-if="error" role="alert" class="admin-error" style="white-space: pre-line">{{ error }}</p></form>
     <p v-else-if="checking">관리자 권한 확인 중...</p>
     <template v-else>
       <div class="admin-workspace">
       <aside class="admin-side"><p class="admin-side-kicker">북적북적 관리자</p><h1>운영 관리</h1><p class="admin-side-label">AI 분석</p><nav aria-label="AI 분석"><button v-for="item in analysisTabs" :key="item.id" type="button" :aria-current="tab === item.id ? 'page' : null" @click="changeTab(item.id)">{{ item.label }} <span aria-hidden="true">›</span></button></nav><p class="admin-side-label admin-side-group">관리 메뉴</p><nav aria-label="관리 메뉴"><button v-for="item in tabs" :key="item.id" type="button" :aria-current="tab === item.id ? 'page' : null" @click="changeTab(item.id)">{{ item.label }} <span aria-hidden="true">›</span></button></nav></aside>
       <div class="admin-workspace-main">
       <div class="admin-section-heading" :class="{ 'overview-heading': tab === 'overview' }"><div><span>{{ analysisTabs.some(item => item.id === tab) ? 'AI 분석' : '운영 현황' }}</span><h2>{{ [...analysisTabs, ...tabs].find(item => item.id === tab)?.label }}</h2></div><div class="management-refresh"><button type="button" :disabled="refreshBusy" @click="refreshCurrent">새로고침</button></div></div>
-      <p v-if="error" role="alert" class="admin-error">{{ error }}</p><p v-if="loading">데이터를 불러오는 중입니다...</p>
+      <p v-if="error" role="alert" class="admin-error" style="white-space: pre-line">{{ error }}</p><p v-if="loading">데이터를 불러오는 중입니다...</p>
       <AdminOperations ref="operationsPanel" v-if="extraTabs.includes(tab)" :section="tab" />
       <AdminAnalysis ref="analysisPanel" v-if="analysisTabs.some(item => item.id === tab)" :section="tab" @show-reviews="changeTab('reviews')" />
       <template v-if="tab === 'overview' && overview && !loading">
