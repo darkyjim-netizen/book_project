@@ -177,29 +177,8 @@ def change_password(
     return MessageResponse(message="비밀번호가 변경되었습니다.")
 
 
-@router.post(
-    "/password/reset",
-    response_model=dict,
-    summary="임시 비밀번호 발급",
-)
-def reset_password(payload: PasswordResetRequest, db: Session = Depends(get_db)):
-    """임시 비밀번호를 발급한다."""
-
-    # 서비스가 임시 비밀번호를 생성하고 해시 형태로 DB에 저장한다.
-    temp = AuthService(db).issue_temp_password(payload.email)
-
-    body = {
-        "message": "임시 비밀번호가 발급되었습니다. 메일을 확인해 주세요."
-    }
-
-    # 개발 환경에서는 확인하기 편하도록 응답에 임시 비밀번호를 포함한다.
-    # 운영 환경에서는 응답에 넣지 않고 메일 등 별도 전달 방식을 사용한다.
-    if not settings.is_production:
-        body["temp_password"] = temp
-
-    return body
-
-
+# 비밀번호 찾기(임시 비밀번호 발급) API는 메일 발송 없이 이메일만으로 남의 비밀번호를
+# 바꿀 수 있어 보안상 제거했다. 로그인 5회 실패 시 정지 + 관리자 해제로 대체한다.
 @router.post(
     "/withdraw",
     response_model=MessageResponse,
