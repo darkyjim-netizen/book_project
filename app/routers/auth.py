@@ -53,6 +53,18 @@ def check_email(email: str, db: Session = Depends(get_db)):
     # 사용자가 확인한 이메일과 사용 가능 여부를 반환한다.
     return {"email": email, "available": available}
 
+@router.get(
+    "/check-nickname",
+    response_model=dict,
+    summary="닉네임 중복 확인",
+)
+def check_nickname(nickname: str, db: Session = Depends(get_db)):
+    """닉네임을 사용할 수 있는지 확인한다."""
+
+    available = AuthService(db).check_nickname_available(nickname)
+
+    # 사용자가 확인한 닉네임과 사용 가능 여부를 반환한다.
+    return {"nickname": nickname, "available": available}
 
 @router.post(
     "/login",

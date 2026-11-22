@@ -36,7 +36,6 @@ from app.models.cart import Cart, CartItem, Wishlist  # noqa: F401
 # 모델에서 공통으로 사용하는 상태와 유형
 from app.models.enums import (  # noqa: F401
     BookStatus,
-    ChatRoomStatus,
     CouponType,
     GenderType,
     MemberRole,
@@ -74,10 +73,8 @@ from app.models.order import (  # noqa: F401
 from app.models.promotion import Banner, Coupon, MemberCoupon  # noqa: F401
 from app.models.review import Review, ReviewImage, ReviewLike, ReviewSentiment  # noqa: F401
 
-# 공지, 문의, FAQ와 상담 채팅
+# 공지, 문의, FAQ
 from app.models.support import (  # noqa: F401
-    ChatMessage,
-    ChatRoom,
     Faq,
     Notice,
     NoticeAttachment,
@@ -93,7 +90,7 @@ __all__ = [
     "Cart", "CartItem", "Wishlist",
     "Order", "OrderItem", "Payment", "PaymentLog", "Refund", "Shipment", "ShipmentTracking",
     "Review", "ReviewImage", "ReviewLike", "ReviewSentiment",
-    "Notice", "NoticeAttachment", "QnaQuestion", "QnaAnswer", "Faq", "ChatRoom", "ChatMessage",
+    "Notice", "NoticeAttachment", "QnaQuestion", "QnaAnswer", "Faq",
     "Coupon", "MemberCoupon", "Banner",
     "ModelRun", "Recommendation", "BookSimilarity", "SalesDaily", "SalesForecast",
     "CustomerSegment", "ChurnPrediction", "AssociationRule",

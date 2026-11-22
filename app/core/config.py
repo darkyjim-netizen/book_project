@@ -103,6 +103,7 @@ class Settings(BaseSettings):
     CHURN_THRESHOLD_HIGH: float = 0.7            # 고객 이탈 위험을 높음으로 판단하는 점수 기준
     CHURN_THRESHOLD_MID: float = 0.4             # 고객 이탈 위험을 중간으로 판단하는 점수 기준
     CHURN_INACTIVE_DAYS: int = 90                 # 이탈 분석에 사용할 비활성 기간 기준
+    CHURN_MIN_TENURE_DAYS: int = 90               # 가입 후 이 기간이 지나지 않은 신규 회원은 이탈 분석에서 제외
 
     # ----------------------------------------------------------------- 로깅
     LOG_LEVEL: str = "INFO"  # 로그를 어느 수준부터 남길지 정하는 값

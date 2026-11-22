@@ -192,7 +192,6 @@ class DashboardKpi(BaseModel):
     today_members: int  # 오늘 가입한 회원 수
     today_reviews: int  # 오늘 작성된 리뷰 수
     waiting_qna: int  # 답변을 기다리는 Q&A 수
-    open_chats: int  # 진행 중인 1:1 상담 수
     low_stock_books: int  # 재고가 부족한 도서 수
     sales_change_rate: float = 0.0  # 이전 비교 기간 대비 매출 변화율
     order_change_rate: float = 0.0  # 이전 비교 기간 대비 주문 수 변화율

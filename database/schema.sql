@@ -46,7 +46,6 @@ CREATE TYPE shipment_status  AS ENUM ('READY', 'PICKED', 'IN_TRANSIT', 'OUT_FOR_
                                       'DELIVERED', 'FAILED', 'RETURNING');
 CREATE TYPE sentiment_label  AS ENUM ('POSITIVE', 'NEUTRAL', 'NEGATIVE');
 CREATE TYPE qna_status       AS ENUM ('WAITING', 'ANSWERED', 'CLOSED');
-CREATE TYPE chat_room_status AS ENUM ('OPEN', 'ASSIGNED', 'CLOSED');
 CREATE TYPE coupon_type      AS ENUM ('AMOUNT', 'PERCENT', 'FREESHIP');
 CREATE TYPE point_reason     AS ENUM ('ORDER_SAVE', 'ORDER_USE', 'REVIEW', 'EVENT',
                                       'ADMIN_ADJUST', 'EXPIRE', 'CANCEL_RESTORE');
@@ -354,7 +353,9 @@ CREATE TABLE shop.orders (
 CREATE INDEX idx_orders_member   ON shop.orders(member_id, ordered_at DESC);
 CREATE INDEX idx_orders_status   ON shop.orders(status, ordered_at DESC);
 CREATE INDEX idx_orders_date     ON shop.orders(ordered_at DESC);
-CREATE INDEX idx_orders_paid_day ON shop.orders((ordered_at::date)) WHERE status <> 'CANCELLED';
+-- timestamptz::date는 세션 시간대에 따라 값이 달라져 인덱스 식으로 쓸 수 없다(PostgreSQL 16 오류).
+-- 한국 시간 기준 날짜로 고정해 만든다. (대시보드의 일별 집계도 Asia/Seoul 기준)
+CREATE INDEX idx_orders_paid_day ON shop.orders(((ordered_at AT TIME ZONE 'Asia/Seoul')::date)) WHERE status <> 'CANCELLED';
 
 CREATE TABLE shop.order_items (
     order_item_id   BIGSERIAL PRIMARY KEY,
@@ -403,7 +404,7 @@ CREATE TABLE log.payment_logs (
     action          VARCHAR(40) NOT NULL,
     request_body    JSONB,
     response_body   JSONB,
-    result_code     VARCHAR(20),
+    result_code     VARCHAR(50),
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -559,36 +560,6 @@ CREATE TABLE shop.faqs (
     is_active       BOOLEAN NOT NULL DEFAULT true,
     view_count      INTEGER NOT NULL DEFAULT 0
 );
-
-CREATE TABLE shop.chat_rooms (
-    room_id         BIGSERIAL PRIMARY KEY,
-    room_uuid       UUID NOT NULL DEFAULT gen_random_uuid(),
-    member_id       BIGINT NOT NULL REFERENCES shop.members(member_id) ON DELETE CASCADE,
-    agent_id        BIGINT REFERENCES shop.members(member_id),
-    subject         VARCHAR(200) NOT NULL DEFAULT '1:1 문의',
-    status          chat_room_status NOT NULL DEFAULT 'OPEN',
-    last_message    VARCHAR(500),
-    last_message_at TIMESTAMPTZ,
-    unread_user     INTEGER NOT NULL DEFAULT 0,
-    unread_agent    INTEGER NOT NULL DEFAULT 0,
-    satisfaction    SMALLINT,
-    created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
-    closed_at       TIMESTAMPTZ
-);
-CREATE INDEX idx_chat_rooms_member ON shop.chat_rooms(member_id, created_at DESC);
-CREATE INDEX idx_chat_rooms_status ON shop.chat_rooms(status, last_message_at DESC);
-
-CREATE TABLE shop.chat_messages (
-    message_id      BIGSERIAL PRIMARY KEY,
-    room_id         BIGINT NOT NULL REFERENCES shop.chat_rooms(room_id) ON DELETE CASCADE,
-    sender_id       BIGINT REFERENCES shop.members(member_id),
-    sender_type     VARCHAR(10) NOT NULL DEFAULT 'USER',
-    content         TEXT NOT NULL,
-    attachment_url  VARCHAR(255),
-    is_read         BOOLEAN NOT NULL DEFAULT false,
-    created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-CREATE INDEX idx_chat_msg_room ON shop.chat_messages(room_id, created_at);
 
 -- =============================================================================
 -- 7. 프로모션 (쿠폰 / 포인트 / 배너)
@@ -936,7 +907,6 @@ SELECT
     (SELECT COUNT(*) FROM shop.members WHERE created_at::date = CURRENT_DATE)                     AS today_members,
     (SELECT COUNT(*) FROM shop.reviews WHERE created_at::date = CURRENT_DATE)                      AS today_reviews,
     (SELECT COUNT(*) FROM shop.qna_questions WHERE status = 'WAITING')                             AS waiting_qna,
-    (SELECT COUNT(*) FROM shop.chat_rooms WHERE status = 'OPEN')                                   AS open_chats,
     (SELECT COUNT(*) FROM shop.books WHERE stock_qty <= safety_stock AND status = 'SALE')          AS low_stock_books;
 
 -- =============================================================================

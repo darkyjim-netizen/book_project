@@ -40,6 +40,9 @@ except ImportError:  # scikit-learn이 설치되지 않은 경우
 
 # 이탈 예측 모델에 입력할 피처 이름이다.
 # 순서는 모델 학습과 예측에서 동일하게 유지해야 한다.
+# 주의: last_login_at·grade_id는 '현재' 값만 저장돼 있어 과거 시점(cutoff) 기준으로
+# 계산할 수 없다. 학습에 넣으면 cutoff 이후 행동(재구매 → 로그인·등급 상승)이 새어 들어가
+# AUC는 비정상적으로 높고 실제 예측은 대부분 '높음'이 되므로 피처에서 제외한다.
 CHURN_FEATURES = [
     "order_cnt",           # 주문 횟수
     "total_amount_log",    # 누적 구매 금액
@@ -47,10 +50,8 @@ CHURN_FEATURES = [
     "distinct_books",      # 구매한 도서 종류 수
     "review_cnt",          # 작성한 리뷰 수
     "recency_days",        # 마지막 구매 후 지난 일수
-    "login_recency_days",  # 마지막 로그인 후 지난 일수
     "tenure_days",         # 가입 후 지난 일수
     "order_per_month",     # 가입 기간 기준 월평균 주문 횟수
-    "grade_id",            # 회원 등급 번호
 ]
 
 
@@ -497,11 +498,21 @@ class ChurnPredictor:
         이 SQL은 학습과 현재 회원 예측에서 공통으로 사용한다.
         """
         return """
-            -- cutoff 이전에 가입한 탈퇴 회원이 아닌 회원을 분석 대상으로 삼는다.
+            -- 분석 대상: 탈퇴하지 않았고,
+            --   (1) cutoff 기준 가입 후 min_tenure일 이상 지났으며 (신규 회원 제외)
+            --   (2) cutoff 이전에 한 번 이상 구매한 회원 (가입만 한 회원은 '미구매'로 보고 제외)
             WITH base AS (
                 SELECT m.member_id, m.created_at, m.grade_id, m.last_login_at
                   FROM shop.members m
-                 WHERE m.status <> 'WITHDRAWN' AND m.created_at < :cutoff
+                 WHERE m.status <> 'WITHDRAWN'
+                   AND m.created_at < :cutoff - make_interval(days => CAST(:min_tenure AS int))
+                   AND EXISTS (
+                       SELECT 1
+                         FROM shop.orders o0
+                        WHERE o0.member_id = m.member_id
+                          AND o0.ordered_at < :cutoff
+                          AND o0.status IN ('PAID','PREPARING','SHIPPING','DELIVERED','CONFIRMED')
+                   )
             ),
 
             -- cutoff 이전의 구매 기록을 회원별로 요약한다.
@@ -549,7 +560,9 @@ class ChurnPredictor:
                        AS recency_days,
 
                    -- 마지막 로그인 날짜가 없으면 가입일을 기준으로 계산한다.
-                   EXTRACT(DAY FROM :cutoff - COALESCE(b.last_login_at, b.created_at))::int
+                   -- last_login_at은 '현재' 값이라 학습 기준일(cutoff)보다 미래일 수 있다.
+                   -- 그대로 쓰면 음수가 되어 학습과 예측의 기준이 어긋나므로 0으로 자른다.
+                   GREATEST(EXTRACT(DAY FROM :cutoff - COALESCE(b.last_login_at, b.created_at))::int, 0)
                        AS login_recency_days,
 
                    -- 가입 기간은 최소 1일로 설정해 0으로 나누는 것을 막는다.
@@ -582,13 +595,11 @@ class ChurnPredictor:
             float(row["distinct_books"]),
             float(row["review_cnt"]),
             float(row["recency_days"]),
-            float(row["login_recency_days"]),
             tenure,
 
             # 가입 기간을 고려한 월평균 주문 횟수
             order_cnt / (tenure / 30.0),
 
-            float(row["grade_id"]),
         ]
 
     def load_training_data(self, observation_days: Optional[int] = None):
@@ -601,7 +612,8 @@ class ChurnPredictor:
 
         # cutoff 당시 회원 상태와 그 이후 구매 여부를 조회한다.
         rows = self.db.execute(
-            text(self._feature_sql()), {"cutoff": cutoff}
+            text(self._feature_sql()),
+            {"cutoff": cutoff, "min_tenure": settings.CHURN_MIN_TENURE_DAYS}
         ).mappings().all()
 
         # 모델 입력값(X), 정답(y), 회원 ID를 각각 목록으로 분리한다.
@@ -616,7 +628,8 @@ class ChurnPredictor:
 
         # 현재 날짜를 cutoff로 전달한다.
         rows = self.db.execute(
-            text(self._feature_sql()), {"cutoff": now}
+            text(self._feature_sql()),
+            {"cutoff": now, "min_tenure": settings.CHURN_MIN_TENURE_DAYS}
         ).mappings().all()
 
         x = [self._to_vector(dict(r)) for r in rows]
@@ -669,6 +682,12 @@ class ChurnPredictor:
             metrics = self._fit_sklearn(scaled, target)
         else:  # scikit-learn이 없으면 NumPy로 직접 학습한다.
             metrics = self._fit_numpy(scaled, target)
+
+        # class_weight="balanced"로 학습하면 이탈/비이탈을 50:50으로 본 확률이 나와
+        # 실제 이탈 비율보다 확률이 크게 부풀려진다. 절편을 실제 비율 기준으로 되돌린다.
+        churn_ratio = float(target.mean())
+        if 0 < churn_ratio < 1:
+            self.bias += math.log(churn_ratio / (1 - churn_ratio))
 
         # 학습 결과에 데이터 건수와 이탈 회원 비율을 추가한다.
         metrics.update(
@@ -895,7 +914,16 @@ class ChurnPredictor:
         """계산한 이탈 예측 결과를 데이터베이스에 저장한다."""
         import json
 
-        if not predictions:
+        # 이번 분석 대상에서 빠진 회원(신규·미구매·탈퇴)의 예전 예측 결과는 지운다.
+        keep_ids = [p["member_id"] for p in predictions]
+        if keep_ids:
+            self.db.execute(
+                text("DELETE FROM ai.churn_predictions WHERE NOT (member_id = ANY(:ids))"),
+                {"ids": keep_ids},
+            )
+        else:
+            self.db.execute(text("DELETE FROM ai.churn_predictions"))
+            self.db.commit()
             return 0
 
         # SQL에 넣을 수 있도록 각 예측 결과를 파라미터 딕셔너리로 변환한다.

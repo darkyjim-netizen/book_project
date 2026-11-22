@@ -275,3 +275,10 @@ class OrderStatusUpdateRequest(BaseModel):
 
     status: str  # 변경할 주문 상태
     memo: Optional[str] = None  # 상태 변경 관련 메모
+
+
+class GuestOrderLookupRequest(BaseModel):
+    """비회원 주문번호와 주문 시 입력한 이메일을 본문으로 받는다."""
+
+    order_no: str = Field(..., min_length=1, max_length=30)
+    email: EmailStr

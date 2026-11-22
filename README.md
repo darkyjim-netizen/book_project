@@ -245,13 +245,6 @@ AI 로직은 `app/ai/`에 있습니다. 관리자 API에서 학습·재계산 �
 | `GET` | `/faqs/categories` | FAQ 카테고리 | 공개 |
 | `POST` | `/faqs` | FAQ 등록(관리자) | 관리자 |
 | `DELETE` | `/faqs/{faq_id}` | FAQ 삭제(관리자) | 관리자 |
-| `POST` | `/chat/rooms` | 상담 시작 | 회원 |
-| `GET` | `/chat/rooms` | 내 상담 목록 | 회원 |
-| `GET` | `/chat/rooms/{room_id}` | 상담 상세 | 회원 |
-| `GET` | `/chat/rooms/{room_id}/messages` | 메시지 조회 | 회원 |
-| `POST` | `/chat/rooms/{room_id}/messages` | 메시지 전송(REST) | 회원 |
-| `POST` | `/chat/rooms/{room_id}/close` | 상담 종료 | 회원 |
-| `POST` | `/chat/rooms/{room_id}/satisfaction` | 상담 만족도 평가 | 회원 |
 
 #### AI·분석
 
@@ -305,9 +298,6 @@ AI 로직은 `app/ai/`에 있습니다. 관리자 API에서 학습·재계산 �
 | `POST` | `/admin/qna/{question_id}/answer` | 답변 등록 | 관리자 |
 | `POST` | `/admin/qna/{question_id}/close` | 문의 종료 | 관리자 |
 | `GET` | `/admin/qna/waiting-count` | 미답변 건수 | 관리자 |
-| `GET` | `/admin/chat/rooms` | 상담 목록 | 관리자 |
-| `POST` | `/admin/chat/rooms/{room_id}/assign` | 상담원 배정 | 관리자 |
-| `GET` | `/admin/chat/stats` | 상담 통계 | 관리자 |
 
 #### 시스템
 
@@ -317,7 +307,6 @@ AI 로직은 `app/ai/`에 있습니다. 관리자 API에서 학습·재계산 �
 
 ### WebSocket 및 별도 경로
 
-- 실시간 상담은 `/api/v1/chat/ws/{room_id}`에 WebSocket으로 연결합니다. HTTP 방식의 채팅 메시지 조회·전송은 위 채팅 표를 참고하세요.
 - 서버 상태 확인은 위 표의 `GET /api/v1/health`와 별도 경로인 `GET /health`를 모두 사용할 수 있습니다.
 - `app/routers/payments_router.py`의 `/api/payments` 라우터는 현재 앱에 등록되어 있지 않습니다. 등록된 결제 API는 위 주문 표의 경로를 사용합니다.
 - 검색·도서 상세·공지·FAQ·관리 화면 등 서버 렌더링 페이지는 [페이지 라우터](app/routers/pages.py)에서 제공합니다.
@@ -388,7 +377,7 @@ AI 로직은 `app/ai/`에 있습니다. 관리자 API에서 학습·재계산 �
 
 | 메뉴 | 수정 내용 및 구현에 참고할 경로 |
 | --- | --- |
-| 홈과 고객지원 | 1:1 문의를 고객지원에 배치하고, 홈에서 바로가기 링크를 제공할 수 있습니다. 답변을 남기는 문의 게시판(`/api/v1/qna`)과 실시간 채팅(`/api/v1/chat/rooms`)은 별도 메뉴로 둡니다. 공지와 FAQ는 `/api/v1/notices`, `/api/v1/faqs`를 연결할 수 있습니다. |
+| 홈과 고객지원 | 1:1 문의를 고객지원에 배치하고, 홈에서 바로가기 링크를 제공할 수 있습니다. 답변을 남기는 문의 게시판(`/api/v1/qna`)을 둡니다. 공지와 FAQ는 `/api/v1/notices`, `/api/v1/faqs`를 연결할 수 있습니다. |
 | 추천과 리뷰 | 홈은 선정 도서에 찜한 분야를 반영하고, 마이페이지는 찜과 주문에서 관심 분야를 계산합니다. 도서 상세의 리뷰 요약은 브라우저에서 표현 빈도를 집계합니다. FastAPI 분석 결과를 표시하려면 `GET /api/v1/ai/recommendations`, `GET /api/v1/books/{book_id}/review-stats` 등의 응답을 화면에 연결합니다. |
 | 주문과 결제 | 현재 영수증은 테스트 결제를 표시합니다. 비회원 주문 조회는 회원 주문 내역과 별도 메뉴로 유지합니다. Vue가 사용하는 이메일 조회 링크 방식과 이 백엔드의 주문번호·이메일 조회(`GET /api/v1/orders/lookup`)는 요청 방식이 달라, 통합 시 사용할 흐름을 먼저 결정해야 합니다. |
 | 마이페이지와 인증 | 배송지·포인트·쿠폰·리뷰는 `/api/v1/members/me/` 아래의 API를 사용할 수 있습니다. 비밀번호 재설정 요청은 `POST /api/v1/auth/password/reset`의 처리 방식과 응답을 확인한 뒤 화면을 연결합니다. |

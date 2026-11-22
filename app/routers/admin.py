@@ -70,6 +70,50 @@ def purchase_demographics(
     return result
 
 
+@router.get("/dashboard/overview", summary="운영 대시보드 집계")
+def dashboard_overview(_admin: Member = Depends(require_admin), db: Session = Depends(get_db)):
+    """한국 시간 기준 일별 주문과 결제 완료 주문의 인구통계를 집계한다."""
+    totals = db.execute(text("""
+        SELECT (SELECT COALESCE(SUM(amount - COALESCE(cancelled_amount, 0)), 0)
+                FROM shop.payments WHERE status IN ('PAID', 'PARTIAL_CANCELLED')) AS total_sales,
+               (SELECT COUNT(*) FROM shop.members) AS member_count,
+               (SELECT COUNT(*) FROM shop.orders) AS order_count,
+               (SELECT COUNT(*) FROM shop.orders WHERE status = 'PAID') AS paid_orders,
+               (SELECT COUNT(*) FROM shop.books WHERE status = 'SALE' AND stock_qty > 0 AND stock_qty <= safety_stock) AS low_stock_books,
+               (SELECT COUNT(*) FROM shop.books WHERE status IN ('SALE', 'SOLDOUT') AND stock_qty <= 0) AS out_of_stock_books
+    """)).mappings().one()
+    daily = db.execute(text("""
+        SELECT (ordered_at AT TIME ZONE 'Asia/Seoul')::date AS day, COUNT(*) AS count
+        FROM shop.orders
+        WHERE ordered_at >= ((CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date - 6)::timestamp AT TIME ZONE 'Asia/Seoul'
+        GROUP BY 1 ORDER BY 1
+    """)).mappings().all()
+    age = db.execute(text("""
+        SELECT CASE WHEN m.birth_date IS NULL OR m.birth_date > (o.ordered_at AT TIME ZONE 'Asia/Seoul')::date THEN '미상'
+                    WHEN EXTRACT(YEAR FROM age((o.ordered_at AT TIME ZONE 'Asia/Seoul')::date, m.birth_date)) < 20 THEN '10대 이하'
+                    WHEN EXTRACT(YEAR FROM age((o.ordered_at AT TIME ZONE 'Asia/Seoul')::date, m.birth_date)) >= 60 THEN '60대 이상'
+                    ELSE (FLOOR(EXTRACT(YEAR FROM age((o.ordered_at AT TIME ZONE 'Asia/Seoul')::date, m.birth_date)) / 10) * 10)::int::text || '대' END AS label,
+               COUNT(*) AS count
+        FROM shop.orders o LEFT JOIN shop.members m ON m.member_id = o.member_id
+        WHERE o.status IN ('PAID', 'PREPARING', 'SHIPPING', 'DELIVERED', 'CONFIRMED')
+        GROUP BY 1 ORDER BY 1
+    """)).mappings().all()
+    region = db.execute(text("""
+        SELECT COALESCE(NULLIF(split_part(trim(address1), ' ', 1), ''), '미상') AS label, COUNT(*) AS count
+        FROM shop.orders WHERE status IN ('PAID', 'PREPARING', 'SHIPPING', 'DELIVERED', 'CONFIRMED')
+        GROUP BY 1 ORDER BY count DESC, label
+    """)).mappings().all()
+    return {"total_sales": int(totals["total_sales"]), "member_count": totals["member_count"],
+            "order_count": totals["order_count"], "paid_orders": totals["paid_orders"],
+            "low_stock_books": totals["low_stock_books"], "out_of_stock_books": totals["out_of_stock_books"], "daily_orders": [dict(row) for row in daily],
+            "age_groups": [dict(row) for row in age], "regions": [dict(row) for row in region]}
+
+
+# =============================================================================
+# 관리자 대시보드
+# =============================================================================
+
+
 @router.get(
     "/dashboard",
     response_model=DashboardResponse,
@@ -140,7 +184,6 @@ def dashboard(
         today_members=int(kpi_row.get("today_members") or 0),
         today_reviews=int(kpi_row.get("today_reviews") or 0),
         waiting_qna=int(kpi_row.get("waiting_qna") or 0),
-        open_chats=int(kpi_row.get("open_chats") or 0),
         low_stock_books=int(kpi_row.get("low_stock_books") or 0),
 
         # 어제 값이 0이면 나눗셈을 할 수 없으므로 증감률을 0으로 둔다.
@@ -239,15 +282,6 @@ def alerts(
                 '미답변 문의'
             FROM shop.qna_questions
             WHERE status = 'WAITING'
-
-            UNION ALL
-
-            SELECT
-                'OPEN_CHAT',
-                COUNT(*)::int,
-                '대기 중 상담'
-            FROM shop.chat_rooms
-            WHERE status = 'OPEN'
 
             UNION ALL
 
@@ -473,6 +507,32 @@ def admin_list_orders(
             service.to_response(order)
             for order in rows
         ],
+        meta=PageMeta.build(page, size, total),
+    )
+
+
+# "/orders/{order_id}"보다 먼저 등록해야 "claims"가 주문 번호로 해석되지 않는다.
+@router.get(
+    "/orders/claims",
+    response_model=PageResponse[OrderResponse],
+    summary="취소·환불 주문 목록(관리자)",
+)
+def admin_list_claim_orders(
+    page: int = Query(1, ge=1),
+    size: int = Query(20, ge=1, le=100),
+    # CANCELLED, RETURN_REQ, RETURNED, EXCHANGE_REQ, EXCHANGED, PARTIAL_REFUND 중 하나. 비우면 전체
+    status_filter: Optional[str] = Query(None, alias="status"),
+    keyword: Optional[str] = None,
+    _admin: Member = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    """취소·반품·교환·환불이 발생한 주문만 조회한다. 응답 형식은 주문 목록과 같다."""
+
+    service = OrderService(db)
+    rows, total = service.list_claim_orders(page, size, status_filter, keyword)
+
+    return PageResponse[OrderResponse](
+        items=[service.to_response(order) for order in rows],
         meta=PageMeta.build(page, size, total),
     )
 
