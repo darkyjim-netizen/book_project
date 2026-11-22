@@ -1,0 +1,93 @@
+/* 관리 목록의 열 너비를 고정해 긴 내용이 다른 열을 밀지 않도록 합니다. */
+.db-dashboard .admin-workspace-main { min-width:0; }
+.db-dashboard .management-table { width:100%; min-width:680px; table-layout:fixed; }
+.db-dashboard .management-table th, .db-dashboard .management-table td { box-sizing:border-box; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:7px 10px; }
+.db-dashboard .management-table th:last-child, .db-dashboard .management-table td:last-child { overflow:visible; text-overflow:clip; }
+.db-dashboard .management-table td:last-child button, .db-dashboard .management-table td:last-child .admin-detail-link { padding:7px 10px; font-size:16px; }
+.db-dashboard .management-table--books col:nth-child(1) { width:36%; }
+.db-dashboard .management-table--books col:nth-child(2) { width:22%; }
+.db-dashboard .management-table--books col:nth-child(3) { width:15%; }
+.db-dashboard .management-table--books col:nth-child(4) { width:10%; }
+.db-dashboard .management-table--books col:nth-child(5) { width:17%; }
+.db-dashboard .management-table--members col:nth-child(1) { width:16%; }
+.db-dashboard .management-table--members col:nth-child(2) { width:39%; }
+.db-dashboard .management-table--members col:nth-child(3), .db-dashboard .management-table--members col:nth-child(4) { width:15%; }
+.db-dashboard .management-table--members col:nth-child(5) { width:15%; }
+.db-dashboard .management-table--reviews col:nth-child(1) { width:29%; }
+.db-dashboard .management-table--reviews col:nth-child(2) { width:16%; }
+.db-dashboard .management-table--reviews col:nth-child(3) { width:28%; }
+.db-dashboard .management-table--reviews col:nth-child(4) { width:13%; }
+.db-dashboard .management-table--reviews col:nth-child(5) { width:14%; }
+.db-dashboard .management-table--orders col:nth-child(1), .db-dashboard .management-table--refunds col:nth-child(1) { width:29%; }
+.db-dashboard .management-table--orders col:nth-child(2), .db-dashboard .management-table--refunds col:nth-child(2) { width:17%; }
+.db-dashboard .management-table--orders col:nth-child(3), .db-dashboard .management-table--refunds col:nth-child(3) { width:20%; }
+.db-dashboard .management-table--orders col:nth-child(4), .db-dashboard .management-table--refunds col:nth-child(4) { width:17%; }
+.db-dashboard .management-table--orders col:nth-child(5), .db-dashboard .management-table--refunds col:nth-child(5) { width:17%; }
+.db-dashboard .management-table--qna col:first-child, .db-dashboard .management-table--notices col:first-child { width:43%; }
+.db-dashboard .management-table--qna col:not(:first-child), .db-dashboard .management-table--notices col:not(:first-child) { width:19%; }
+.db-dashboard .management-table--coupons col:first-child { width:26%; }
+.db-dashboard .management-table--coupons col:nth-child(2), .db-dashboard .management-table--coupons col:nth-child(3), .db-dashboard .management-table--coupons col:nth-child(4) { width:16%; }
+.db-dashboard .management-table--coupons col:nth-child(5) { width:11%; }
+.db-dashboard .management-table--coupons col:nth-child(6) { width:15%; }
+
+.db-dashboard .management-table th, .db-dashboard .management-table td { text-align:center; vertical-align:middle; }
+
+
+.db-dashboard .management-table th, .db-dashboard .management-table td { vertical-align:middle; line-height:1.5; }
+.db-dashboard .management-table td:last-child button + button { margin-left:4px; }
+.db-dashboard .admin-editor h3 { margin:0 0 18px; line-height:1.4; }
+.db-dashboard .admin-editor > p { margin:10px 0; line-height:1.6; }
+
+/* Keep management headings compact and readable across dashboard tabs. */
+.db-dashboard .admin-section-heading.admin-section-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:24px 0 18px}
+.db-dashboard .admin-section-heading .management-refresh{flex:none;margin:0}
+.db-dashboard .admin-section-heading.overview-heading{padding-top:0}
+.db-dashboard .admin-work-panel,.db-dashboard .management-table{font-size:18px;line-height:1.6}
+.db-dashboard .admin-toolbar h2{font-size:23px}
+.db-dashboard .admin-section-heading h2{font-size:27px}
+.db-dashboard .admin-section-heading p,.db-dashboard .admin-section-heading span{font-size:17px}
+.db-dashboard .admin-toolbar input,.db-dashboard .admin-toolbar select,.db-dashboard .admin-toolbar button,.db-dashboard .management-refresh button,.db-dashboard .management-table button,.db-dashboard .admin-detail-link{font-size:18px}
+@media(max-width:600px){.db-dashboard .admin-section-heading{gap:10px;margin-top:18px}.db-dashboard .admin-section-heading h2{font-size:23px}.db-dashboard .admin-work-panel,.db-dashboard .management-table{font-size:16px}}
+
+/* One divider system for every administrative section. */
+html body .db-dashboard{--admin-divider:#e1d7eb;--admin-soft-divider:#eee7f4;--admin-surface:#fff;--admin-tint:#faf7fd}
+html body .db-dashboard .admin-side{padding-right:22px;border-right:1px solid var(--admin-divider)}
+html body .db-dashboard .admin-side nav{gap:0}
+html body .db-dashboard .admin-side nav button{position:relative;border-bottom:1px solid var(--admin-soft-divider);border-radius:8px;margin:2px 0;padding-top:13px;padding-bottom:13px}
+html body .db-dashboard .admin-side nav button:last-child{border-bottom-color:transparent}
+html body .db-dashboard .admin-side nav button[aria-current]{background:#efe6fa;color:#60349b;box-shadow:inset 3px 0 #7952ad}
+html body .db-dashboard .admin-side-group{padding-top:22px;border-top:1px solid var(--admin-divider);margin-top:22px}
+html body .db-dashboard .admin-section-heading.admin-section-heading{padding-bottom:22px;margin-bottom:24px;border-bottom:1px solid var(--admin-divider)}
+html body .db-dashboard .admin-toolbar{padding:0 0 18px;margin-bottom:20px;border-bottom:1px solid var(--admin-soft-divider)}
+html body .db-dashboard .dashboard-card,html body .db-dashboard .insight-card,html body .db-dashboard .admin-chart{border:1px solid var(--admin-divider);border-radius:14px;background:var(--admin-surface);box-shadow:0 3px 12px #49305e04}
+html body .db-dashboard .dashboard-card.table-wrap{padding:0;overflow-x:auto}
+html body .db-dashboard .management-table{border-collapse:separate;border-spacing:0}
+html body .db-dashboard .management-table thead th{padding:15px 14px;background:#f5f0fa;border-bottom:1px solid var(--admin-divider);color:#624d73;font-size:15px;font-weight:700}
+html body .db-dashboard .management-table tbody td{padding:14px;border-bottom:1px solid var(--admin-soft-divider);line-height:1.6}
+html body .db-dashboard .management-table tbody tr:last-child td{border-bottom:0}
+html body .db-dashboard .management-table :is(th,td)+:is(th,td){border-left:1px solid #f0eaf5}
+html body .db-dashboard .management-table tbody tr:hover>td{background:#fcfaff}
+html body .db-dashboard .management-table .member-detail-row>td{padding:0;background:var(--admin-tint)}
+html body .db-dashboard .admin-editor h3{padding-bottom:14px;border-bottom:1px solid var(--admin-soft-divider)}
+html body .db-dashboard .admin-editor .admin-actions{padding-top:16px;border-top:1px solid var(--admin-soft-divider)}
+html body .db-dashboard .metric-card{border:1px solid var(--admin-divider);border-radius:12px;background:var(--admin-tint)}
+html body .db-dashboard .insight-card-head,html body .db-dashboard .admin-chart .card-heading{padding-bottom:18px;border-bottom:1px solid var(--admin-soft-divider)}
+html body .db-dashboard .admin-operations-heading{padding-bottom:16px;border-bottom:1px solid var(--admin-soft-divider)}
+html body .db-dashboard .admin-pagination{padding-top:20px;border-top:1px solid var(--admin-soft-divider)}
+@media(max-width:600px){html body .db-dashboard .admin-side{padding-right:0;border-right:0;padding-bottom:18px;border-bottom:1px solid var(--admin-divider);margin-bottom:24px}html body .db-dashboard .admin-side nav{gap:7px}html body .db-dashboard .admin-side nav button{border:1px solid var(--admin-soft-divider)}html body .db-dashboard .admin-section-heading.admin-section-heading{padding-bottom:16px}html body .db-dashboard .management-table tbody td{padding:12px 10px}}
+
+/* Administrative controls share a light purple interaction palette. */
+html body :is(.db-dashboard,.book-dialog,.admin-detail-dialog,.admin-order-detail){--admin-button-bg:#f3edfb;--admin-button-active:#e7d9f6;--admin-button-text:#593780;--admin-button-border:#d8c4ed}
+html body :is(.db-dashboard,.book-dialog,.admin-detail-dialog,.admin-order-detail) button,html body .db-dashboard .admin-detail-link{background:var(--admin-button-bg)!important;color:var(--admin-button-text)!important;border-color:var(--admin-button-border)!important;font-weight:700;cursor:pointer;transition:background .15s ease,color .15s ease,box-shadow .15s ease}
+html body :is(.db-dashboard,.book-dialog,.admin-detail-dialog,.admin-order-detail) button:not(:disabled):is(:hover,:active,:focus-visible,[aria-pressed=true],[aria-current=page]),html body .db-dashboard .admin-detail-link:hover{background:var(--admin-button-active)!important;color:var(--admin-button-text)!important;filter:none;box-shadow:0 2px 6px #59378012}
+html body .db-dashboard .admin-side nav button[aria-current]{box-shadow:inset 3px 0 #cdb4e8}
+html body :is(.db-dashboard,.book-dialog,.admin-detail-dialog,.admin-order-detail) button:focus-visible{outline:2px solid #bda0dc;outline-offset:3px}
+html body :is(.db-dashboard,.book-dialog,.admin-detail-dialog,.admin-order-detail) button:disabled{opacity:.5;cursor:default;box-shadow:none}
+html body .db-dashboard :is(.admin-toolbar,.admin-toolbar form,.admin-actions,.admin-pagination,.management-refresh){display:flex;flex-wrap:wrap;gap:8px;min-width:0}
+html body .db-dashboard .admin-toolbar input{min-width:0;max-width:100%;box-sizing:border-box}
+@media(max-width:700px){html body .db-dashboard .admin-toolbar{align-items:stretch}html body .db-dashboard .admin-toolbar form{flex:1 1 100%}html body .db-dashboard .admin-toolbar form input{flex:1 1 140px;width:0}html body .db-dashboard :is(.admin-actions,.admin-toolbar) button{min-height:40px;white-space:normal}html body .db-dashboard .admin-side nav button{min-height:44px}}
+@media(prefers-reduced-motion:reduce){html body :is(.db-dashboard,.book-dialog,.admin-detail-dialog,.admin-order-detail) button{transition:none}}
+
+/* Sidebar menus use the same hover and selected treatment as book categories. */
+html body .db-dashboard .admin-side nav button{background:transparent!important;color:#352b3e!important;box-shadow:none;border:0;border-radius:8px;font-weight:700}
+html body .db-dashboard .admin-side nav button:not(:disabled):is(:hover,:active,:focus-visible,[aria-current=page]){background:#eee5f8!important;color:#593780!important;box-shadow:none}

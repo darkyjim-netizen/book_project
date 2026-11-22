@@ -24,6 +24,7 @@ from app.schemas.order import (
     OrderCancelRequest,
     OrderCreateRequest,
     OrderCreateResponse,
+    GuestOrderLookupRequest,
     OrderResponse,
     PaymentConfirmRequest,
     PaymentResponse,
@@ -125,6 +126,17 @@ def lookup_order(
 
     # 주문번호만으로 조회하지 않고 이메일도 함께 확인한다.
     order = service.get_by_order_no(order_no, email)
+    if order.member_id is not None:
+        raise HTTPException(status_code=404, detail="비회원 주문을 찾을 수 없습니다.")
+    return service.to_response(order)
+
+
+@router.post("/lookup", response_model=OrderResponse, summary="비회원 주문 조회 (본문 방식)")
+def lookup_order_by_body(payload: GuestOrderLookupRequest, db: Session = Depends(get_db)):
+    """이메일이 주소(URL)에 남지 않도록 주문번호와 이메일을 요청 본문으로 받아 조회한다."""
+
+    service = OrderService(db)
+    order = service.get_by_order_no(payload.order_no.strip(), str(payload.email).strip())
     if order.member_id is not None:
         raise HTTPException(status_code=404, detail="비회원 주문을 찾을 수 없습니다.")
     return service.to_response(order)

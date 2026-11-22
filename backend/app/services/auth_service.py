@@ -47,6 +47,17 @@ class AuthService:
                 code="EMAIL_DUPLICATED",
             )
 
+        # 별명을 비워 두면 이름을 별명으로 사용하므로, 실제로 저장될 별명으로 중복을 확인한다.
+        nickname = (payload.nickname or "").strip() or payload.name.strip()
+        nickname_exists = self.db.scalar(
+            select(Member.member_id).where(Member.nickname == nickname)
+        )
+        if nickname_exists:
+            raise BusinessError(
+                "이미 사용 중인 별명입니다.",
+                code="NICKNAME_DUPLICATED",
+            )
+
         # 비밀번호가 프로젝트에서 정한 보안 규칙에 맞는지 검사한다.
         validate_password_policy(payload.password)
 
@@ -54,8 +65,8 @@ class AuthService:
         member = Member(
             email=payload.email,
             password_hash=hash_password(payload.password),  # 원문 대신 해시 저장
-            name=payload.name,
-            nickname=payload.nickname or payload.name,  # 별명이 없으면 이름을 사용
+            name=payload.name.strip(),
+            nickname=nickname,  # 별명이 없으면 이름을 사용
             phone=payload.phone,
             birth_date=payload.birth_date,
             gender=payload.gender,
@@ -128,6 +139,13 @@ class AuthService:
             select(Member).where(Member.email == email)
         ) is None
 
+    def check_nickname_available(self, nickname: str) -> bool:
+        """해당 닉네임을 가입에 사용할 수 있으면 True를 반환한다."""
+
+        return self.db.scalar(
+            select(Member).where(Member.nickname == nickname)
+        ) is None
+
     # ------------------------------------------------------------------ 로그인
     def login(
         self,
@@ -141,6 +159,20 @@ class AuthService:
         member = self.db.scalar(
             select(Member).where(Member.email == payload.email)
         )
+
+        # 탈퇴·정지된 계정은 비밀번호와 관계없이 바로 안내한다.
+        if member is not None and member.status == MemberStatus.WITHDRAWN:
+            raise BusinessError(
+                "탈퇴한 계정입니다.",
+                code="WITHDRAWN",
+                status_code=403,
+            )
+        if member is not None and member.status == MemberStatus.SUSPENDED:
+            raise BusinessError(
+                f"비밀번호를 {settings.LOGIN_FAIL_LIMIT}회 잘못 입력해 계정이 정지되었습니다.\n고객센터로 문의해 주세요.",
+                code="SUSPENDED",
+                status_code=403,
+            )
 
         # 회원이 없거나 비밀번호가 틀리면 로그인 실패로 처리한다.
         if member is None or not verify_password(
@@ -156,43 +188,40 @@ class AuthService:
                 user_agent,
             )
 
-            # 회원이 존재하는 경우에만 연속 실패 횟수를 올린다.
+            message = "이메일 또는 비밀번호가 올바르지 않습니다."
+            code = "INVALID_CREDENTIALS"
+            status_code = 401
+
+            # 회원이 존재하는 경우에만 연속 실패 횟수를 올리고 남은 횟수를 알려준다.
             if member is not None:
                 member.login_fail_cnt = (member.login_fail_cnt or 0) + 1
+                remaining = settings.LOGIN_FAIL_LIMIT - member.login_fail_cnt
 
-                # 설정된 실패 횟수에 도달하면 계정을 정지한다.
-                if member.login_fail_cnt >= settings.LOGIN_FAIL_LIMIT:
+                if remaining <= 0:
+                    # 설정된 실패 횟수에 도달하면 계정을 정지한다.
                     member.status = MemberStatus.SUSPENDED
                     logger.warning(
                         "로그인 실패 한도 초과로 계정 정지: %s",
                         member.email,
                     )
+                    message = (
+                        f"비밀번호를 {settings.LOGIN_FAIL_LIMIT}회 잘못 입력해 계정이 정지되었습니다.\n"
+                        "고객센터로 문의해 주세요."
+                    )
+                    code = "SUSPENDED"
+                    status_code = 403
+                else:
+                    # 줄바꿈(\n)으로 두 줄을 만든다. 화면은 white-space: pre-line으로 표시한다.
+                    message = (
+                        f"비밀번호가 올바르지 않습니다.\n"
+                        f"({member.login_fail_cnt}/{settings.LOGIN_FAIL_LIMIT}회 실패, "
+                        f"{remaining}회 더 틀리면 계정이 정지됩니다)"
+                    )
 
             # 로그인 실패 기록과 실패 횟수 변경을 저장한다.
             self.db.commit()
 
-            # 계정 존재 여부를 알 수 없도록 같은 오류 메시지를 사용한다.
-            raise BusinessError(
-                "이메일 또는 비밀번호가 올바르지 않습니다.",
-                code="INVALID_CREDENTIALS",
-                status_code=401,
-            )
-
-        # 탈퇴한 회원은 로그인할 수 없다.
-        if member.status == MemberStatus.WITHDRAWN:
-            raise BusinessError(
-                "탈퇴한 계정입니다.",
-                code="WITHDRAWN",
-                status_code=403,
-            )
-
-        # 정지된 회원은 로그인할 수 없다.
-        if member.status == MemberStatus.SUSPENDED:
-            raise BusinessError(
-                "정지된 계정입니다. 고객센터로 문의해 주세요.",
-                code="SUSPENDED",
-                status_code=403,
-            )
+            raise BusinessError(message, code=code, status_code=status_code)
 
         # 휴면 회원이 로그인하면 정상 이용 상태로 되돌린다.
         if member.status == MemberStatus.DORMANT:

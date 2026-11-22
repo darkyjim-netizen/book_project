@@ -6,7 +6,7 @@ register_routers(app)을 호출해 모든 라우터를 애플리케이션에 등
 from fastapi import APIRouter, FastAPI
 
 from app.core.config import settings
-from app.routers import admin, ai_router, auth, books, cart, chat, members, orders, pages, postal, reviews, support
+from app.routers import admin, admin_operations, admin_sentiment, ai_router, auth, books, cart, members, orders, postal, reviews, support
 
 
 def register_routers(app: FastAPI) -> None:
@@ -25,23 +25,21 @@ def register_routers(app: FastAPI) -> None:
     api.include_router(orders.router)
     api.include_router(reviews.router)
 
-    # 사용자 API: 공지사항, 문의, FAQ, 채팅, AI 기능
+    # 사용자 API: 공지사항, 문의, FAQ, AI 기능
     api.include_router(support.notice_router)
     api.include_router(support.qna_router)
     api.include_router(support.faq_router)
-    api.include_router(chat.router)
     api.include_router(ai_router.router)
 
-    # 관리자 API: 관리 기능, 배송, 리뷰, 공지사항, 문의, 채팅
+    # 관리자 API: 관리 기능, 배송, 리뷰, 공지사항, 문의
     api.include_router(admin.router)
+    api.include_router(admin_sentiment.router)
+    api.include_router(admin_operations.router)
     api.include_router(orders.admin_shipment_router)
     api.include_router(reviews.admin_router)
     api.include_router(support.admin_notice_router)
     api.include_router(support.admin_qna_router)
-    api.include_router(chat.admin_router)
 
     # 모아 둔 API 라우터를 FastAPI 앱에 한 번에 연결한다.
     app.include_router(api)
 
-    # 서버에서 HTML을 렌더링하는 페이지는 앱에 직접 등록한다.
-    app.include_router(pages.router)

@@ -33,6 +33,15 @@ class SignupRequest(BaseModel):
     sms_agree: bool = False  # 문자 수신 동의 여부
     email_agree: bool = False  # 이메일 수신 동의 여부
 
+    @field_validator("name")
+    @classmethod
+    def _name_not_blank(cls, v: str) -> str:
+        """공백만 있는 이름은 받지 않는다. 앞뒤 공백은 지워서 저장한다."""
+        v = v.strip()
+        if not v:
+            raise ValueError("이름을 입력해 주세요.")
+        return v
+
     @field_validator("password_confirm")
     @classmethod
     def _match(cls, v: str, info):

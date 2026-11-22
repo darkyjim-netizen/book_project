@@ -7,7 +7,7 @@ from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session, selectinload
 
 from app.core.config import settings
-from app.core.exceptions import BusinessError, NotFoundError
+from app.core.exceptions import BusinessError, NotFoundError, PaymentError
 from app.models.book import Book, StockHistory
 from app.models.cart import Cart, CartItem
 from app.models.enums import (
@@ -18,7 +18,7 @@ from app.models.enums import (
     PointReason,
     ShipmentStatus,
 )
-from app.models.member import Member, PointHistory
+from app.models.member import Member, MemberAddress, PointHistory
 from app.models.order import (
     Order,
     OrderItem,
@@ -236,6 +236,50 @@ class OrderService:
             raise BusinessError("주문할 상품이 없습니다.")
 
         return pairs, cart_item_ids
+
+    RECENT_ADDRESS_ALIAS = "최근 배송지"
+
+    def _remember_shipping(self, member: Member, payload: OrderCreateRequest) -> None:
+        """주문에 쓴 배송 정보를 회원 배송지에 저장한다.
+
+        - 같은 배송지가 이미 있으면 아무것도 하지 않는다.
+        - 저장된 배송지가 없으면 기본 배송지로 등록한다.
+        - 다른 배송지만 있으면 '최근 배송지' 한 건을 만들거나 갱신한다.
+        """
+        fields = {
+            "receiver": payload.receiver.strip(),
+            "phone": payload.receiver_phone.strip(),
+            "zipcode": payload.zipcode.strip(),
+            "address1": payload.address1.strip(),
+            "address2": (payload.address2 or "").strip() or None,
+        }
+        addresses = list(
+            self.db.scalars(
+                select(MemberAddress).where(MemberAddress.member_id == member.member_id)
+            )
+        )
+        for a in addresses:
+            if all((getattr(a, k) or None) == (v or None) for k, v in fields.items()):
+                return
+
+        memo = payload.request_memo
+        if not addresses:
+            self.db.add(MemberAddress(
+                member_id=member.member_id, alias="기본 배송지",
+                request_memo=memo, is_default=True, **fields,
+            ))
+            return
+
+        recent = next((a for a in addresses if a.alias == self.RECENT_ADDRESS_ALIAS), None)
+        if recent:
+            for k, v in fields.items():
+                setattr(recent, k, v)
+            recent.request_memo = memo
+        elif len(addresses) < 10:
+            self.db.add(MemberAddress(
+                member_id=member.member_id, alias=self.RECENT_ADDRESS_ALIAS,
+                request_memo=memo, is_default=False, **fields,
+            ))
 
     def create_order(
         self,
@@ -470,6 +514,10 @@ class OrderService:
                 CartItem.cart_item_id.in_(cart_item_ids),
             ).delete(synchronize_session=False)
 
+        # 회원이 입력한 배송 정보를 배송지로 기억해 다음 주문서에 불러올 수 있게 한다.
+        if member:
+            self._remember_shipping(member, payload)
+
         # 주문, 상품, 재고, 포인트, 쿠폰, 결제 정보를 한 번에 저장한다.
         self.db.commit()
         self.db.refresh(order)
@@ -604,13 +652,32 @@ class OrderService:
         status: Optional[str] = None,
         keyword: Optional[str] = None,
     ) -> Tuple[List[Order], int]:
-        """관리자가 전체 주문을 조회한다."""
+        """관리자 '주문·배송 관리' 목록을 조회한다.
+
+        상태를 지정하지 않으면 취소·반품·교환 주문과 환불(부분 환불 포함)이 발생한 주문은
+        빼고 보여준다. 이런 주문은 '취소·환불 관리'(list_claim_orders)에서 따로 관리한다.
+        상태를 직접 고르면(예: CANCELLED) 그 상태의 주문을 그대로 보여준다.
+        """
+        from sqlalchemy import exists, not_
 
         conditions = []
 
         # 상태가 지정되면 해당 상태의 주문만 조회한다.
         if status:
             conditions.append(Order.status == OrderStatus(status))
+        else:
+            conditions.append(Order.status.notin_(self.CLAIM_STATUSES))
+            conditions.append(
+                not_(exists().where(Refund.order_id == Order.order_id))
+            )
+            conditions.append(
+                not_(
+                    exists().where(
+                        Payment.order_id == Order.order_id,
+                        Payment.status == PaymentStatus.PARTIAL_CANCELLED,
+                    )
+                )
+            )
 
         # 검색어가 있으면 주문 번호, 주문자, 수령인 정보에서 찾는다.
         if keyword:
@@ -640,6 +707,84 @@ class OrderService:
                 self._query_with_relations()
                 .where(*conditions)
                 .order_by(Order.ordered_at.desc())
+                .offset((page - 1) * size)
+                .limit(size)
+            ).unique()
+        )
+
+        return rows, total
+
+    # 취소·반품·교환이 발생한 주문 상태 (관리자 '취소·환불 관리' 목록에 표시)
+    CLAIM_STATUSES = (
+        OrderStatus.CANCELLED,
+        OrderStatus.RETURN_REQ,
+        OrderStatus.RETURNED,
+        OrderStatus.EXCHANGE_REQ,
+        OrderStatus.EXCHANGED,
+    )
+
+    def list_claim_orders(
+        self,
+        page: int = 1,
+        size: int = 20,
+        status: Optional[str] = None,
+        keyword: Optional[str] = None,
+    ) -> Tuple[List[Order], int]:
+        """취소·반품·교환 또는 환불(부분 환불 포함)이 발생한 주문만 조회한다.
+
+        status 값:
+        - 없음: 아래 전부
+        - CANCELLED / RETURN_REQ / RETURNED / EXCHANGE_REQ / EXCHANGED: 해당 주문 상태
+        - PARTIAL_REFUND: 결제가 일부만 환불된 주문
+        """
+        from sqlalchemy import exists, or_
+
+        partial_refund = exists().where(
+            Payment.order_id == Order.order_id,
+            Payment.status == PaymentStatus.PARTIAL_CANCELLED,
+        )
+        has_refund = exists().where(Refund.order_id == Order.order_id)
+
+        conditions = []
+        if not status:
+            conditions.append(
+                or_(Order.status.in_(self.CLAIM_STATUSES), partial_refund, has_refund)
+            )
+        elif status == "PARTIAL_REFUND":
+            conditions.append(partial_refund)
+        else:
+            try:
+                target = OrderStatus(status)
+            except ValueError:
+                target = None
+            if target not in self.CLAIM_STATUSES:
+                allowed = ", ".join([s.value for s in self.CLAIM_STATUSES] + ["PARTIAL_REFUND"])
+                raise BusinessError(f"취소·환불 목록의 상태는 {allowed} 중 하나여야 합니다.")
+            conditions.append(Order.status == target)
+
+        # 검색어가 있으면 주문 번호, 주문자, 수령인 정보에서 찾는다.
+        if keyword:
+            kw = f"%{keyword}%"
+            conditions.append(
+                or_(
+                    Order.order_no.ilike(kw),
+                    Order.orderer_name.ilike(kw),
+                    Order.orderer_email.ilike(kw),
+                    Order.receiver.ilike(kw),
+                )
+            )
+
+        total = (
+            self.db.scalar(select(func.count()).select_from(Order).where(*conditions))
+            or 0
+        )
+
+        # 최근에 취소·접수된 주문이 위로 오도록 취소 시각(없으면 주문 시각) 기준으로 정렬한다.
+        rows = list(
+            self.db.scalars(
+                self._query_with_relations()
+                .where(*conditions)
+                .order_by(func.coalesce(Order.cancelled_at, Order.ordered_at).desc())
                 .offset((page - 1) * size)
                 .limit(size)
             ).unique()
@@ -716,6 +861,9 @@ class OrderService:
         elif target == OrderStatus.CONFIRMED:
             order.confirmed_at = now
             self._save_point(order)
+        elif target == OrderStatus.RETURNED:
+            # 반품 완료: 재고를 되돌리고, 아직 환불되지 않은 결제 금액을 환불한다.
+            self._complete_return(order, memo, now)
 
         self.db.commit()
         self.db.refresh(order)
@@ -727,6 +875,58 @@ class OrderService:
             memo or "",
         )
         return order
+
+    def _complete_return(self, order: Order, memo: Optional[str], now: datetime) -> None:
+        """반품 완료 처리. 재고 복원 + 남은 결제 금액 PG 환불 + 환불 기록."""
+        for item in order.items:
+            book = self.db.get(Book, item.book_id)
+            if book:
+                book.stock_qty += item.quantity
+                book.sales_count = max((book.sales_count or 0) - item.quantity, 0)
+                if book.status == BookStatus.SOLDOUT and book.stock_qty > 0:
+                    book.status = BookStatus.SALE
+                self.db.add(
+                    StockHistory(
+                        book_id=book.book_id,
+                        change_qty=item.quantity,
+                        after_qty=book.stock_qty,
+                        reason="RETURN",
+                        ref_id=order.order_id,
+                    )
+                )
+
+        payment = order.main_payment
+        if not payment or payment.status not in (PaymentStatus.PAID, PaymentStatus.PARTIAL_CANCELLED):
+            return
+        remain = float(payment.amount) - float(payment.cancelled_amount or 0)
+        if remain <= 0:
+            return
+
+        from app.services.payment_service import PaymentService
+
+        pay_service = PaymentService(self.db)
+        reason = memo or "반품 완료"
+        result = pay_service.pg_cancel(payment, remain, reason, order.order_no)
+        if str(result.get("result_code")) != "0000":
+            self.db.rollback()
+            pay_service._log(payment, order.order_no, "CANCEL", {"amount": remain, "reason": reason}, result)
+            self.db.commit()
+            raise PaymentError(result.get("result_msg") or "반품 환불에 실패했습니다.")
+
+        payment.status = PaymentStatus.CANCELLED
+        payment.cancelled_amount = payment.amount
+        payment.cancelled_at = now
+        self.db.add(
+            Refund(
+                order_id=order.order_id,
+                payment_id=payment.payment_id,
+                refund_amount=remain,
+                point_restore=0,
+                reason_code="RETURN",
+                reason_text=reason,
+                completed_at=now,
+            )
+        )
 
     def _save_point(self, order: Order) -> None:
         """구매 확정 시 회원에게 포인트를 적립한다."""
@@ -899,24 +1099,44 @@ class OrderService:
         # ---- 결제 취소 및 환불 기록
         payment = order.main_payment
 
-        if payment and payment.status == PaymentStatus.PAID:
-            # 결제가 끝난 주문이면 결제 상태와 취소 금액을 기록한다.
+        if payment and payment.status in (PaymentStatus.PAID, PaymentStatus.PARTIAL_CANCELLED):
+            # 부분 환불이 있었다면 남은 금액만 취소한다.
+            remain = float(payment.amount) - float(payment.cancelled_amount or 0)
+
+            if remain > 0:
+                # 실제 PG(토스)에도 결제 취소를 요청한다. 실패하면 주문 취소 전체를 되돌린다.
+                from app.services.payment_service import PaymentService
+
+                pay_service = PaymentService(self.db)
+                reason = reason_text or reason_code
+                result = pay_service.pg_cancel(payment, remain, reason, order.order_no)
+                if str(result.get("result_code")) != "0000":
+                    self.db.rollback()
+                    # 재고·쿠폰 변경은 되돌리고, 실패한 PG 기록만 남긴다.
+                    pay_service._log(
+                        payment, order.order_no, "CANCEL",
+                        {"amount": remain, "reason": reason}, result,
+                    )
+                    self.db.commit()
+                    raise PaymentError(result.get("result_msg") or "결제 취소에 실패했습니다.")
+
             payment.status = PaymentStatus.CANCELLED
             payment.cancelled_amount = payment.amount
             payment.cancelled_at = now
 
-            # 실제 환불 처리 내용을 DB에 기록한다.
-            self.db.add(
-                Refund(
-                    order_id=order.order_id,
-                    payment_id=payment.payment_id,
-                    refund_amount=payment.amount,
-                    point_restore=order.point_used,
-                    reason_code=reason_code,
-                    reason_text=reason_text,
-                    completed_at=now,
+            if remain > 0:
+                # 이번에 환불한 금액을 DB에 기록한다.
+                self.db.add(
+                    Refund(
+                        order_id=order.order_id,
+                        payment_id=payment.payment_id,
+                        refund_amount=remain,
+                        point_restore=order.point_used,
+                        reason_code=reason_code,
+                        reason_text=reason_text,
+                        completed_at=now,
+                    )
                 )
-            )
 
         elif payment:
             # 결제가 완료되기 전 취소된 경우 결제 상태만 취소로 바꾼다.

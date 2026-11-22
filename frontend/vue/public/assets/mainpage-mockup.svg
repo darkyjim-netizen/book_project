@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1900" viewBox="0 0 1440 1900">
+<defs>
+ <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e6f5f0"/><stop offset="1" stop-color="#c9e9df"/></linearGradient>
+ <linearGradient id="cover1" x2="0" y2="1"><stop stop-color="#6b4a8c"/><stop offset="1" stop-color="#342348"/></linearGradient>
+ <linearGradient id="cover2" x2="1" y2="1"><stop stop-color="#e7a76e"/><stop offset="1" stop-color="#b95c52"/></linearGradient>
+ <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#33514a" flood-opacity=".16"/></filter>
+ <style>
+  text{font-family:Arial,'Malgun Gothic',sans-serif;fill:#203a34}.muted{fill:#75847f}.small{font-size:14px}.label{font-size:13px;font-weight:700;letter-spacing:1.8px}.heading{font-size:34px;font-weight:700;letter-spacing:-1.4px}.booktitle{fill:white;font-size:18px;font-weight:700}.booksub{fill:#ffffffd9;font-size:11px}
+ </style>
+</defs>
+<rect width="1440" height="1900" fill="#fff"/>
+<!-- top utility/nav -->
+<rect x="0" y="0" width="1440" height="38" fill="#f5f7f5"/><text x="110" y="25" class="small muted">책과 사람을 잇는 작은 서점</text><text x="1040" y="25" class="small muted">로그인　 회원가입　 고객센터</text>
+<rect x="0" y="38" width="1440" height="92" fill="#fff"/><text x="110" y="96" font-size="29" font-weight="800" fill="#33244e">✦ 북적북적</text>
+<rect x="400" y="61" width="490" height="48" rx="24" fill="#f4f6f4" stroke="#e3e9e5"/><text x="428" y="91" class="small muted">읽고 싶은 책을 검색해 보세요</text><circle cx="856" cy="85" r="12" fill="none" stroke="#536963" stroke-width="2"/><path d="m865 94 9 9" stroke="#536963" stroke-width="2"/>
+<text x="1020" y="91" class="small">♡ 찜　　🛒 장바구니　　♙ 내 계정</text>
+<rect x="0" y="130" width="1440" height="54" fill="#fff" stroke="#edf0ed"/><text x="112" y="164" font-size="15" font-weight="700" fill="#108b76">전체 카테고리　　</text><text x="290" y="164" font-size="15">베스트셀러　　신간　　국내도서　　외국도서　　에세이　　문학　　자기계발　　이벤트</text>
+<!-- hero -->
+<rect x="90" y="224" width="1260" height="426" rx="24" fill="url(#hero)"/>
+<circle cx="1155" cy="344" r="145" fill="#ffffff" opacity=".29"/><circle cx="1252" cy="506" r="78" fill="#b1dbce" opacity=".6"/>
+<text x="154" y="302" class="label" fill="#178a76">BOOKJJEOK WEEKLY</text><text x="154" y="371" font-size="48" font-weight="800" letter-spacing="-2">이번 주, 마음에</text><text x="154" y="429" font-size="48" font-weight="800" letter-spacing="-2">오래 남을 한 권</text><text x="156" y="474" font-size="17" class="muted">북적북적 에디터가 고른 이달의 책을 만나보세요.</text>
+<rect x="155" y="515" width="164" height="49" rx="24" fill="#108b76"/><text x="188" y="546" fill="white" font-size="15" font-weight="700">추천 도서 보기　→</text>
+<!-- hero books -->
+<g filter="url(#shadow)" transform="rotate(-9 1010 460)"><rect x="850" y="305" width="205" height="282" rx="5" fill="url(#cover1)"/><path d="M869 330h168" stroke="#d8b6ed" stroke-width="1" opacity=".8"/><circle cx="950" cy="405" r="45" fill="#d5b5ed" opacity=".75"/><text x="873" y="491" class="booktitle">마음의 정원</text><text x="873" y="521" class="booksub">오늘을 다정하게 살아가는 법</text><text x="873" y="558" class="booksub">북적북적 이달의 추천</text></g>
+<g filter="url(#shadow)" transform="rotate(8 1130 430)"><rect x="1055" y="284" width="190" height="269" rx="5" fill="url(#cover2)"/><path d="M1080 320c40 28 92 28 141 0" fill="none" stroke="#f9d6ad" stroke-width="2"/><circle cx="1150" cy="398" r="43" fill="#f4d7a9" opacity=".8"/><text x="1080" y="474" class="booktitle">느린 문장들</text><text x="1080" y="503" class="booksub">잠시 멈춰 읽는 시간</text></g>
+<circle cx="1278" cy="350" r="31" fill="#fff"/><text x="1268" y="359" font-size="23" fill="#108b76">✦</text><circle cx="822" cy="533" r="20" fill="#fff" opacity=".8"/><text x="815" y="540" font-size="18" fill="#108b76">✧</text>
+<!-- categories -->
+<text x="110" y="730" class="label" fill="#108b76">FIND YOUR NEXT READ</text><text x="110" y="776" class="heading">어떤 책을 찾고 있나요?</text><text x="1242" y="771" class="small muted">카테고리 전체　→</text>
+<g font-size="15" font-weight="700" text-anchor="middle">
+ <rect x="110" y="812" width="174" height="68" rx="16" fill="#f3f7f5"/><text x="197" y="853">📖　문학</text>
+ <rect x="302" y="812" width="174" height="68" rx="16" fill="#f3f7f5"/><text x="389" y="853">🌱　에세이</text>
+ <rect x="494" y="812" width="174" height="68" rx="16" fill="#f3f7f5"/><text x="581" y="853">✦　자기계발</text>
+ <rect x="686" y="812" width="174" height="68" rx="16" fill="#f3f7f5"/><text x="773" y="853">⌂　인문</text>
+ <rect x="878" y="812" width="174" height="68" rx="16" fill="#f3f7f5"/><text x="965" y="853">♧　경제·경영</text>
+ <rect x="1070" y="812" width="174" height="68" rx="16" fill="#f3f7f5"/><text x="1157" y="853">☼　어린이</text>
+</g>
+<!-- bestsellers -->
+<text x="110" y="972" class="label" fill="#108b76">READERS' FAVORITES</text><text x="110" y="1018" class="heading">지금 많이 읽는 책</text><text x="1248" y="1013" class="small muted">베스트 더보기　→</text>
+<text x="112" y="1060" font-size="14" font-weight="700" fill="#108b76">종합</text><text x="170" y="1060" class="small muted">소설　 에세이　 인문　 자기계발</text>
+<!-- cards -->
+<g filter="url(#shadow)">
+ <rect x="112" y="1090" width="204" height="266" rx="6" fill="#d8c8a8"/><rect x="127" y="1106" width="174" height="234" rx="2" fill="#273f39"/><circle cx="214" cy="1190" r="46" fill="#f0ce87"/><path d="M158 1285q55-100 111 0" fill="#c58352"/><text x="148" y="1310" class="booktitle">오늘의 온도</text>
+ <rect x="356" y="1090" width="204" height="266" rx="6" fill="#e4c2ad"/><rect x="371" y="1106" width="174" height="234" rx="2" fill="#c5775e"/><path d="M400 1155h117v92H400z" fill="#f2d9b8"/><circle cx="458" cy="1201" r="31" fill="#d8a982"/><text x="391" y="1304" class="booktitle">작은 기쁨</text>
+ <rect x="600" y="1090" width="204" height="266" rx="6" fill="#c2d2ce"/><rect x="615" y="1106" width="174" height="234" rx="2" fill="#52756e"/><path d="M640 1165q60-75 124 0v75H640z" fill="#d9e7dc"/><path d="M640 1240q60-55 124 0" fill="none" stroke="#8bb2a1" stroke-width="7"/><text x="636" y="1305" class="booktitle">숲의 문장</text>
+ <rect x="844" y="1090" width="204" height="266" rx="6" fill="#d6cbe3"/><rect x="859" y="1106" width="174" height="234" rx="2" fill="#685784"/><circle cx="946" cy="1190" r="50" fill="#d9b9d6"/><path d="M916 1190h60M946 1160v60" stroke="#f8e6f3" stroke-width="5"/><text x="881" y="1305" class="booktitle">사이의 세계</text>
+ <rect x="1088" y="1090" width="204" height="266" rx="6" fill="#e7d5b5"/><rect x="1103" y="1106" width="174" height="234" rx="2" fill="#d09949"/><circle cx="1190" cy="1190" r="52" fill="#f3dfa5"/><path d="M1160 1220l30-75 30 75z" fill="#628376"/><text x="1126" y="1305" class="booktitle">다정한 하루</text>
+</g>
+<g font-size="13"><text x="112" y="1385" font-weight="700">오늘의 온도</text><text x="112" y="1408" class="muted">김하늘 · 문학</text><text x="112" y="1434" font-weight="700">₩15,300　 <tspan fill="#d89642">★★★★★</tspan></text>
+<text x="356" y="1385" font-weight="700">작은 기쁨</text><text x="356" y="1408" class="muted">이서윤 · 에세이</text><text x="356" y="1434" font-weight="700">₩14,400　 <tspan fill="#d89642">★★★★★</tspan></text>
+<text x="600" y="1385" font-weight="700">숲의 문장</text><text x="600" y="1408" class="muted">박도현 · 소설</text><text x="600" y="1434" font-weight="700">₩16,200　 <tspan fill="#d89642">★★★★★</tspan></text>
+<text x="844" y="1385" font-weight="700">사이의 세계</text><text x="844" y="1408" class="muted">정민주 · 인문</text><text x="844" y="1434" font-weight="700">₩18,000　 <tspan fill="#d89642">★★★★★</tspan></text>
+<text x="1088" y="1385" font-weight="700">다정한 하루</text><text x="1088" y="1408" class="muted">최은결 · 자기계발</text><text x="1088" y="1434" font-weight="700">₩15,120　 <tspan fill="#d89642">★★★★★</tspan></text></g>
+<!-- editorial banner -->
+<rect x="90" y="1510" width="1260" height="235" rx="22" fill="#f7f3eb"/><circle cx="1180" cy="1628" r="124" fill="#eee1cb"/><path d="M1107 1660q75-120 148-3" fill="none" stroke="#a98561" stroke-width="9"/><path d="M1180 1657v-87m0 30q-42-52-59-24m59 42q38-54 61-34" fill="none" stroke="#688576" stroke-width="8" stroke-linecap="round"/>
+<text x="145" y="1570" class="label" fill="#b27e48">EDITOR'S NOTE</text><text x="145" y="1620" font-size="30" font-weight="700">책 한 권으로 시작하는,</text><text x="145" y="1660" font-size="30" font-weight="700">나만의 작은 취향</text><text x="146" y="1698" class="small muted">오늘의 에디터 픽과 함께 새로운 이야기를 발견해 보세요.</text>
+<!-- footer -->
+<rect x="0" y="1800" width="1440" height="100" fill="#f7f8f6"/><text x="110" y="1845" font-size="17" font-weight="800" fill="#33244e">북적북적</text><text x="300" y="1845" class="small muted">회사소개　 이용약관　 개인정보처리방침　 고객센터</text><text x="110" y="1875" font-size="12" class="muted">© 2026 북적북적. 책과 사람을 잇습니다.</text>
+</svg>

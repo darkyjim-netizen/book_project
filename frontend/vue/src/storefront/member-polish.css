@@ -1,0 +1,43 @@
+/* Member journeys: consistent spacing without changing administrative layouts. */
+.app:has(.storefront-header) { display: flex; flex-direction: column; }
+.app > .content { flex: 1; min-width: 0; width: 100%; }
+.storefront-header ~ .content { min-width: 0; }
+.site-top .topline { height: auto; min-height: 32px; padding: 6px 16px; gap: 16px; line-height: 1.5; }
+.site-top .topline p { margin: 0; }
+.site-top .topline a { font-weight: 700; color: inherit; white-space: nowrap; }
+.member-shortcuts { display: grid; grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr)); align-items: center; gap: 12px; margin: 0 0 24px; padding: 20px 24px; border: 1px solid #e5ddeb; border-radius: 12px; background: #faf7fc; color: #352544; }
+.member-shortcuts > div { display: grid; gap: 5px; min-width: 0; }
+.member-shortcuts strong { font-size: 17px; overflow-wrap: anywhere; }
+.member-shortcuts > div > span { font-size: 13px; color: #75697f; line-height: 1.5; }
+.member-shortcuts > a { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 44px; padding: 10px 14px; border-left: 1px solid #e5ddeb; font-size: 15px; font-weight: 700; }
+.member-shortcuts > a:hover { color: #65419a; background: #f1eaf8; border-radius: 6px; }
+.member-shortcuts a:focus-visible, .site-top .topline a:focus-visible { outline: 2px solid #7953aa; outline-offset: 3px; }
+.member-mypage .mypage-dashboard { padding-top: 28px; }
+.member-mypage .mypage-order-status { margin-bottom: 24px; }
+.member-mypage .member-recommendations { margin-bottom: 0; padding-bottom: 24px; }
+.member-mypage .member-recommendations.member-wishlist { box-sizing: border-box; margin-bottom: 24px; padding: 26px; border: 1px solid #e5ddeb; border-radius: 12px; background: #fff; }
+@media (max-width: 700px) {
+  .member-mypage .member-recommendations.member-wishlist { padding: 20px; }
+}
+.member-mypage .member-recommendation strong { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; line-height: 1.5; }
+.member-mypage .member-recommendation > span:last-child { margin-top: auto; font-weight: 700; }
+.member-mypage .as-grid { margin-top: 24px; }
+.member-mypage .as-card form { max-width: 760px; }
+.member-mypage .as-list li:last-child { padding-bottom: 0; }
+.member-mypage .mypage-main { overflow-wrap: anywhere; }
+@media (max-width: 1000px) {
+  .member-mypage .mypage-layout { grid-template-columns: 180px minmax(0, 1fr); gap: 24px; }
+  .member-mypage .mypage-profile { flex-direction: column; align-items: stretch; padding: 24px; }
+  .member-mypage .mypage-profile-stats { width: 100%; }
+  .member-mypage .mypage-profile-stats > * { flex: 1; min-width: 0; }
+}
+@media (max-width: 600px) {
+  .site-top .topline { flex-wrap: wrap; gap: 4px 12px; font-size: 11px; letter-spacing: 0; }
+  .member-shortcuts { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 16px; margin-bottom: 18px; }
+  .member-shortcuts > div { grid-column: 1 / -1; margin-bottom: 4px; }
+  .member-shortcuts > a { padding: 8px 4px; border-left: 0; border-top: 1px solid #e5ddeb; font-size: 13px; }
+  .member-mypage .mypage-layout { display: block; }
+  .member-mypage .mypage-profile { padding: 20px 16px; }
+  .member-mypage .member-recommendation-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 14px; }
+  .member-mypage .mypage-dashboard { padding-top: 24px; }
+}

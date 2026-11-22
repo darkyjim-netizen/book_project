@@ -13,7 +13,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 # Base를 상속한 모델은 SQLAlchemy에 테이블 정의를 등록한다.
 from app.core.database import Base
-from app.models.enums import ChatRoomStatus, QnaStatus
+from app.models.enums import QnaStatus
 from app.models.member import Member
 
 
@@ -125,55 +125,3 @@ class Faq(Base):
     sort_order: Mapped[int] = mapped_column(SmallInteger, server_default="0")
     is_active: Mapped[bool] = mapped_column(Boolean, server_default="true")
     view_count: Mapped[int] = mapped_column(Integer, server_default="0")
-
-
-# 상담 채팅방의 참여자, 상담 상태, 마지막 메시지 정보를 저장한다.
-class ChatRoom(Base):
-    __tablename__ = "chat_rooms"
-    __table_args__ = {"schema": "shop"}
-
-    room_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
-    # DB가 임의의 UUID를 생성한다. 이 값은 숫자로 된 기본 키(room_id)와 별도다.
-    room_uuid: Mapped[UUID] = mapped_column(PgUUID(as_uuid=True), server_default=func.gen_random_uuid())
-    member_id: Mapped[int] = mapped_column(
-        BigInteger, ForeignKey("shop.members.member_id", ondelete="CASCADE")
-    )
-    agent_id: Mapped[int | None] = mapped_column(BigInteger, ForeignKey("shop.members.member_id"))
-    subject: Mapped[str] = mapped_column(String(200), server_default="1:1 문의")
-    # 채팅방은 생성할 때 OPEN(열림) 상태로 시작한다.
-    status: Mapped[ChatRoomStatus] = mapped_column(
-        ENUM(ChatRoomStatus, name="chat_room_status", schema="shop", create_type=False),
-        server_default=ChatRoomStatus.OPEN.value,
-    )
-    last_message: Mapped[str | None] = mapped_column(String(500))
-    last_message_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    # 회원과 상담원이 아직 읽지 않은 메시지 수를 각각 저장한다.
-    unread_user: Mapped[int] = mapped_column(Integer, server_default="0")
-    unread_agent: Mapped[int] = mapped_column(Integer, server_default="0")
-    satisfaction: Mapped[int | None] = mapped_column(SmallInteger)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    closed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-
-    # 회원과 상담원이 같은 테이블에 있으므로 회원 관계에 사용할 키를 지정한다.
-    member: Mapped[Member] = relationship(foreign_keys=[member_id])
-    # room.messages로 채팅 내역을 읽는다. 방 삭제 시 메시지 행은 DB가 지운다.
-    messages: Mapped[list["ChatMessage"]] = relationship(passive_deletes="all")
-
-
-# 채팅방에서 주고받은 메시지 한 건을 저장한다.
-class ChatMessage(Base):
-    __tablename__ = "chat_messages"
-    __table_args__ = {"schema": "shop"}
-
-    message_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
-    room_id: Mapped[int] = mapped_column(
-        BigInteger, ForeignKey("shop.chat_rooms.room_id", ondelete="CASCADE")
-    )
-    # sender_id는 보낸 사람의 회원 번호, sender_type은 보낸 사람의 구분이다.
-    sender_id: Mapped[int | None] = mapped_column(BigInteger, ForeignKey("shop.members.member_id"))
-    sender_type: Mapped[str] = mapped_column(String(10), server_default="USER")
-    content: Mapped[str] = mapped_column(Text)
-    # 첨부가 없으면 URL은 비어 있고, 새 메시지는 읽지 않은 상태로 저장된다.
-    attachment_url: Mapped[str | None] = mapped_column(String(255))
-    is_read: Mapped[bool] = mapped_column(Boolean, server_default="false")
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

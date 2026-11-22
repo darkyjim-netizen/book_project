@@ -127,12 +127,6 @@ def smoke(connection):
     qid = question["question_id"]
     check(admin, "POST", f"/admin/qna/{qid}/answer", json={"content": "Test answer"})
     assert check(member, "GET", f"/qna/{qid}")["answers"][0]["content"] == "Test answer"
-    # 일반 회원이 만든 상담 채팅방을 관리자가 배정받아 답변하고, 회원이 메시지를 조회한다.
-    room = check(member, "POST", "/chat/rooms", 201, json={"subject": "Smoke test", "first_message": "Test message"})
-    rid = room["room_id"]
-    check(admin, "POST", f"/admin/chat/rooms/{rid}/assign")
-    check(admin, "POST", f"/chat/rooms/{rid}/messages", json={"content": "Reply from staff"})
-    assert any(item["content"] == "Reply from staff" for item in check(member, "GET", f"/chat/rooms/{rid}")["messages"])
     # 관리자 구매 통계에 테스트 주문의 배송 지역인 서울특별시가 표시되는지 확인한다.
     stats = check(admin, "GET", "/admin/purchase-demographics")
     assert any(item["label"] == "서울특별시" for item in stats["regions"])

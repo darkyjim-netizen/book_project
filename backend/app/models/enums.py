@@ -97,13 +97,6 @@ class QnaStatus(str, enum.Enum):
     CLOSED = "CLOSED"      # 문의 종료
 
 
-class ChatRoomStatus(str, enum.Enum):
-    """1:1 상담방의 상태."""
-    OPEN = "OPEN"          # 상담 시작 전 또는 상담 중
-    ASSIGNED = "ASSIGNED"  # 상담 직원이 배정됨
-    CLOSED = "CLOSED"      # 상담 종료
-
-
 class CouponType(str, enum.Enum):
     """쿠폰의 할인 방식."""
     AMOUNT = "AMOUNT"      # 정해진 금액 할인

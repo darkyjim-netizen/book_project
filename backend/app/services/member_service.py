@@ -40,7 +40,30 @@ class MemberService:
 
         # exclude_unset=True는 요청에서 실제로 보낸 항목만 가져온다.
         # setattr은 member 객체의 해당 속성에 새 값을 넣는다.
-        for key, value in payload.model_dump(exclude_unset=True).items():
+        data = payload.model_dump(exclude_unset=True)
+
+        # 이름은 비울 수 없다. (공백만 입력한 경우 포함)
+        if "name" in data:
+            name = (data["name"] or "").strip()
+            if not name:
+                raise BusinessError("이름을 입력해 주세요.", code="NAME_REQUIRED")
+            data["name"] = name
+
+        # 별명을 바꿀 때도 가입 때처럼 다른 회원과 겹치지 않게 막는다.
+        if "nickname" in data:
+            nickname = (data["nickname"] or "").strip() or None
+            if nickname and nickname != member.nickname:
+                taken = self.db.scalar(
+                    select(Member.member_id).where(
+                        Member.nickname == nickname,
+                        Member.member_id != member.member_id,
+                    )
+                )
+                if taken:
+                    raise BusinessError("이미 사용 중인 별명입니다.", code="NICKNAME_DUPLICATED")
+            data["nickname"] = nickname
+
+        for key, value in data.items():
             setattr(member, key, value)
 
         self.db.commit()  # 수정 사항을 DB에 확정한다.

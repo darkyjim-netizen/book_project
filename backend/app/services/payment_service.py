@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.core.exceptions import BusinessError, NotFoundError, PaymentError
 from app.models.enums import OrderStatus, PaymentMethod, PaymentStatus
-from app.models.order import Order, Payment, PaymentLog
+from app.models.order import Order, Payment, PaymentLog, Refund
 from app.schemas.order import PaymentConfirmRequest
 from app.services.payment_gateway import PgGateway, get_gateway
 
@@ -47,9 +47,33 @@ class PaymentService:
                 action=action,
                 request_body=req,
                 response_body=res,
-                result_code=str(res.get("result_code")),
+                # result_code column is varchar(20); Toss error codes can be longer.
+                result_code=str(res.get("result_code"))[:20],
             )
         )
+
+    def pg_cancel(
+        self,
+        payment: Payment,
+        amount: float,
+        reason: str,
+        order_no: str,
+    ) -> Dict:
+        """PG(토스/모의)에 결제 취소를 요청하고 결제 로그를 남긴다.
+
+        토스 결제 키(pg_tid)가 없는 결제는 PG를 거치지 않은 더미 데이터이므로
+        PG 호출 없이 DB만 취소한다. 성공 여부(result_code)는 호출한 쪽에서 확인한다.
+        """
+        if not settings.PG_MOCK_MODE and not payment.pg_tid:
+            result = {
+                "result_code": "0000",
+                "result_msg": "PG 거래 없음(더미 결제) - DB만 취소",
+                "skipped_pg": True,
+            }
+        else:
+            result = self.gateway.cancel(payment, amount, reason)
+        self._log(payment, order_no, "CANCEL", {"amount": amount, "reason": reason}, result)
+        return result
 
     def get_payment(self, order_id: int) -> Payment:
         """주문에 연결된 결제 정보를 조회한다."""
@@ -294,7 +318,8 @@ class PaymentService:
         remain = float(payment.amount) - float(payment.cancelled_amount)
 
         # 취소 금액이 생략되면 남은 전액을 취소한다.
-        target = float(amount) if amount else remain
+        # amount를 보내지 않았을 때만 전액 환불한다. 0원은 아래 검사에서 오류로 막는다.
+        target = float(amount) if amount is not None else remain
 
         # 0원 이하 또는 남은 금액을 초과하는 취소는 허용하지 않는다.
         if target <= 0 or target > remain:
@@ -305,16 +330,7 @@ class PaymentService:
         order = self.db.get(Order, order_id)
 
         # 실제 PG 취소 요청은 gateway가 담당한다.
-        result = self.gateway.cancel(payment, target, reason)
-
-        # 취소 요청과 PG 응답을 기록한다.
-        self._log(
-            payment,
-            order.order_no if order else "",
-            "CANCEL",
-            {"amount": target, "reason": reason},
-            result,
-        )
+        result = self.pg_cancel(payment, target, reason, order.order_no if order else "")
 
         # PG가 실패를 반환하면 취소 금액이나 상태를 바꾸지 않는다.
         if str(result.get("result_code")) != "0000":
@@ -334,6 +350,19 @@ class PaymentService:
             PaymentStatus.CANCELLED
             if float(payment.cancelled_amount) >= float(payment.amount)
             else PaymentStatus.PARTIAL_CANCELLED
+        )
+
+        # 환불 내역을 남긴다. 취소·환불 관리 목록과 정산은 이 기록을 기준으로 한다.
+        self.db.add(
+            Refund(
+                order_id=order_id,
+                payment_id=payment.payment_id,
+                refund_amount=target,
+                point_restore=0,
+                reason_code="ADMIN_REFUND",
+                reason_text=reason,
+                completed_at=payment.cancelled_at,
+            )
         )
 
         self.db.commit()

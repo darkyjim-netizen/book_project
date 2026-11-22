@@ -248,7 +248,7 @@ class PaymentLog(Base):
     request_body: Mapped[Optional[dict]] = mapped_column(JSONB)
     response_body: Mapped[Optional[dict]] = mapped_column(JSONB)
 
-    result_code: Mapped[Optional[str]] = mapped_column(String(20))  # 결제대행사의 처리 결과 코드
+    result_code: Mapped[Optional[str]] = mapped_column(String(50))  # 결제대행사의 처리 결과 코드
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
