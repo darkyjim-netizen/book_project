@@ -418,12 +418,20 @@ class HuggingFaceSentimentModel:
             return
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            str(model_path), local_files_only=True
-        )
-        self.model = AutoModelForSequenceClassification.from_pretrained(
-            str(model_path), local_files_only=True
-        )
+        try:
+            self.tokenizer = AutoTokenizer.from_pretrained(
+                str(model_path), local_files_only=True
+            )
+            self.model = AutoModelForSequenceClassification.from_pretrained(
+                str(model_path), local_files_only=True
+            )
+        except Exception as exc:  # noqa: BLE001
+            # 모델 파일이 손상됐거나 Git LFS 포인터만 있는 경우(예: lfs pull 안 함)에는
+            # BERT 없이 사전+ML 분석으로 동작하도록 넘어간다.
+            logger.warning("BERT 감성 모델을 불러오지 못해 대체 분석을 사용합니다: %s", exc)
+            self.tokenizer = None
+            self.model = None
+            return
         self.model.to(self.device)
         self.model.eval()
 
