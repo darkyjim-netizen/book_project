@@ -20,7 +20,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.database import engine, get_db
-from app.main import app
+from backend.main import app
 from app.models.book import Book
 from app.models.enums import BookStatus, MemberRole
 from app.models.member import Member

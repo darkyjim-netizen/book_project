@@ -131,7 +131,7 @@ def lookup_order(
     return service.to_response(order)
 
 
-@router.post("/lookup", response_model=OrderResponse, summary="비회원 주문 조회 (본문 방식)")
+@router.post("/lookup", response_model=OrderCreateResponse, summary="비회원 주문 조회 (본문 방식)")
 def lookup_order_by_body(payload: GuestOrderLookupRequest, db: Session = Depends(get_db)):
     """이메일이 주소(URL)에 남지 않도록 주문번호와 이메일을 요청 본문으로 받아 조회한다."""
 
@@ -139,7 +139,12 @@ def lookup_order_by_body(payload: GuestOrderLookupRequest, db: Session = Depends
     order = service.get_by_order_no(payload.order_no.strip(), str(payload.email).strip())
     if order.member_id is not None:
         raise HTTPException(status_code=404, detail="비회원 주문을 찾을 수 없습니다.")
-    return service.to_response(order)
+    # 주문번호와 이메일로 본인임을 확인했으므로, 이 주문 한 건에만 쓸 수 있는
+    # 비회원 토큰(2시간 유효)을 새로 발급한다. 조회 화면에서 주문 취소할 때 사용한다.
+    return OrderCreateResponse(
+        **service.to_response(order).model_dump(),
+        guest_order_token=create_guest_order_token(order.order_id),
+    )
 
 
 # 주문서가 서버와 같은 결제 모드 및 배송비를 사용하도록 알려준다.
