@@ -1,9 +1,9 @@
 <template>
 <div class="site-top">
-  <StorefrontTopBanner />
-  <header class="header storefront-header">
+  <StorefrontTopBanner v-if="!isAdminPage" />
+  <header class="header storefront-header" :class="{ 'header-admin': isAdminPage }">
     <a class="brand" href="/main" aria-label="북적북적 홈"><img class="brand-logo" src="/assets/bookjjeok-logo-new.png" alt="" /></a>
-    <StorefrontSearch />
+    <StorefrontSearch v-if="!isAdminPage" />
     <div class="head-actions">
       <button v-if="auth.initialized && !auth.isAdmin" type="button" class="icon-btn" :aria-label="'장바구니 ' + cart.length + '종'" @click="navigate('cart')"><span aria-hidden="true">🛒<span v-if="cart.length" class="badge">{{ cart.length }}</span></span><small>장바구니</small></button>
       <button v-if="auth.initialized && !auth.isAdmin" type="button" class="icon-btn mypage-icon-button" aria-label="마이페이지" @click="navigate('mypage')"><span aria-hidden="true">👤</span><small>마이페이지</small></button>
@@ -11,7 +11,7 @@
       <a v-if="auth.initialized && auth.isAdmin" class="icon-btn" href="/store-admin/dashboard" aria-label="관리자 대시보드"><span aria-hidden="true">🧑</span><small>관리자</small></a>
       <a v-else-if="auth.initialized && !auth.isAuthenticated" class="icon-btn" href="/login" aria-label="로그인"><span aria-hidden="true">♙</span><small>로그인</small></a>
     </div>
-    <nav class="nav" aria-label="주요 메뉴">
+    <nav v-if="!isAdminPage" class="nav" aria-label="주요 메뉴">
       <details ref="headerCategoryMenu" class="header-category-menu"
         @keydown.esc.stop="closeHeaderCategoryMenu(true)"
         @focusout="closeHeaderCategoryMenuOnBlur">
@@ -44,8 +44,8 @@
 </template>
 
 <script>
-import { onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { computed, onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/authStore.js';
 import { useStorefrontContext } from './context.js';
 import StorefrontSearch from './StorefrontSearch.vue';
@@ -55,6 +55,9 @@ export default {
   setup() {
     const auth = useAuthStore();
     const router = useRouter();
+    const route = useRoute();
+    // 관리자 화면(대시보드, 주문 상세)에서는 상단 띠배너·검색창·쇼핑 메뉴를 숨긴다.
+    const isAdminPage = computed(() => ['adminDashboard', 'adminOrderDetail'].includes(route.name));
     const logoutDialog = ref(null), loggingOut = ref(false), logoutError = ref('');
     function openLogout() { logoutError.value = ''; logoutDialog.value?.showModal(); }
     function closeLogout() { if (!loggingOut.value) logoutDialog.value?.close(); }
@@ -66,7 +69,12 @@ export default {
       finally { loggingOut.value = false; }
     }
     onMounted(() => { if (!auth.initialized) auth.fetchMe(); });
-    return { ...useStorefrontContext(), auth, logoutDialog, loggingOut, logoutError, openLogout, closeLogout, signOut };
+    return { ...useStorefrontContext(), auth, isAdminPage, logoutDialog, loggingOut, logoutError, openLogout, closeLogout, signOut };
   },
 };
 </script>
+
+<style scoped>
+/* 관리자 화면: 검색창이 빠진 자리만큼 오른쪽 버튼(로그아웃·관리자)을 오른쪽 끝으로 */
+.header-admin .head-actions { margin-left: auto; }
+</style>

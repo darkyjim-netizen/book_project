@@ -115,10 +115,72 @@
                 @click="loadOrders(orderPage)">다시 시도</button></p>
             <p v-else-if="!orders.length">주문내역이 없습니다.</p>
             <ul v-if="!ordersLoading && !ordersError" class="as-list">
-              <li v-for="order in orders" :key="order.order_id"><b>{{ order.order_no }} · {{ order.status_label
-                  }}</b><span>{{ order.summary_title }} · {{ money(order.total_amount) }} · {{ date(order.ordered_at)
-                  }}</span></li>
+              <li v-for="order in orders" :key="order.order_id" class="order-row">
+                <div class="order-row-main">
+                  <div class="order-row-top">
+                    <span class="order-status" :class="`st-${String(order.status).toLowerCase()}`">{{ order.status_label }}</span>
+                    <span class="order-date">{{ date(order.ordered_at) }}</span>
+                  </div>
+                  <strong class="order-title">{{ order.summary_title }}</strong>
+                  <span class="order-no">주문번호 {{ order.order_no }}</span>
+                </div>
+                <div class="order-row-side">
+                  <strong class="order-amount">{{ money(order.total_amount) }}</strong>
+                  <button type="button" class="order-detail-btn" @click="openOrderDetail(order.order_id)">상세보기 ›</button>
+                </div>
+              </li>
             </ul>
+            <div v-if="orderDetailOpen" class="order-modal-backdrop" @click.self="closeOrderDetail" @keydown.esc="closeOrderDetail">
+              <section class="order-modal" role="dialog" aria-modal="true" aria-labelledby="order-modal-title">
+                <header class="order-modal-header">
+                  <h2 id="order-modal-title">주문 상세</h2>
+                  <button type="button" class="order-modal-close" aria-label="닫기" @click="closeOrderDetail">✕</button>
+                </header>
+
+                <p v-if="orderDetailLoading" role="status">주문 정보를 불러오는 중입니다.</p>
+                <p v-else-if="orderDetailError" role="alert" class="order-modal-error">{{ orderDetailError }}</p>
+
+                <template v-else-if="orderDetail">
+                  <p class="order-modal-meta">{{ orderDetail.order_no }} · {{ date(orderDetail.ordered_at) }} · <b>{{ orderDetail.status_label }}</b></p>
+
+                  <h3>주문 상품</h3>
+                  <ul class="order-modal-items">
+                    <li v-for="item in orderDetail.items" :key="item.order_item_id">
+                      <span>{{ item.book_title }} × {{ item.quantity }}</span>
+                      <b>{{ money(item.item_total) }}</b>
+                    </li>
+                  </ul>
+
+                  <h3>결제 정보</h3>
+                  <dl class="order-modal-dl">
+                    <div><dt>상품 금액</dt><dd>{{ money(orderDetail.item_amount) }}</dd></div>
+                    <div><dt>할인·쿠폰·포인트</dt><dd>-{{ money(orderDetail.discount_amount + orderDetail.coupon_amount + orderDetail.point_used) }}</dd></div>
+                    <div><dt>배송비</dt><dd>{{ money(orderDetail.ship_fee) }}</dd></div>
+                    <div><dt>최종 결제 금액</dt><dd><b>{{ money(orderDetail.total_amount) }}</b></dd></div>
+                  </dl>
+
+                  <h3>배송지</h3>
+                  <p>{{ orderDetail.receiver }} · {{ orderDetail.receiver_phone }}<br>
+                    ({{ orderDetail.zipcode }}) {{ orderDetail.address1 }} {{ orderDetail.address2 || '' }}</p>
+
+                  <div v-if="orderDetail.is_cancelable" class="order-cancel-box">
+                    <label>취소 사유
+                      <select v-model="cancelReason">
+                        <option value="CHANGE_MIND">단순 변심</option>
+                        <option value="WRONG_ORDER">주문 실수</option>
+                        <option value="DELAY">배송 지연</option>
+                        <option value="ETC">기타</option>
+                      </select>
+                    </label>
+                    <input v-model.trim="cancelReasonText" maxlength="200" placeholder="상세 사유 (선택)">
+                    <button type="button" class="order-cancel-btn" :disabled="cancelling" @click="cancelMyOrder">
+                      {{ cancelling ? '취소 처리 중…' : '주문 취소' }}
+                    </button>
+                  </div>
+                  <p v-else class="order-modal-note">배송이 시작된 주문은 취소할 수 없어요. 반품은 1:1 문의로 요청해 주세요.</p>
+                </template>
+              </section>
+            </div>
             <div v-if="!ordersLoading && !ordersError && orderPages > 1" class="as-pagination"><button
                 v-if="orderPage > 1" @click="loadOrders(orderPage - 1)">이전</button><span>{{ orderPage }} / {{ orderPages
                 }}</span><button v-if="orderPage < orderPages" @click="loadOrders(orderPage + 1)">다음</button></div>
@@ -163,7 +225,9 @@
                   type="checkbox"> 기본 배송지로 설정</label>
               <div class="address-actions"><button :disabled="busy">{{ addressId ? '수정 저장' : '배송지 등록' }}</button> <button v-if="addressId"
                   type="button" class="as-secondary" @click="resetAddress">취소</button></div>
-            </form><div v-if="postalOpen" class="postal-modal-backdrop" @click.self="postalOpen = false" @keydown.esc="postalOpen = false"><section class="postal-modal" role="dialog" aria-modal="true" aria-labelledby="mypage-postal-title"><div class="postal-modal-header"><h2 id="mypage-postal-title">주소 검색</h2><button type="button" class="postal-modal-close" aria-label="닫기" @click="postalOpen = false">×</button></div><div class="postal-search"><label>도로명주소 또는 지번<input id="mypage-postal-keyword" v-model="postalKeyword" maxlength="200" placeholder="예: 세종대로 110" @keydown.enter.prevent="searchPostal()" /></label><button type="button" class="text-action" :disabled="postalLoading || postalKeyword.trim().length < 2" @click="searchPostal()">검색</button><p v-if="postalLoading || postalMessage" role="status">{{ postalLoading ? '주소를 검색하고 있습니다.' : postalMessage }}</p><ul><li v-for="(item, index) in postalResults" :key="index"><button type="button" class="text-action" @click="selectPostal(item)">{{ item.zip_code }} {{ item.road_address || item.jibun_address }}</button></li></ul><button v-if="postalPage > 1" type="button" class="text-action" :disabled="postalLoading" @click="searchPostal(postalPage - 1)">이전</button><button v-if="postalResults.length === 10" type="button" class="text-action" :disabled="postalLoading" @click="searchPostal(postalPage + 1)">다음</button></div></section></div>
+              </form>
+              
+            <div v-if="postalOpen" class="postal-modal-backdrop" @click.self="postalOpen = false" @keydown.esc="postalOpen = false"><section class="postal-modal" role="dialog" aria-modal="true" aria-labelledby="mypage-postal-title"><div class="postal-modal-header"><h2 id="mypage-postal-title">주소 검색</h2><button type="button" class="postal-modal-close" aria-label="닫기" @click="postalOpen = false">×</button></div><div class="postal-search"><label>도로명주소 또는 지번<input id="mypage-postal-keyword" v-model="postalKeyword" maxlength="200" placeholder="예: 세종대로 110" @keydown.enter.prevent="searchPostal()" /></label><button type="button" class="text-action" :disabled="postalLoading || postalKeyword.trim().length < 2" @click="searchPostal()">검색</button><p v-if="postalLoading || postalMessage" role="status">{{ postalLoading ? '주소를 검색하고 있습니다.' : postalMessage }}</p><ul><li v-for="(item, index) in postalResults" :key="index"><button type="button" class="text-action" @click="selectPostal(item)">{{ item.zip_code }} {{ item.road_address || item.jibun_address }}</button></li></ul><button v-if="postalPage > 1" type="button" class="text-action" :disabled="postalLoading" @click="searchPostal(postalPage - 1)">이전</button><button v-if="postalResults.length === 10" type="button" class="text-action" :disabled="postalLoading" @click="searchPostal(postalPage + 1)">다음</button></div></section></div>
           </section>
           <section v-show="activeTab === 'profile'" class="as-card as-wide">
             <h2>회원탈퇴</h2>
@@ -204,6 +268,39 @@ const money = n => `${Number(n || 0).toLocaleString('ko-KR')}원`, date = s => s
 function failure(e) { error.value = e.userMessage || '요청을 처리하지 못했습니다.'; }
 async function run(fn, success = '') { if (busy.value) return; error.value = ''; message.value = ''; busy.value = true; try { await fn(); message.value = success; } catch (e) { failure(e) } finally { busy.value = false } }
 async function loadOrders(page = 1) { ordersLoading.value = true; ordersError.value = false; try { const { data } = await http.get('/api/v1/orders', { params: { page, size: 10 } }); orders.value = data.items; orderPage.value = page; orderPages.value = data.meta.total_pages || 1 } catch { ordersError.value = true } finally { ordersLoading.value = false } }
+// ---- 주문 상세 / 취소 ----
+const orderDetailOpen = ref(false), orderDetail = ref(null), orderDetailLoading = ref(false), orderDetailError = ref('');
+const cancelReason = ref('CHANGE_MIND'), cancelReasonText = ref(''), cancelling = ref(false);
+
+async function openOrderDetail(orderId) {
+  orderDetailOpen.value = true; orderDetail.value = null; orderDetailError.value = '';
+  cancelReason.value = 'CHANGE_MIND'; cancelReasonText.value = '';
+  orderDetailLoading.value = true;
+  try { orderDetail.value = (await http.get(`/api/v1/orders/${orderId}`)).data; }
+  catch (e) { orderDetailError.value = e.userMessage || '주문 정보를 불러오지 못했습니다.'; }
+  finally { orderDetailLoading.value = false; }
+}
+
+function closeOrderDetail() { if (!cancelling.value) orderDetailOpen.value = false; }
+
+async function cancelMyOrder() {
+  const o = orderDetail.value;
+  if (!o || !confirm(`주문 ${o.order_no}을(를) 취소할까요?\n결제된 금액은 환불되고 쿠폰·포인트는 복원됩니다.`)) return;
+  cancelling.value = true;
+  try {
+    orderDetail.value = (await http.post(`/api/v1/orders/${o.order_id}/cancel`, {
+      reason_code: cancelReason.value,
+      reason_text: cancelReasonText.value || null,
+    })).data;                       // 응답으로 취소된 주문이 와서 화면이 바로 '주문 취소'로 바뀜
+    alert('주문이 취소되었습니다.');
+    loadOrders(orderPage.value);    // 목록·통계 새로고침
+    loadOrderStats();
+  } catch (e) {
+    alert(e.userMessage || '주문을 취소하지 못했습니다.');
+  } finally {
+    cancelling.value = false;
+  }
+}
 async function loadCoupons() { couponsLoading.value = true; couponsError.value = false; try { coupons.value = (await http.get('/api/v1/members/me/coupons')).data; couponsLoaded.value = true } catch { couponsError.value = true; couponsLoaded.value = false } finally { couponsLoading.value = false } }
 async function loadAddresses() { addressesLoading.value = true; addressesError.value = false; try { addresses.value = (await http.get('/api/v1/members/me/addresses')).data } catch { addressesError.value = true } finally { addressesLoading.value = false } }
 onMounted(async () => { const results = await Promise.allSettled([http.get('/api/v1/members/me').then(r => Object.assign(profile, r.data)), loadCoupons(), loadAddresses(), loadOrders(), loadOrderStats(), loadRecommendations(), ...(auth.isAdmin ? [] : [loadWishlist()])]); const failed = results.find(r => r.status === 'rejected'); if (failed) failure(failed.reason); });
@@ -306,6 +403,45 @@ function withdraw() { if (!window.confirm('정말 회원탈퇴하시겠습니까
 .address-form > .as-check { grid-column: 1; align-self: center; margin: 14px 0 }
 .address-form > .address-actions { grid-column: 2; display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin: 14px 0 }
 .address-form > .address-actions button { min-width: 120px }
+
+.member-mypage .as-list li.order-row{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:20px 22px;margin-bottom:12px;background:#fff;border:1px solid #ece4f2;border-radius:12px;transition:border-color .15s,box-shadow .15s}
+.member-mypage .as-list li.order-row:last-child{padding-bottom:20px;margin-bottom:0}
+.member-mypage .as-list li.order-row:hover{border-color:#cdb8e6;box-shadow:0 4px 14px rgba(104,65,164,.08)}
+.order-row-main{display:flex;flex-direction:column;gap:6px;flex:1;min-width:0;word-break:keep-all}
+.order-row-top{display:flex;align-items:center;gap:10px}
+.order-status{display:inline-block;padding:3px 10px;border-radius:999px;font-size:13px;font-weight:700;background:#f1ebf8;color:#6841a4}
+.order-status.st-pending{background:#fff4e0;color:#b26a00}
+.order-status.st-paid,.order-status.st-preparing{background:#f1ebf8;color:#6841a4}
+.order-status.st-shipping{background:#e6f1fb;color:#2a6aa8}
+.order-status.st-delivered,.order-status.st-confirmed{background:#e7f5ee;color:#2d7a55}
+.order-status.st-cancelled,.order-status.st-return_req,.order-status.st-returned{background:#f4f2f5;color:#8a8090}
+.order-date{font-size:14px;color:#8a8090}
+.order-title{font-size:17px;font-weight:700;color:#2b2430;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.order-no{font-size:13px;color:#a399aa;letter-spacing:.2px}
+.order-row-side{display:flex;flex-direction:column;align-items:flex-end;gap:10px;flex:none}
+.order-amount{font-size:18px;font-weight:800;color:#2b2430;white-space:nowrap}
+.order-detail-btn{padding:7px 14px;border:1px solid #d9cbe9;border-radius:8px;background:#fff;color:#6841a4;font:inherit;font-size:14px;font-weight:600;white-space:nowrap;cursor:pointer;transition:background .15s,border-color .15s}
+.order-detail-btn:hover{background:#f6f1fb;border-color:#bca4df}
+@media(max-width:650px){.member-mypage .as-list li.order-row{flex-direction:column;align-items:stretch;gap:12px}.order-row-side{flex-direction:row;justify-content:space-between;align-items:center}}
+.order-modal{overflow-wrap:normal;word-break:keep-all}
+.order-modal-backdrop{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:rgba(30,20,40,.45);padding:16px}
+.order-modal{width:min(560px,100%);max-height:85vh;overflow:auto;background:#fff;border-radius:14px;padding:22px 24px;box-shadow:0 20px 50px rgba(0,0,0,.2)}
+.order-modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.order-modal-header h2{margin:0;font-size:20px}
+.order-modal-close{border:0;background:none;font-size:20px;cursor:pointer}
+.order-modal h3{margin:18px 0 8px;font-size:15px;color:#5b3f7a}
+.order-modal-meta{color:#7a6c85}
+.order-modal-items{list-style:none;padding:0;margin:0}
+.order-modal-items li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0eaf4}
+.order-modal-dl div{display:flex;justify-content:space-between;padding:4px 0}
+.order-modal-dl dt,.order-modal-dl dd{margin:0}
+.order-cancel-box{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:20px;padding-top:16px;border-top:1px solid #eee}
+.order-cancel-box input,.order-cancel-box select{padding:8px;border:1px solid #ded2e9;border-radius:8px;font:inherit}
+.order-cancel-box input{flex:1;min-width:160px}
+.order-cancel-btn{padding:9px 16px;border:0;border-radius:8px;background:#d05a6e;color:#fff;font-weight:600;cursor:pointer}
+.order-cancel-btn:disabled{opacity:.6}
+.order-modal-note,.order-modal-error{margin-top:18px;color:#8a7a92}
+.order-modal-error{color:#c0392b}
 
 @media (max-width: 700px) {
   .address-form > .as-check, .address-form > .address-actions { grid-column: 1 / -1 }

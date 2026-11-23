@@ -57,6 +57,10 @@ export const storefrontApi = Object.freeze({
   searchAddresses: (keyword, page) => request(`/api/v1/postal/search?${new URLSearchParams({ keyword, page })}`),
   listBooks,
   lookupGuestOrder: (order_no, email) => request('/api/v1/orders/lookup', { method: 'POST', body: JSON.stringify({ order_no, email }) }),
+  // 비회원 주문 취소: 조회 응답의 guest_order_token을 X-Guest-Order-Token 헤더로 보낸다.
+  cancelGuestOrder: (orderId, body, guestToken) => request(`/api/v1/orders/${encodeURIComponent(orderId)}/cancel`, {
+    method: 'POST', body: JSON.stringify(body), headers: { 'X-Guest-Order-Token': guestToken }
+  }),
   getBook: id => request(`/api/v1/books/${encodeURIComponent(id)}`),
   listBookReviews: (id, page = 1, sort = 'recent', rating = '') => {
     const query = new URLSearchParams({ page, size: 6, sort });

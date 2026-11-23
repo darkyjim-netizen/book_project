@@ -36,6 +36,7 @@ const storefrontRoutes = [
   { path: 'store-admin', name: 'admin', redirect: { name: 'adminDashboard' } },
   { path: 'store-login', name: 'adminLogin', redirect: { name: 'adminDashboard' } },
   { path: 'store-signup', name: 'adminSignup', redirect: { name: 'adminDashboard' } },
+    { path: 'store-admin/dashboard', name: 'adminDashboard', component: () => import('../storefront/pages/StoreDashboardView.vue'), requiresAuth: true, requiresAdmin: true },
   { path: 'store-admin/dashboard', name: 'adminDashboard', component: () => import('../storefront/pages/StoreDashboardView.vue') },
   { path: 'store-admin/orders/:id', name: 'adminOrderDetail', component: () => import('../storefront/pages/AdminOrderDetail.vue'), requiresAuth: true, requiresAdmin: true },
 ].map(route => ({ ...route, meta: { storefrontView: route.name, requiresAuth: !!route.requiresAuth, requiresAdmin: !!route.requiresAdmin } }))
@@ -68,10 +69,19 @@ const router = createRouter({
 })
 
 router.beforeEach(async to => {
-  // Public entry paths must not load a session or fall through to the dashboard.
+  const auth = useAuthStore()
+
+  // 관리자는 쇼핑 페이지(메인, 상품, 장바구니 등)에 못 들어가고 대시보드로 보낸다.
+  // storefrontView가 있는 라우트 중 이름이 admin으로 시작하지 않는 것 = 쇼핑 페이지
+  const isShopPage = to.meta.storefrontView && !String(to.name).startsWith('admin')
+  if (isShopPage) {
+    if (!auth.initialized) await auth.fetchMe()   // 처음 한 번만 로그인 상태 확인
+    if (auth.isAdmin) return { name: 'adminDashboard' }
+  }
+
+  // 그 외 공개 페이지는 그대로 통과
   if (!to.meta.requiresAuth && !to.meta.guestOnly) return
 
-  const auth = useAuthStore()
   if (!auth.initialized) await auth.fetchMe()
 
   if (to.meta.requiresAuth && !auth.isAuthenticated) {

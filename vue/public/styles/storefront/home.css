@@ -4166,3 +4166,14 @@ html body .site-top .storefront-top-banner{display:grid;grid-template-columns:mi
 html body .site-top .storefront-top-banner>p{grid-column:2;text-align:center}
 html body .site-top .storefront-top-banner>a{grid-column:3;justify-self:start}
 @media(max-width:1000px){html body .site-top .storefront-top-banner{grid-template-columns:minmax(0,1fr);gap:4px}html body .site-top .storefront-top-banner>p,html body .site-top .storefront-top-banner>a{grid-column:1;justify-self:center}}
+
+/* 푸터: 로고 | 내용 (로고는 은은하게, 마우스를 올리면 원래 색) */
+html body .app .storefront-footer .storefront-footer-grid{flex-direction:row;align-items:center;gap:32px}
+.storefront-footer .footer-brand{flex:none;padding-right:32px;border-right:1px solid #dfd3ed}
+.storefront-footer .footer-brand img{width:180px;opacity:.7;transition:opacity .2s}
+.storefront-footer .footer-brand a:hover img,.storefront-footer .footer-brand a:focus-visible img{opacity:1}
+.storefront-footer .footer-details{flex:1;flex-direction:column;align-items:flex-start;gap:6px}
+@media(max-width:700px){
+  html body .app .storefront-footer .storefront-footer-grid{flex-direction:column;align-items:flex-start;gap:12px}
+  .storefront-footer .footer-brand{padding-right:0;border-right:0}
+}

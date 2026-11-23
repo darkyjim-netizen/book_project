@@ -1,7 +1,7 @@
 <template>
   <div class="app">
     <Teleport to="head">
-      <link v-for="sheet in stylesheets" :key="sheet" rel="stylesheet" :href="'/styles/storefront/' + sheet + '.css' + (sheet === 'home' ? '?v=header-alignment-20261120' : '')" />
+      <link v-for="sheet in stylesheets" :key="sheet" rel="stylesheet" :href="'/styles/storefront/' + sheet + '.css' + '?v=20261122-footer'" />
     </Teleport>
     <StorefrontHeader />
     <main class="content" :class="{ 'content-dashboard': ['adminDashboard', 'adminOrderDetail'].includes($route.name) }"><RouterView /></main>
