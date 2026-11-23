@@ -3,6 +3,15 @@
     <div class="signup-panel">
       <RouterLink to="/login" class="signup-back">← 로그인으로</RouterLink>
       <div class="signup-heading"><h1>회원가입</h1><p class="signup-intro">북적북적과 함께 나만의 책장을 만들어 보세요.</p></div>
+      <!-- 구글 간편 가입: 로그인과 같은 API. 처음 오는 구글 계정이면 자동으로 회원가입된다. -->
+      <div class="signup-social">
+        <a class="signup-google-button" :href="googleLoginUrl">
+          <svg class="google-icon" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
+          Google로 가입하기
+        </a>
+        <small>구글 계정으로 바로 가입하고 로그인돼요. 가입 축하 혜택도 똑같이 받아요.</small>
+        <div class="signup-social-divider"><span>또는 이메일로 가입</span></div>
+      </div>
       <p class="signup-required-note"><span aria-hidden="true">*</span> 필수 입력 항목</p>
       <AlertMessage :message="error" />
       <form class="signup-form" @submit.prevent="submit">
@@ -33,6 +42,8 @@ const form = reactive({ email: '', name: '', nickname: '', phone: '', password: 
 const birthDate = ref('')
 const showPassword = ref(false)
 const passwordConfirm = ref('')
+// 구글 간편 가입 (로그인과 같은 백엔드 API. 처음 오는 구글 계정은 자동 가입)
+const googleLoginUrl = `/api/v1/auth/google/login?origin=${encodeURIComponent(window.location.origin)}`
 const error = ref('')
 const saving = ref(false)
 
@@ -90,6 +101,14 @@ async function submit() {
 
 <style scoped>
 .signup-page .signup-panel{width:min(100%,820px)}
+.signup-social{display:flex;flex-direction:column;align-items:center;gap:10px;margin:8px 0 18px}
+.signup-google-button{box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;max-width:420px;min-height:52px;background:#fff;border:1.5px solid #d9d2e3;border-radius:14px;color:#2b2430;font:inherit;font-size:16px;font-weight:700;text-decoration:none;box-shadow:0 2px 6px rgba(60,40,90,.08);transition:background .15s,border-color .15s,box-shadow .15s}
+.signup-google-button:hover{background:#faf8fd;border-color:#b9a6d6;box-shadow:0 4px 12px rgba(60,40,90,.12)}
+.signup-google-button:focus-visible{outline:3px solid #bca4df;outline-offset:2px}
+.signup-social .google-icon{width:22px;height:22px;flex:none}
+.signup-social small{font-size:13px;color:#8a7f92;text-align:center;word-break:keep-all}
+.signup-social-divider{display:flex;align-items:center;gap:12px;width:100%;margin-top:10px;color:#8b8090;font-size:13px}
+.signup-social-divider::before,.signup-social-divider::after{content:'';flex:1;height:1px;background:#e6e0ec}
 .signup-check-row{display:grid;grid-template-columns:minmax(0,1fr) 112px;align-items:stretch;gap:10px}
 .signup-check-row .signup-check-button{display:flex;align-items:center;justify-content:center;height:46px;padding:0 16px;border:1px solid #d8c5ef;border-radius:8px;background:#f3edfb;color:#6841a4;font-size:14px;font-weight:600;white-space:nowrap;cursor:pointer;transition:background .15s,border-color .15s}
 .signup-check-row .signup-check-button:hover:not(:disabled){background:#e9ddf8;border-color:#b59ad8}
