@@ -1,9 +1,10 @@
 """회원 인증과 계정 관리 서비스."""
 import logging
+import secrets
 from datetime import datetime, timezone
 from typing import Optional
 
-from sqlalchemy import select  # ORM 조회문을 만드는 도구
+from sqlalchemy import func, select  # ORM 조회문을 만드는 도구
 from sqlalchemy.orm import Session  # DB 세션 타입
 
 from app.core.config import settings  # 로그인 제한, 토큰 만료 시간 등 설정
@@ -257,6 +258,112 @@ class AuthService:
             "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
             "member": member,
         }
+
+    # ------------------------------------------------------------ 구글 로그인
+    def login_with_google(
+        self,
+        google_id: str,
+        email: str,
+        name: Optional[str] = None,
+        picture: Optional[str] = None,
+        ip: Optional[str] = None,
+        user_agent: Optional[str] = None,
+    ) -> dict:
+        """구글 계정 정보로 회원을 찾거나 새로 가입시키고 로그인 토큰을 발급한다.
+
+        1) 이미 구글로 연결된 회원(oauth_provider='google', oauth_id=구글 sub)이면 그 회원
+        2) 같은 이메일로 가입한 회원이 있으면 그 회원에 구글 계정을 연결
+        3) 둘 다 없으면 새 회원으로 가입시키고 가입 혜택(포인트·쿠폰)을 지급
+        """
+
+        email = email.strip()
+        member = self.db.scalar(
+            select(Member).where(
+                Member.oauth_provider == "google",
+                Member.oauth_id == google_id,
+            )
+        )
+
+        if member is None:
+            member = self.db.scalar(
+                select(Member).where(func.lower(Member.email) == email.lower())
+            )
+            if member is not None:
+                # 다른 소셜 서비스로 가입한 이메일이면 덮어쓰지 않는다.
+                if member.oauth_provider and member.oauth_provider != "google":
+                    raise BusinessError(
+                        f"{member.oauth_provider} 계정으로 가입된 이메일입니다.",
+                        code="OAUTH_PROVIDER_MISMATCH",
+                    )
+                # 구글이 확인한 이메일과 같은 기존 회원에 구글 계정을 연결한다.
+                member.oauth_provider = "google"
+                member.oauth_id = google_id
+
+        if member is None:
+            member = self._create_google_member(google_id, email, name, picture)
+
+        # 일반 로그인과 같은 계정 상태 검사
+        if member.status == MemberStatus.WITHDRAWN:
+            raise BusinessError("탈퇴한 계정입니다.", code="WITHDRAWN", status_code=403)
+        if member.status == MemberStatus.SUSPENDED:
+            raise BusinessError(
+                "정지된 계정입니다. 고객센터로 문의해 주세요.",
+                code="SUSPENDED",
+                status_code=403,
+            )
+        if member.status == MemberStatus.DORMANT:
+            member.status = MemberStatus.ACTIVE
+
+        member.last_login_at = datetime.now(timezone.utc)
+        self._write_login_history(member, member.email, True, ip, user_agent)
+        self.db.commit()
+        self.db.refresh(member)
+
+        return {
+            "access_token": create_access_token(
+                member.member_id,
+                member.email,
+                member.role.value,
+            ),
+            "refresh_token": create_refresh_token(member.member_id),
+            "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+            "member": member,
+        }
+
+    def _create_google_member(
+        self,
+        google_id: str,
+        email: str,
+        name: Optional[str],
+        picture: Optional[str],
+    ) -> Member:
+        """구글 계정으로 새 회원을 만든다. 비밀번호는 없다(구글 로그인으로만 로그인)."""
+
+        display = (name or "").strip() or email.split("@")[0]
+        display = display[:50] or "회원"
+
+        # 별명은 중복될 수 없으므로 겹치면 뒤에 숫자를 붙인다.
+        nickname = display
+        while self.db.scalar(
+            select(Member.member_id).where(Member.nickname == nickname)
+        ):
+            nickname = f"{display}{secrets.randbelow(9000) + 1000}"
+
+        member = Member(
+            email=email,
+            password_hash=None,
+            name=display[:60],
+            nickname=nickname,
+            oauth_provider="google",
+            oauth_id=google_id,
+            profile_image=picture if picture and len(picture) <= 255 else None,
+            grade_id=1,
+        )
+        self.db.add(member)
+        self.db.flush()
+        self._grant_welcome_benefits(member)
+        logger.info("구글 계정으로 신규 가입: member_id=%s email=%s", member.member_id, email)
+        return member
 
     def _write_login_history(
         self,

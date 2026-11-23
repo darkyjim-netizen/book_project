@@ -86,6 +86,14 @@ class Settings(BaseSettings):
     TOSS_CLIENT_KEY: str = ""
     TOSS_SECRET_KEY: str = ""
 
+    # ------------------------------------------------------------ 구글 로그인
+    # Google Cloud Console > Google Auth Platform > 클라이언트(웹 애플리케이션)에서 발급한 값
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
+    # localhost와 *.trycloudflare.com 외에 구글 로그인을 허용할 화면 주소(쉼표로 구분)
+    # 예: https://shop.example.com
+    GOOGLE_ALLOWED_ORIGINS: str = ""
+
     # 환경 변수 또는 backend/.env에서 우체국 인증키를 읽는다.
     # 키가 비어 있으면 우편번호 검색 요청을 받을 때 설정 오류를 반환한다.
     DATA_GO_KEY: str = ""
